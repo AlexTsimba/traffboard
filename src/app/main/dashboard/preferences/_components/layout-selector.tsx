@@ -2,110 +2,106 @@
 
 import { useState, useEffect } from "react";
 
-import { Button } from "@/components/ui/button";
-import { getSidebarVariant, getSidebarCollapsible, getContentLayout } from "@/lib/layout-preferences";
+import { Label } from "@/components/ui/label";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import type { SidebarVariant, SidebarCollapsible, ContentLayout } from "@/lib/layout-preferences";
+import { setValueToCookie } from "@/server/server-actions";
 
 export function LayoutSelector() {
-  const [sidebarVariant, setSidebarVariant] = useState<"inset" | "sidebar" | "floating">("sidebar");
-  const [sidebarCollapsible, setSidebarCollapsible] = useState<"icon" | "offcanvas">("icon");
-  const [contentLayout, setContentLayout] = useState<"centered" | "full-width">("full-width");
+  const [variant, setVariant] = useState<SidebarVariant>("sidebar");
+  const [collapsible, setCollapsible] = useState<SidebarCollapsible>("icon");
+  const [contentLayout, setContentLayout] = useState<ContentLayout>("full-width");
 
   useEffect(() => {
-    // Load current settings
-    const loadSettings = async () => {
-      setSidebarVariant(await getSidebarVariant());
-      setSidebarCollapsible(await getSidebarCollapsible());
-      setContentLayout(await getContentLayout());
+    // Get values from cookies on client side
+    const getValueFromCookie = (name: string) => {
+      if (typeof document !== "undefined") {
+        const value = document.cookie
+          .split("; ")
+          .find((row) => row.startsWith(`${name}=`))
+          ?.split("=")[1];
+        return value;
+      }
+      return null;
     };
-    loadSettings();
+
+    const sidebarVariant = getValueFromCookie("sidebar_variant") as SidebarVariant;
+    const sidebarCollapsible = getValueFromCookie("sidebar_collapsible") as SidebarCollapsible;
+    const contentLayoutValue = getValueFromCookie("content_layout") as ContentLayout;
+
+    if (sidebarVariant) setVariant(sidebarVariant);
+    if (sidebarCollapsible) setCollapsible(sidebarCollapsible);
+    if (contentLayoutValue) setContentLayout(contentLayoutValue);
   }, []);
 
-  const handleSidebarVariantChange = async (variant: "inset" | "sidebar" | "floating") => {
-    setSidebarVariant(variant);
-    // Set cookie for persistence
-    document.cookie = `sidebar_variant=${variant}; path=/; max-age=31536000`;
-    window.location.reload(); // Reload to apply changes
-  };
-
-  const handleSidebarCollapsibleChange = async (collapsible: "icon" | "offcanvas") => {
-    setSidebarCollapsible(collapsible);
-    document.cookie = `sidebar_collapsible=${collapsible}; path=/; max-age=31536000`;
-    window.location.reload();
-  };
-
-  const handleContentLayoutChange = async (layout: "centered" | "full-width") => {
-    setContentLayout(layout);
-    document.cookie = `content_layout=${layout}; path=/; max-age=31536000`;
-    window.location.reload();
+  const handleValueChange = async (key: string, value: string) => {
+    await setValueToCookie(key, value);
+    // Update local state
+    if (key === "sidebar_variant") setVariant(value as SidebarVariant);
+    if (key === "sidebar_collapsible") setCollapsible(value as SidebarCollapsible);
+    if (key === "content_layout") setContentLayout(value as ContentLayout);
   };
 
   return (
     <div className="space-y-6">
-      <div>
-        <label className="mb-3 block text-sm font-medium">Sidebar Variant</label>
-        <div className="flex gap-2">
-          <Button
-            variant={sidebarVariant === "inset" ? "default" : "outline"}
-            size="sm"
-            onClick={() => handleSidebarVariantChange("inset")}
-          >
+      <div className="space-y-3">
+        <Label className="text-sm font-medium">Sidebar Variant</Label>
+        <ToggleGroup
+          className="w-full justify-start"
+          size="sm"
+          variant="outline"
+          type="single"
+          value={variant}
+          onValueChange={(value) => handleValueChange("sidebar_variant", value)}
+        >
+          <ToggleGroupItem value="inset" aria-label="Toggle inset">
             Inset
-          </Button>
-          <Button
-            variant={sidebarVariant === "sidebar" ? "default" : "outline"}
-            size="sm"
-            onClick={() => handleSidebarVariantChange("sidebar")}
-          >
+          </ToggleGroupItem>
+          <ToggleGroupItem value="sidebar" aria-label="Toggle sidebar">
             Sidebar
-          </Button>
-          <Button
-            variant={sidebarVariant === "floating" ? "default" : "outline"}
-            size="sm"
-            onClick={() => handleSidebarVariantChange("floating")}
-          >
+          </ToggleGroupItem>
+          <ToggleGroupItem value="floating" aria-label="Toggle floating">
             Floating
-          </Button>
-        </div>
+          </ToggleGroupItem>
+        </ToggleGroup>
       </div>
 
-      <div>
-        <label className="mb-3 block text-sm font-medium">Sidebar Collapsible</label>
-        <div className="flex gap-2">
-          <Button
-            variant={sidebarCollapsible === "icon" ? "default" : "outline"}
-            size="sm"
-            onClick={() => handleSidebarCollapsibleChange("icon")}
-          >
+      <div className="space-y-3">
+        <Label className="text-sm font-medium">Sidebar Collapsible</Label>
+        <ToggleGroup
+          className="w-full justify-start"
+          size="sm"
+          variant="outline"
+          type="single"
+          value={collapsible}
+          onValueChange={(value) => handleValueChange("sidebar_collapsible", value)}
+        >
+          <ToggleGroupItem value="icon" aria-label="Toggle icon">
             Icon
-          </Button>
-          <Button
-            variant={sidebarCollapsible === "offcanvas" ? "default" : "outline"}
-            size="sm"
-            onClick={() => handleSidebarCollapsibleChange("offcanvas")}
-          >
+          </ToggleGroupItem>
+          <ToggleGroupItem value="offcanvas" aria-label="Toggle offcanvas">
             OffCanvas
-          </Button>
-        </div>
+          </ToggleGroupItem>
+        </ToggleGroup>
       </div>
 
-      <div>
-        <label className="mb-3 block text-sm font-medium">Content Layout</label>
-        <div className="flex gap-2">
-          <Button
-            variant={contentLayout === "centered" ? "default" : "outline"}
-            size="sm"
-            onClick={() => handleContentLayoutChange("centered")}
-          >
+      <div className="space-y-3">
+        <Label className="text-sm font-medium">Content Layout</Label>
+        <ToggleGroup
+          className="w-full justify-start"
+          size="sm"
+          variant="outline"
+          type="single"
+          value={contentLayout}
+          onValueChange={(value) => handleValueChange("content_layout", value)}
+        >
+          <ToggleGroupItem value="centered" aria-label="Toggle centered">
             Centered
-          </Button>
-          <Button
-            variant={contentLayout === "full-width" ? "default" : "outline"}
-            size="sm"
-            onClick={() => handleContentLayoutChange("full-width")}
-          >
+          </ToggleGroupItem>
+          <ToggleGroupItem value="full-width" aria-label="Toggle full-width">
             Full Width
-          </Button>
-        </div>
+          </ToggleGroupItem>
+        </ToggleGroup>
       </div>
     </div>
   );

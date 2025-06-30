@@ -18,17 +18,10 @@ export default function PreferencesPage() {
 
         <TabsContent value="appearance" className="space-y-6">
           <div className="rounded-lg border p-6">
-            <h3 className="mb-4 text-lg font-semibold">Theme & Layout</h3>
-            <div className="space-y-6">
-              <div>
-                <label className="mb-3 block text-sm font-medium">Theme</label>
-                <ThemeSelector />
-              </div>
-
-              <div>
-                <label className="mb-3 block text-sm font-medium">Layout Settings</label>
-                <LayoutSelector />
-              </div>
+            <h3 className="mb-6 text-lg font-semibold">Theme & Layout</h3>
+            <div className="space-y-8">
+              <ThemeSelector />
+              <LayoutSelector />
             </div>
           </div>
         </TabsContent>
