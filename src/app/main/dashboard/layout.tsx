@@ -43,18 +43,7 @@ export default async function Layout({ children }: Readonly<{ children: ReactNod
         </header>
 
         {/* Content area with configurable width */}
-        <div
-          className={cn(
-            "p-4 md:p-6",
-            contentLayout === "centered" && "mx-auto max-w-screen-2xl",
-            // Adds right margin for inset sidebar in centered layout up to 113rem.
-            // On wider screens with collapsed sidebar, removes margin and sets margin auto for alignment.
-            contentLayout === "centered" &&
-              "max-[113rem]:peer-data-[variant=inset]:!mr-2 min-[101rem]:peer-data-[variant=inset]:peer-data-[state=collapsed]:!mr-auto",
-          )}
-        >
-          {children}
-        </div>
+        <div className={cn("p-4 md:p-6", contentLayout === "centered" && "mx-auto w-full max-w-6xl")}>{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );
