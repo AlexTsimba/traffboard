@@ -10,9 +10,7 @@ import { getSidebarVariant, getSidebarCollapsible, getContentLayout } from "@/li
 import { cn } from "@/lib/utils";
 
 import { AccountSwitcher } from "./_components/sidebar/account-switcher";
-import { LayoutControls } from "./_components/sidebar/layout-controls";
 import { SearchDialog } from "./_components/sidebar/search-dialog";
-import { ThemeSwitcher } from "./_components/sidebar/theme-switcher";
 
 export default async function Layout({ children }: Readonly<{ children: ReactNode }>) {
   const cookieStore = await cookies();
@@ -35,8 +33,6 @@ export default async function Layout({ children }: Readonly<{ children: ReactNod
               <SearchDialog />
             </div>
             <div className="flex items-center gap-2">
-              <LayoutControls contentLayout={contentLayout} variant={sidebarVariant} collapsible={sidebarCollapsible} />
-              <ThemeSwitcher />
               <AccountSwitcher users={users} />
             </div>
           </div>

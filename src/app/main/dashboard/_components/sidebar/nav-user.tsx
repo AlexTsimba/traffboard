@@ -1,6 +1,6 @@
 "use client";
 
-import { EllipsisVertical, CircleUser, Upload as UploadIcon, Users as UsersIcon, LogOut } from "lucide-react";
+import { EllipsisVertical, Settings, Shield, LogOut } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -66,17 +66,17 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <CircleUser />
-                Account
+              <DropdownMenuItem asChild>
+                <a href="/main/dashboard/preferences">
+                  <Settings />
+                  Preferences
+                </a>
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <UploadIcon />
-                Data Management
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <UsersIcon />
-                User Management
+              <DropdownMenuItem asChild>
+                <a href="/main/dashboard/administration">
+                  <Shield />
+                  Administration
+                </a>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
