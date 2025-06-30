@@ -1,22 +1,4 @@
-import {
-  Home,
-  ChartPie,
-  Grid2X2,
-  ChartLine,
-  ShoppingBag,
-  BookA,
-  Forklift,
-  Mail,
-  MessageSquare,
-  Calendar,
-  Kanban,
-  ReceiptText,
-  Users,
-  Lock,
-  Fingerprint,
-  SquareArrowUpRight,
-  type LucideIcon,
-} from "lucide-react";
+import { Home, ChartPie, Users, SquareArrowUpRight, type LucideIcon } from "lucide-react";
 
 export interface NavSubItem {
   title: string;
@@ -44,88 +26,40 @@ export interface NavGroup {
 export const sidebarItems: NavGroup[] = [
   {
     id: 1,
-    label: "Dashboards",
+    label: "Analytics",
     items: [
       {
-        title: "Dashboards",
-        url: "/dashboard",
+        title: "Overview",
+        url: "/main/dashboard/overview",
         icon: Home,
-        subItems: [
-          { title: "Default", url: "/dashboard/default", icon: ChartPie },
-          { title: "CRM", url: "/dashboard", icon: Grid2X2, comingSoon: true },
-          { title: "Analytics", url: "/dashboard/analytics", icon: ChartLine, comingSoon: true },
-          { title: "eCommerce", url: "/dashboard/e-commerce", icon: ShoppingBag, comingSoon: true },
-          { title: "Academy", url: "/dashboard/academy", icon: BookA, comingSoon: true },
-          { title: "Logistics", url: "/dashboard/logistics", icon: Forklift, comingSoon: true },
-        ],
+      },
+      {
+        title: "Conversions",
+        url: "/main/dashboard/conversions",
+        icon: ChartPie,
       },
     ],
   },
   {
     id: 2,
-    label: "Pages",
+    label: "Data Management",
     items: [
       {
-        title: "Authentication",
-        url: "/auth",
-        icon: Fingerprint,
-        subItems: [
-          { title: "Login v1", url: "/auth/v1/login", newTab: true },
-          { title: "Register v1", url: "/auth/v1/register", newTab: true },
-        ],
-      },
-      {
-        title: "Email",
-        url: "/mail",
-        icon: Mail,
-        comingSoon: true,
-      },
-      {
-        title: "Chat",
-        url: "/chat",
-        icon: MessageSquare,
-        comingSoon: true,
-      },
-      {
-        title: "Calendar",
-        url: "/calendar",
-        icon: Calendar,
-        comingSoon: true,
-      },
-      {
-        title: "Kanban",
-        url: "/kanban",
-        icon: Kanban,
-        comingSoon: true,
-      },
-      {
-        title: "Invoice",
-        url: "/invoice",
-        icon: ReceiptText,
-        comingSoon: true,
-      },
-      {
-        title: "Users",
-        url: "/users",
-        icon: Users,
-        comingSoon: true,
-      },
-      {
-        title: "Roles",
-        url: "/roles",
-        icon: Lock,
+        title: "CSV Upload",
+        url: "/main/dashboard/upload",
+        icon: SquareArrowUpRight,
         comingSoon: true,
       },
     ],
   },
   {
     id: 3,
-    label: "Misc",
+    label: "Admin",
     items: [
       {
-        title: "Others",
-        url: "/others",
-        icon: SquareArrowUpRight,
+        title: "User Management",
+        url: "/main/dashboard/users",
+        icon: Users,
         comingSoon: true,
       },
     ],
