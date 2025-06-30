@@ -1,0 +1,236 @@
+TraffBoardLite MVP PRD
+Minimal Viable Product for Affiliate Analytics Dashboard
+
+Overview
+TraffBoardLite MVP is a minimal affiliate marketing analytics dashboard with CSV upload and basic reporting. Goal: Get a working product on DigitalOcean App Platform as fast as possible.
+Problem Statement: Need a simple tool for uploading CSV files with conversion data and viewing basic analytics.
+
+Value Proposition:
+- CSV upload with automatic parsing
+- Basic analytics with filters
+- Simple authentication with 2FA
+- Fast deployment on App Platform
+
+Target Users:
+- Regular Users: View reports
+- Superusers: Upload data + manage users
+
+Core Features (MVP Only)
+1. Basic Authentication
+  - Login/password + 2FA (TOTP)
+  - Two roles: user/superuser
+  - Protected routes
+2. CSV Upload (Superuser Only)
+  - Simple upload form
+  - File structure validation
+  - Save to PostgreSQL
+3. Basic Analytics
+  - Single dashboard with key metrics
+  - Global filters (date, partner, campaign)
+  - Simple charts (shadcn/ui charts)
+4. Minimal User Management
+  - User CRUD (superuser only)
+  - Role assignment
+
+Technical Stack
+Frontend & Backend
+- Framework: Next.js 15 + App Router + TypeScript
+- UI: shadcn/ui + Tailwind CSS
+- Charts: shadcn/ui charts (Recharts wrapper)
+- State: TanStack Query + Zustand
+- Database: Drizzle ORM + PostgreSQL
+- Auth: NextAuth.js + TOTP
+- CSV: PapaParse
+- Validation: Zod
+
+Deployment
+- Platform: DigitalOcean App Platform
+- Database: DigitalOcean Managed PostgreSQL
+- SSL: Automatic HTTPS
+- CI/CD: Auto-deploy on git push
+
+MVP Data Models
+// Minimal schema with Drizzle
+export const users = pgTable('users', {
+  id: serial('id').primaryKey(),
+  email: varchar('email', { length: 255 }).unique().notNull(),
+  passwordHash: text('password_hash').notNull(),
+  role: varchar('role', { length: 50 }).default('user').notNull(),
+  totpSecret: text('totp_secret'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+})
+
+export const conversions = pgTable('conversions', {
+  id: serial('id').primaryKey(),
+  date: date('date').notNull(),
+  partnerId: varchar('partner_id', { length: 100 }).notNull(),
+  campaignId: varchar('campaign_id', { length: 100 }).notNull(),
+  clicks: integer('clicks').default(0).notNull(),
+  registrations: integer('registrations').default(0).notNull(),
+  revenue: decimal('revenue', { precision: 10, scale: 2 }).default('0').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+})
+
+Development Tasks (MVP)
+Task 1: Setup Template & Dependencies
+Goal: Clean starter with required dependencies
+- Clone https://github.com/arhamkhnz/next-shadcn-admin-dashboard
+- Remove unnecessary pages and components
+- Install TanStack Query, Zustand
+- Install Drizzle ORM, PapaParse, NextAuth.js
+
+Task 2: Database Setup & Models
+Goal: Working database with minimal models
+- Configure Drizzle connection to PostgreSQL
+- Create users and conversions schemas
+- Set up migrations with drizzle-kit
+- Create seed data for testing
+
+Task 3: Authentication & 2FA
+Goal: Working login with 2FA
+- Configure NextAuth.js with Drizzle adapter
+- Add TOTP 2FA support
+- Create protected route middleware
+- Basic role-based access control
+
+Task 4: Basic Layout & Navigation
+Goal: Basic navigation and pages structure
+- Update sidebar navigation
+- Create pages: Dashboard, Upload, Users
+- Role-based menu visibility
+- Responsive layout with shadcn/ui
+
+Task 5: CSV Upload & Processing
+Goal: Working CSV file upload
+- File upload form with shadcn/ui
+- PapaParse processing with Server Actions
+- Zod data validation
+- Save to conversions table
+
+Task 6: Analytics Dashboard
+Goal: Simple report with filters
+- Global filter components (date, partner, campaign) with Zustand
+- TanStack Query for data fetching
+- Basic KPI cards
+- Simple charts with shadcn/ui charts
+
+Task 7: User Management
+Goal: User CRUD interface
+- User list with data table
+- Create/edit user forms
+- Role management
+- Superuser-only access
+
+Task 8: Deploy to App Platform
+Goal: Production deployment
+- Create app.yaml configuration
+- Set up DigitalOcean Managed PostgreSQL
+- Configure environment variables
+- Run database migrations
+- Domain and HTTPS setup
+
+App Platform Configuration
+# app.yaml
+name: traffboard-mvp
+services:
+- name: web
+  source_dir: /
+  github:
+    repo: your-username/traffboard-mvp
+    branch: main
+  build_command: npm run build
+  run_command: npm start
+  environment_slug: node-js
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  envs:
+  - key: DATABASE_URL
+    scope: RUN_TIME
+    type: SECRET
+  - key: NEXTAUTH_SECRET
+    scope: RUN_TIME
+    type: SECRET
+  - key: NEXTAUTH_URL
+    scope: RUN_TIME
+    value: ${APP_URL}
+
+databases:
+- engine: PG
+  name: traffboard-db
+  num_nodes: 1
+  size: db-s-1vcpu-1gb
+
+State Management Architecture
+// Global filter store with Zustand
+interface FilterState {
+  dateRange: [Date, Date]
+  partners: string[]
+  campaigns: string[]
+  setFilters: (filters: Partial<FilterState>) => void
+  resetFilters: () => void
+}
+
+export const useFilterStore = create<FilterState>((set) => ({
+  dateRange: [startOfMonth(new Date()), new Date()],
+  partners: [],
+  campaigns: [],
+  setFilters: (filters) => set((state) => ({ ...state, ...filters })),
+  resetFilters: () => set({
+    dateRange: [startOfMonth(new Date()), new Date()],
+    partners: [],
+    campaigns: []
+  })
+}))
+
+// Analytics data with TanStack Query
+export const useAnalytics = () => {
+  const filters = useFilterStore()
+  
+  return useQuery({
+    queryKey: ['analytics', filters],
+    queryFn: () => fetchAnalytics(filters),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  })
+}
+
+MVP Success Criteria
+Functional Requirements
+✅ User can login with 2FA
+✅ Superuser can upload CSV files
+✅ Data displays in dashboard
+✅ Filters work correctly
+✅ Superuser can manage users
+✅ Application accessible via HTTPS
+
+Performance Targets
+- Page load: <3s
+- CSV processing: <60s for 50K records
+- Filter updates: <1s
+
+Scope Limitations (NOT in MVP)
+❌ Multiple dashboard tabs
+❌ Advanced analytics
+❌ Data export
+❌ Notifications
+❌ Third-party APIs
+❌ Caching strategies
+❌ Microservices
+❌ Comprehensive testing
+
+Timeline Estimate
+- Setup (Task 1): 1 day
+- Database (Task 2): 1 day
+- Auth (Task 3): 2 days
+- Layout (Task 4): 1 day
+- CSV Upload (Task 5): 2 days
+- Dashboard (Task 6): 2 days
+- Users (Task 7): 1 day
+- Deploy (Task 8): 0.5 days
+
+Total: ~10.5 days for fully working MVP
+
+Cost Estimate
+- App Platform Basic: $12/month
+- Managed PostgreSQL: $15/month
+- Domain: $12/year
+- Total: ~$27/month + domain
