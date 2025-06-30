@@ -1,6 +1,6 @@
 "use client";
 
-import { EllipsisVertical, CircleUser, CreditCard, MessageSquareDot, LogOut } from "lucide-react";
+import { EllipsisVertical, CircleUser, Upload as UploadIcon, Users as UsersIcon, LogOut } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -71,12 +71,12 @@ export function NavUser({
                 Account
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <CreditCard />
-                Billing
+                <UploadIcon />
+                Data Management
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <MessageSquareDot />
-                Notifications
+                <UsersIcon />
+                User Management
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
