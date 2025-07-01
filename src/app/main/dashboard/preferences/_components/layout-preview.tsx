@@ -38,7 +38,6 @@ export function LayoutPreview() {
           ?.split("=")[1];
         return value;
       }
-      return;
     };
 
     const updateValues = () => {

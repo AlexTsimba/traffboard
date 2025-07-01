@@ -24,7 +24,6 @@ export function LayoutSelector() {
           ?.split("=")[1];
         return value;
       }
-      return;
     };
 
     const sidebarVariant = getValueFromCookie("sidebar_variant");

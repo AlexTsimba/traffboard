@@ -23,7 +23,6 @@ export function LayoutSettings() {
           ?.split("=")[1];
         return value;
       }
-      return undefined;
     };
 
     const updateValues = () => {
