@@ -6,6 +6,23 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { SidebarVariant, SidebarCollapsible, ContentLayout } from "@/lib/layout-preferences";
 
+const formatLabel = (key: string, value: string) => {
+  switch (key) {
+    case "variant": {
+      return `Sidebar: ${value.charAt(0).toUpperCase() + value.slice(1)}`;
+    }
+    case "collapsible": {
+      return `Collapse: ${value === "icon" ? "Icon" : "Off-canvas"}`;
+    }
+    case "contentLayout": {
+      return `Content: ${value === "centered" ? "Centered" : "Full Width"}`;
+    }
+    default: {
+      return value;
+    }
+  }
+};
+
 export function LayoutPreview() {
   const [variant, setVariant] = useState<SidebarVariant>("sidebar");
   const [collapsible, setCollapsible] = useState<SidebarCollapsible>("icon");
@@ -21,7 +38,6 @@ export function LayoutPreview() {
           ?.split("=")[1];
         return value;
       }
-      return null;
     };
 
     const updateValues = () => {
@@ -40,21 +56,10 @@ export function LayoutPreview() {
     // Listen for cookie changes with reduced interval
     const interval = setInterval(updateValues, 300);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+    };
   }, []);
-
-  const formatLabel = (key: string, value: string) => {
-    switch (key) {
-      case "variant":
-        return `Sidebar: ${value.charAt(0).toUpperCase() + value.slice(1)}`;
-      case "collapsible":
-        return `Collapse: ${value === "icon" ? "Icon" : "Off-canvas"}`;
-      case "contentLayout":
-        return `Content: ${value === "centered" ? "Centered" : "Full Width"}`;
-      default:
-        return value;
-    }
-  };
 
   return (
     <Card>
@@ -64,13 +69,13 @@ export function LayoutPreview() {
       </CardHeader>
       <CardContent className="space-y-1.5 px-6 pt-0 pb-2">
         <div className="flex flex-wrap gap-1">
-          <Badge variant="secondary" className="px-2 py-0.5 text-xs">
+          <Badge className="px-2 py-0.5 text-xs" variant="secondary">
             {formatLabel("variant", variant)}
           </Badge>
-          <Badge variant="secondary" className="px-2 py-0.5 text-xs">
+          <Badge className="px-2 py-0.5 text-xs" variant="secondary">
             {formatLabel("collapsible", collapsible)}
           </Badge>
-          <Badge variant="secondary" className="px-2 py-0.5 text-xs">
+          <Badge className="px-2 py-0.5 text-xs" variant="secondary">
             {formatLabel("contentLayout", contentLayout)}
           </Badge>
         </div>

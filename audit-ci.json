@@ -1,0 +1,25 @@
+{
+  "moderate": true,
+  "high": true,
+  "critical": true,
+  "allowlist": [],
+  "advisories": [],
+  "report-type": "summary",
+  "package-manager": "pnpm",
+  "output-format": "json",
+  "pass-enoaudit": true,
+  "show-found": true,
+  "show-not-found": false,
+  "registry": "https://registry.npmjs.org/",
+  "retry": {
+    "count": 3,
+    "factor": 2,
+    "minTimeout": 1000,
+    "maxTimeout": 10000
+  },
+  "threshold": {
+    "moderate": 0,
+    "high": 0,
+    "critical": 0
+  }
+}

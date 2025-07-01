@@ -1,7 +1,6 @@
 "use client";
 
-import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
-import { Table } from "@tanstack/react-table";
+import { type Table } from "@tanstack/react-table";
 import { Settings2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -11,17 +10,18 @@ import {
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
 interface DataTableViewOptionsProps<TData> {
-  table: Table<TData>;
+  readonly table: Table<TData>;
 }
 
 export function DataTableViewOptions<TData>({ table }: DataTableViewOptionsProps<TData>) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="ml-auto hidden h-8 lg:flex">
+        <Button className="ml-auto hidden h-8 lg:flex" size="sm" variant="outline">
           <Settings2 />
           View
         </Button>
@@ -31,14 +31,16 @@ export function DataTableViewOptions<TData>({ table }: DataTableViewOptionsProps
         <DropdownMenuSeparator />
         {table
           .getAllColumns()
-          .filter((column) => typeof column.accessorFn !== "undefined" && column.getCanHide())
+          .filter((column) => column.accessorFn !== undefined && column.getCanHide())
           .map((column) => {
             return (
               <DropdownMenuCheckboxItem
                 key={column.id}
-                className="capitalize"
                 checked={column.getIsVisible()}
-                onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                className="capitalize"
+                onCheckedChange={(value) => {
+                  column.toggleVisibility(!!value);
+                }}
               >
                 {column.id}
               </DropdownMenuCheckboxItem>

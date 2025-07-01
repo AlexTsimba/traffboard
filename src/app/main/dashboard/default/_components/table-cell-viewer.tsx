@@ -1,9 +1,9 @@
 import { TrendingUp } from "lucide-react";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
-import { z } from "zod";
+import { type z } from "zod";
 
 import { Button } from "@/components/ui/button";
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import {
   Drawer,
   DrawerClose,
@@ -20,7 +20,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-import { sectionSchema } from "./schema";
+import { type sectionSchema } from "./schema";
 
 const chartData = [
   { month: "January", desktop: 186, mobile: 80 },
@@ -42,13 +42,13 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function TableCellViewer({ item }: { item: z.infer<typeof sectionSchema> }) {
+export function TableCellViewer({ item }: { readonly item: z.infer<typeof sectionSchema> }) {
   const isMobile = useIsMobile();
 
   return (
     <Drawer direction={isMobile ? "bottom" : "right"}>
       <DrawerTrigger asChild>
-        <Button variant="link" className="text-foreground w-fit px-0 text-left">
+        <Button className="text-foreground w-fit px-0 text-left" variant="link">
           {item.header}
         </Button>
       </DrawerTrigger>
@@ -71,29 +71,29 @@ export function TableCellViewer({ item }: { item: z.infer<typeof sectionSchema> 
                 >
                   <CartesianGrid vertical={false} />
                   <XAxis
-                    dataKey="month"
-                    tickLine={false}
-                    axisLine={false}
-                    tickMargin={8}
-                    tickFormatter={(value) => value.slice(0, 3)}
                     hide
+                    axisLine={false}
+                    dataKey="month"
+                    tickFormatter={(value: string) => value.slice(0, 3)}
+                    tickLine={false}
+                    tickMargin={8}
                   />
-                  <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
+                  <ChartTooltip content={<ChartTooltipContent indicator="dot" />} cursor={false} />
                   <Area
                     dataKey="mobile"
-                    type="natural"
                     fill="var(--color-mobile)"
                     fillOpacity={0.6}
-                    stroke="var(--color-mobile)"
                     stackId="a"
+                    stroke="var(--color-mobile)"
+                    type="natural"
                   />
                   <Area
                     dataKey="desktop"
-                    type="natural"
                     fill="var(--color-desktop)"
                     fillOpacity={0.4}
-                    stroke="var(--color-desktop)"
                     stackId="a"
+                    stroke="var(--color-desktop)"
+                    type="natural"
                   />
                 </AreaChart>
               </ChartContainer>
@@ -113,13 +113,13 @@ export function TableCellViewer({ item }: { item: z.infer<typeof sectionSchema> 
           <form className="flex flex-col gap-4">
             <div className="flex flex-col gap-3">
               <Label htmlFor="header">Header</Label>
-              <Input id="header" defaultValue={item.header} />
+              <Input defaultValue={item.header} id="header" />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-3">
                 <Label htmlFor="type">Type</Label>
                 <Select defaultValue={item.type}>
-                  <SelectTrigger id="type" className="w-full">
+                  <SelectTrigger className="w-full" id="type">
                     <SelectValue placeholder="Select a type" />
                   </SelectTrigger>
                   <SelectContent>
@@ -137,7 +137,7 @@ export function TableCellViewer({ item }: { item: z.infer<typeof sectionSchema> 
               <div className="flex flex-col gap-3">
                 <Label htmlFor="status">Status</Label>
                 <Select defaultValue={item.status}>
-                  <SelectTrigger id="status" className="w-full">
+                  <SelectTrigger className="w-full" id="status">
                     <SelectValue placeholder="Select a status" />
                   </SelectTrigger>
                   <SelectContent>
@@ -151,17 +151,17 @@ export function TableCellViewer({ item }: { item: z.infer<typeof sectionSchema> 
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-3">
                 <Label htmlFor="target">Target</Label>
-                <Input id="target" defaultValue={item.target} />
+                <Input defaultValue={item.target} id="target" />
               </div>
               <div className="flex flex-col gap-3">
                 <Label htmlFor="limit">Limit</Label>
-                <Input id="limit" defaultValue={item.limit} />
+                <Input defaultValue={item.limit} id="limit" />
               </div>
             </div>
             <div className="flex flex-col gap-3">
               <Label htmlFor="reviewer">Reviewer</Label>
               <Select defaultValue={item.reviewer}>
-                <SelectTrigger id="reviewer" className="w-full">
+                <SelectTrigger className="w-full" id="reviewer">
                   <SelectValue placeholder="Select a reviewer" />
                 </SelectTrigger>
                 <SelectContent>

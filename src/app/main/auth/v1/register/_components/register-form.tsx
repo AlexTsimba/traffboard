@@ -30,19 +30,24 @@ export function RegisterFormV1() {
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+  const onSubmit = (data: z.infer<typeof FormSchema>) => {
     toast("You submitted the following values", {
       description: (
         <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
+          <code className="text-white">{JSON.stringify(data, undefined, 2)}</code>
         </pre>
       ),
     });
   };
 
+  const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    void form.handleSubmit(onSubmit)(event);
+  };
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form className="space-y-4" onSubmit={handleFormSubmit}>
         <FormField
           control={form.control}
           name="email"
@@ -50,7 +55,7 @@ export function RegisterFormV1() {
             <FormItem>
               <FormLabel>Email Address</FormLabel>
               <FormControl>
-                <Input id="email" type="email" placeholder="you@example.com" autoComplete="email" {...field} />
+                <Input autoComplete="email" id="email" placeholder="you@example.com" type="email" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -63,7 +68,7 @@ export function RegisterFormV1() {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input id="password" type="password" placeholder="••••••••" autoComplete="new-password" {...field} />
+                <Input autoComplete="new-password" id="password" placeholder="••••••••" type="password" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -77,10 +82,10 @@ export function RegisterFormV1() {
               <FormLabel>Confirm Password</FormLabel>
               <FormControl>
                 <Input
-                  id="confirmPassword"
-                  type="password"
-                  placeholder="••••••••"
                   autoComplete="new-password"
+                  id="confirmPassword"
+                  placeholder="••••••••"
+                  type="password"
                   {...field}
                 />
               </FormControl>

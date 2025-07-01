@@ -1,7 +1,7 @@
-import { ColumnDef } from "@tanstack/react-table";
+import { type ColumnDef } from "@tanstack/react-table";
 import { CircleCheck, Loader, EllipsisVertical } from "lucide-react";
 import { toast } from "sonner";
-import { z } from "zod";
+import { type z } from "zod";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -19,7 +19,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 import { DataTableColumnHeader } from "../../../../../components/data-table/data-table-column-header";
 
-import { sectionSchema } from "./schema";
+import { type sectionSchema } from "./schema";
 import { TableCellViewer } from "./table-cell-viewer";
 
 export const dashboardColumns: ColumnDef<z.infer<typeof sectionSchema>>[] = [
@@ -28,18 +28,22 @@ export const dashboardColumns: ColumnDef<z.infer<typeof sectionSchema>>[] = [
     header: ({ table }) => (
       <div className="flex items-center justify-center">
         <Checkbox
-          checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")}
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
           aria-label="Select all"
+          checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")}
+          onCheckedChange={(value) => {
+            table.toggleAllPageRowsSelected(!!value);
+          }}
         />
       </div>
     ),
     cell: ({ row }) => (
       <div className="flex items-center justify-center">
         <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
           aria-label="Select row"
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => {
+            row.toggleSelected(!!value);
+          }}
         />
       </div>
     ),
@@ -59,7 +63,7 @@ export const dashboardColumns: ColumnDef<z.infer<typeof sectionSchema>>[] = [
     header: ({ column }) => <DataTableColumnHeader column={column} title="Section Type" />,
     cell: ({ row }) => (
       <div className="w-32">
-        <Badge variant="outline" className="text-muted-foreground px-1.5">
+        <Badge className="text-muted-foreground px-1.5" variant="outline">
           {row.original.type}
         </Badge>
       </div>
@@ -70,7 +74,7 @@ export const dashboardColumns: ColumnDef<z.infer<typeof sectionSchema>>[] = [
     accessorKey: "status",
     header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
     cell: ({ row }) => (
-      <Badge variant="outline" className="text-muted-foreground px-1.5">
+      <Badge className="text-muted-foreground px-1.5" variant="outline">
         {row.original.status === "Done" ? (
           <CircleCheck className="stroke-border fill-green-500 dark:fill-green-400" />
         ) : (
@@ -95,7 +99,7 @@ export const dashboardColumns: ColumnDef<z.infer<typeof sectionSchema>>[] = [
           });
         }}
       >
-        <Label htmlFor={`${row.original.id}-target`} className="sr-only">
+        <Label className="sr-only" htmlFor={`${row.original.id}-target`}>
           Target
         </Label>
         <Input
@@ -121,7 +125,7 @@ export const dashboardColumns: ColumnDef<z.infer<typeof sectionSchema>>[] = [
           });
         }}
       >
-        <Label htmlFor={`${row.original.id}-limit`} className="sr-only">
+        <Label className="sr-only" htmlFor={`${row.original.id}-limit`}>
           Limit
         </Label>
         <Input
@@ -136,31 +140,34 @@ export const dashboardColumns: ColumnDef<z.infer<typeof sectionSchema>>[] = [
   {
     accessorKey: "reviewer",
     header: ({ column }) => <DataTableColumnHeader column={column} title="Reviewer" />,
-    cell: ({ row }) => {
+    // eslint-disable-next-line sonarjs/function-return-type
+    cell: ({ row }): React.ReactNode => {
       const isAssigned = row.original.reviewer !== "Assign reviewer";
-
-      if (isAssigned) {
-        return row.original.reviewer;
-      }
 
       return (
         <>
-          <Label htmlFor={`${row.original.id}-reviewer`} className="sr-only">
-            Reviewer
-          </Label>
-          <Select>
-            <SelectTrigger
-              className="w-38 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate"
-              size="sm"
-              id={`${row.original.id}-reviewer`}
-            >
-              <SelectValue placeholder="Assign reviewer" />
-            </SelectTrigger>
-            <SelectContent align="end">
-              <SelectItem value="Eddie Lake">Eddie Lake</SelectItem>
-              <SelectItem value="Jamik Tashpulatov">Jamik Tashpulatov</SelectItem>
-            </SelectContent>
-          </Select>
+          {isAssigned ? (
+            <span>{row.original.reviewer}</span>
+          ) : (
+            <>
+              <Label className="sr-only" htmlFor={`${row.original.id}-reviewer`}>
+                Reviewer
+              </Label>
+              <Select>
+                <SelectTrigger
+                  className="w-38 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate"
+                  id={`${row.original.id}-reviewer`}
+                  size="sm"
+                >
+                  <SelectValue placeholder="Assign reviewer" />
+                </SelectTrigger>
+                <SelectContent align="end">
+                  <SelectItem value="Eddie Lake">Eddie Lake</SelectItem>
+                  <SelectItem value="Jamik Tashpulatov">Jamik Tashpulatov</SelectItem>
+                </SelectContent>
+              </Select>
+            </>
+          )}
         </>
       );
     },
@@ -171,7 +178,7 @@ export const dashboardColumns: ColumnDef<z.infer<typeof sectionSchema>>[] = [
     cell: () => (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="data-[state=open]:bg-muted text-muted-foreground flex size-8" size="icon">
+          <Button className="data-[state=open]:bg-muted text-muted-foreground flex size-8" size="icon" variant="ghost">
             <EllipsisVertical />
             <span className="sr-only">Open menu</span>
           </Button>

@@ -7,7 +7,7 @@ import { SecuritySettings } from "./_components/security-settings";
 export default function SettingsPage() {
   return (
     <div className="@container/main flex flex-col gap-4">
-      <Tabs defaultValue="account" className="w-full">
+      <Tabs className="w-full" defaultValue="account">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
           <TabsList>
@@ -16,13 +16,13 @@ export default function SettingsPage() {
             <TabsTrigger value="appearance">Appearance</TabsTrigger>
           </TabsList>
         </div>
-        <TabsContent value="account" className="pt-2">
+        <TabsContent className="pt-2" value="account">
           <AccountProfile />
         </TabsContent>
-        <TabsContent value="security" className="pt-2">
+        <TabsContent className="pt-2" value="security">
           <SecuritySettings />
         </TabsContent>
-        <TabsContent value="appearance" className="pt-2">
+        <TabsContent className="pt-2" value="appearance">
           <AppearanceSettings />
         </TabsContent>
       </Tabs>

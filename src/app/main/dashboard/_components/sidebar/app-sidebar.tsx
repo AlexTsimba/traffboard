@@ -26,7 +26,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:!p-1.5">
-              <a href="#">
+              <a href="/main/dashboard">
                 <Command />
                 <span className="text-base font-semibold">{APP_CONFIG.name}</span>
               </a>
@@ -37,7 +37,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <NavMain items={sidebarItems} />
         {/* <NavDocuments items={data.documents} /> */}
-        <NavSecondary items={navSecondaryItems} className="mt-auto" />
+        <NavSecondary className="mt-auto" items={navSecondaryItems} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={rootUser} />

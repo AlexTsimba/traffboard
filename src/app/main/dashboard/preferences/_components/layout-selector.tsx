@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-
 import { Settings, Sidebar, Maximize2 } from "lucide-react";
+import { useState, useEffect } from "react";
 
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -25,7 +24,6 @@ export function LayoutSelector() {
           ?.split("=")[1];
         return value;
       }
-      return null;
     };
 
     const sidebarVariant = getValueFromCookie("sidebar_variant");
@@ -45,6 +43,18 @@ export function LayoutSelector() {
     if (key === "content_layout") setContentLayout(value as ContentLayout);
   };
 
+  const handleSidebarVariantChange = (value: string | undefined) => {
+    if (value) void handleValueChange("sidebar_variant", value);
+  };
+
+  const handleSidebarCollapsibleChange = (value: string | undefined) => {
+    if (value) void handleValueChange("sidebar_collapsible", value);
+  };
+
+  const handleContentLayoutChange = (value: string | undefined) => {
+    if (value) void handleValueChange("content_layout", value);
+  };
+
   return (
     <div className="space-y-4">
       {/* Sidebar Style */}
@@ -59,29 +69,29 @@ export function LayoutSelector() {
         <ToggleGroup
           className="grid w-full grid-cols-1 gap-1 sm:grid-cols-3"
           size="sm"
-          variant="outline"
           type="single"
           value={variant}
-          onValueChange={(value) => handleValueChange("sidebar_variant", value)}
+          variant="outline"
+          onValueChange={handleSidebarVariantChange}
         >
           <ToggleGroupItem
-            value="inset"
             aria-label="Inset sidebar"
             className="flex h-10 items-center justify-center px-3"
+            value="inset"
           >
             <div className="text-sm font-medium">Inset</div>
           </ToggleGroupItem>
           <ToggleGroupItem
-            value="sidebar"
             aria-label="Standard sidebar"
             className="flex h-10 items-center justify-center px-3"
+            value="sidebar"
           >
             <div className="text-sm font-medium">Sidebar</div>
           </ToggleGroupItem>
           <ToggleGroupItem
-            value="floating"
             aria-label="Floating sidebar"
             className="flex h-10 items-center justify-center px-3"
+            value="floating"
           >
             <div className="text-sm font-medium">Floating</div>
           </ToggleGroupItem>
@@ -102,22 +112,22 @@ export function LayoutSelector() {
         <ToggleGroup
           className="grid w-full grid-cols-1 gap-1 sm:grid-cols-2"
           size="sm"
-          variant="outline"
           type="single"
           value={collapsible}
-          onValueChange={(value) => handleValueChange("sidebar_collapsible", value)}
+          variant="outline"
+          onValueChange={handleSidebarCollapsibleChange}
         >
           <ToggleGroupItem
-            value="icon"
             aria-label="Icon collapse"
             className="flex h-10 items-center justify-center px-3"
+            value="icon"
           >
             <div className="text-sm font-medium">Icon</div>
           </ToggleGroupItem>
           <ToggleGroupItem
-            value="offcanvas"
             aria-label="Off-canvas collapse"
             className="flex h-10 items-center justify-center px-3"
+            value="offcanvas"
           >
             <div className="text-sm font-medium">Off-canvas</div>
           </ToggleGroupItem>
@@ -138,22 +148,22 @@ export function LayoutSelector() {
         <ToggleGroup
           className="grid w-full grid-cols-1 gap-1 sm:grid-cols-2"
           size="sm"
-          variant="outline"
           type="single"
           value={contentLayout}
-          onValueChange={(value) => handleValueChange("content_layout", value)}
+          variant="outline"
+          onValueChange={handleContentLayoutChange}
         >
           <ToggleGroupItem
-            value="centered"
             aria-label="Centered layout"
             className="flex h-10 items-center justify-center px-3"
+            value="centered"
           >
             <div className="text-sm font-medium">Centered</div>
           </ToggleGroupItem>
           <ToggleGroupItem
-            value="full-width"
             aria-label="Full width layout"
             className="flex h-10 items-center justify-center px-3"
+            value="full-width"
           >
             <div className="text-sm font-medium">Full Width</div>
           </ToggleGroupItem>

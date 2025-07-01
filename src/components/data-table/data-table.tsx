@@ -1,5 +1,3 @@
-import * as React from "react";
-
 import {
   KeyboardSensor,
   MouseSensor,
@@ -13,19 +11,21 @@ import {
 } from "@dnd-kit/core";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import { SortableContext, verticalListSortingStrategy, arrayMove } from "@dnd-kit/sortable";
-import { ColumnDef, flexRender, type Table as TanStackTable } from "@tanstack/react-table";
+import { type ColumnDef, flexRender, type Table as TanStackTable } from "@tanstack/react-table";
+import * as React from "react";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 import { DraggableRow } from "./draggable-row";
 
 interface DataTableProps<TData, TValue> {
-  table: TanStackTable<TData>;
-  columns: ColumnDef<TData, TValue>[];
-  dndEnabled?: boolean;
-  onReorder?: (newData: TData[]) => void;
+  readonly table: TanStackTable<TData>;
+  readonly columns: ColumnDef<TData, TValue>[];
+  readonly dndEnabled?: boolean;
+  readonly onReorder?: (newData: TData[]) => void;
 }
 
+// eslint-disable-next-line sonarjs/function-return-type
 function renderTableBody<TData, TValue>({
   table,
   columns,
@@ -36,11 +36,11 @@ function renderTableBody<TData, TValue>({
   columns: ColumnDef<TData, TValue>[];
   dndEnabled: boolean;
   dataIds: UniqueIdentifier[];
-}) {
-  if (!table.getRowModel().rows.length) {
+}): React.ReactNode {
+  if (table.getRowModel().rows.length === 0) {
     return (
       <TableRow>
-        <TableCell colSpan={columns.length} className="h-24 text-center">
+        <TableCell className="h-24 text-center" colSpan={columns.length}>
           No results.
         </TableCell>
       </TableRow>
@@ -55,13 +55,17 @@ function renderTableBody<TData, TValue>({
       </SortableContext>
     );
   }
-  return table.getRowModel().rows.map((row) => (
-    <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-      {row.getVisibleCells().map((cell) => (
-        <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+  return (
+    <>
+      {table.getRowModel().rows.map((row) => (
+        <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+          {row.getVisibleCells().map((cell) => (
+            <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+          ))}
+        </TableRow>
       ))}
-    </TableRow>
-  ));
+    </>
+  );
 }
 
 export function DataTable<TData, TValue>({
@@ -94,7 +98,7 @@ export function DataTable<TData, TValue>({
             {headerGroup.headers.map((header) => {
               return (
                 <TableHead key={header.id} colSpan={header.colSpan}>
-                  {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                  {header.isPlaceholder ? undefined : flexRender(header.column.columnDef.header, header.getContext())}
                 </TableHead>
               );
             })}
@@ -111,10 +115,10 @@ export function DataTable<TData, TValue>({
     return (
       <DndContext
         collisionDetection={closestCenter}
-        modifiers={[restrictToVerticalAxis]}
-        onDragEnd={handleDragEnd}
-        sensors={sensors}
         id={sortableId}
+        modifiers={[restrictToVerticalAxis]}
+        sensors={sensors}
+        onDragEnd={handleDragEnd}
       >
         {tableContent}
       </DndContext>

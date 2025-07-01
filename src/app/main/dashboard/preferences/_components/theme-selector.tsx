@@ -13,36 +13,57 @@ export function ThemeSelector() {
 
   const getThemeDescription = () => {
     switch (theme) {
-      case "light":
+      case "light": {
         return "Light mode - easy on the eyes in bright environments";
-      case "dark":
+      }
+      case "dark": {
         return "Dark mode - perfect for low-light conditions";
-      case "system":
+      }
+      case "system": {
         return "System mode - automatically matches your device settings";
-      default:
+      }
+      case undefined: {
         return "Choose your preferred theme";
+      }
+      default: {
+        return "Choose your preferred theme";
+      }
     }
   };
 
   const getBackgroundClass = () => {
     switch (theme) {
-      case "light":
+      case "light": {
         return "bg-white";
-      case "dark":
+      }
+      case "dark": {
         return "bg-slate-900";
-      default:
+      }
+      case "system":
+      case undefined: {
         return "bg-gradient-to-r from-white to-slate-900";
+      }
+      default: {
+        return "bg-gradient-to-r from-white to-slate-900";
+      }
     }
   };
 
   const getElementClass = (lightClass: string, darkClass: string, gradientClass: string) => {
     switch (theme) {
-      case "light":
+      case "light": {
         return lightClass;
-      case "dark":
+      }
+      case "dark": {
         return darkClass;
-      default:
+      }
+      case "system":
+      case undefined: {
         return gradientClass;
+      }
+      default: {
+        return gradientClass;
+      }
     }
   };
 
@@ -88,31 +109,33 @@ export function ThemeSelector() {
         <ToggleGroup
           className="grid w-full grid-cols-1 gap-2 sm:grid-cols-3"
           size="sm"
-          variant="outline"
           type="single"
           value={theme}
-          onValueChange={(value) => setTheme(value)}
+          variant="outline"
+          onValueChange={(value) => {
+            setTheme(value);
+          }}
         >
           <ToggleGroupItem
-            value="light"
             aria-label="Light theme"
             className="flex h-10 items-center justify-center gap-2 px-3"
+            value="light"
           >
             <Sun className="h-4 w-4" />
             <span className="text-sm font-medium">Light</span>
           </ToggleGroupItem>
           <ToggleGroupItem
-            value="dark"
             aria-label="Dark theme"
             className="flex h-10 items-center justify-center gap-2 px-3"
+            value="dark"
           >
             <Moon className="h-4 w-4" />
             <span className="text-sm font-medium">Dark</span>
           </ToggleGroupItem>
           <ToggleGroupItem
-            value="system"
             aria-label="System theme"
             className="flex h-10 items-center justify-center gap-2 px-3"
+            value="system"
           >
             <Monitor className="h-4 w-4" />
             <span className="text-sm font-medium">System</span>

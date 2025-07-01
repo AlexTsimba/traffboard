@@ -1,6 +1,6 @@
 "use client";
 
-import { LucideIcon, Ellipsis, Folder, Forward, Trash2 } from "lucide-react";
+import { type LucideIcon, Ellipsis, Folder, Forward, Trash2 } from "lucide-react";
 
 import {
   DropdownMenu,
@@ -50,9 +50,9 @@ export function NavDocuments({
                 </SidebarMenuAction>
               </DropdownMenuTrigger>
               <DropdownMenuContent
+                align={isMobile ? "end" : "start"}
                 className="w-24 rounded-lg"
                 side={isMobile ? "bottom" : "right"}
-                align={isMobile ? "end" : "start"}
               >
                 <DropdownMenuItem>
                   <Folder />

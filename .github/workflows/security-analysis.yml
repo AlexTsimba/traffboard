@@ -1,0 +1,65 @@
+name: Security Analysis
+run-name: 🔒 Security Analysis - ${{ github.actor }}
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    - cron: '0 2 * * *'  # Daily at 2 AM UTC
+
+permissions:
+  contents: read
+  security-events: write
+
+env:
+  PNPM_VERSION: '9'
+  CI: true
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Essential security scanning with standard tools
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false
+
+      - name: 🚀 Setup Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'pnpm'
+
+      - name: 🔨 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔍 Dependency audit
+        run: pnpm audit --audit-level moderate
+        continue-on-error: true
+
+      - name: 🕵️ CodeQL Analysis
+        uses: github/codeql-action/init@v3
+        with:
+          languages: 'javascript,typescript'
+
+      - name: 🏗️ Build for analysis
+        run: pnpm build
+        env:
+          NODE_ENV: production
+
+      - name: 📊 Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
