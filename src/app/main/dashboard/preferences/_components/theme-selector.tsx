@@ -22,6 +22,9 @@ export function ThemeSelector() {
       case "system": {
         return "System mode - automatically matches your device settings";
       }
+      case undefined: {
+        return "Choose your preferred theme";
+      }
       default: {
         return "Choose your preferred theme";
       }
@@ -36,6 +39,10 @@ export function ThemeSelector() {
       case "dark": {
         return "bg-slate-900";
       }
+      case "system":
+      case undefined: {
+        return "bg-gradient-to-r from-white to-slate-900";
+      }
       default: {
         return "bg-gradient-to-r from-white to-slate-900";
       }
@@ -49,6 +56,10 @@ export function ThemeSelector() {
       }
       case "dark": {
         return darkClass;
+      }
+      case "system":
+      case undefined: {
+        return gradientClass;
       }
       default: {
         return gradientClass;

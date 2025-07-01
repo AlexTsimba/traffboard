@@ -19,5 +19,5 @@ export function PreferencesInitializer() {
     }
   }, [layoutStore]);
 
-  return null; // This component doesn't render anything
+  return undefined; // This component doesn't render anything
 }

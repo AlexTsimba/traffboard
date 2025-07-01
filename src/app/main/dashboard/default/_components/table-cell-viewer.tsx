@@ -42,7 +42,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function TableCellViewer({ item }: { item: z.infer<typeof sectionSchema> }) {
+export function TableCellViewer({ item }: { readonly item: z.infer<typeof sectionSchema> }) {
   const isMobile = useIsMobile();
 
   return (

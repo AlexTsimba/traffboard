@@ -26,6 +26,10 @@ export function ThemeSettings() {
       case "dark": {
         return "bg-slate-900";
       }
+      case "system":
+      case undefined: {
+        return "bg-gradient-to-r from-white to-slate-900";
+      }
       default: {
         return "bg-gradient-to-r from-white to-slate-900";
       }
@@ -39,6 +43,10 @@ export function ThemeSettings() {
       }
       case "dark": {
         return darkClass;
+      }
+      case "system":
+      case undefined: {
+        return gradientClass;
       }
       default: {
         return gradientClass;

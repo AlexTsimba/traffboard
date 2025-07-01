@@ -161,6 +161,7 @@ export default tseslint.config(
       "node_modules/**",
       "*.config.js",
       "*.config.mjs",
+      "src/components/ui/**",  // shadcn/ui library components
     ],
   }
 );

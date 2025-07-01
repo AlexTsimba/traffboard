@@ -24,7 +24,7 @@ export function LayoutSelector() {
           ?.split("=")[1];
         return value;
       }
-      return null;
+      return;
     };
 
     const sidebarVariant = getValueFromCookie("sidebar_variant");
@@ -44,6 +44,18 @@ export function LayoutSelector() {
     if (key === "content_layout") setContentLayout(value as ContentLayout);
   };
 
+  const handleSidebarVariantChange = (value: string | undefined) => {
+    if (value) void handleValueChange("sidebar_variant", value);
+  };
+
+  const handleSidebarCollapsibleChange = (value: string | undefined) => {
+    if (value) void handleValueChange("sidebar_collapsible", value);
+  };
+
+  const handleContentLayoutChange = (value: string | undefined) => {
+    if (value) void handleValueChange("content_layout", value);
+  };
+
   return (
     <div className="space-y-4">
       {/* Sidebar Style */}
@@ -61,7 +73,7 @@ export function LayoutSelector() {
           type="single"
           value={variant}
           variant="outline"
-          onValueChange={(value) => handleValueChange("sidebar_variant", value)}
+          onValueChange={handleSidebarVariantChange}
         >
           <ToggleGroupItem
             aria-label="Inset sidebar"
@@ -104,7 +116,7 @@ export function LayoutSelector() {
           type="single"
           value={collapsible}
           variant="outline"
-          onValueChange={(value) => handleValueChange("sidebar_collapsible", value)}
+          onValueChange={handleSidebarCollapsibleChange}
         >
           <ToggleGroupItem
             aria-label="Icon collapse"
@@ -140,7 +152,7 @@ export function LayoutSelector() {
           type="single"
           value={contentLayout}
           variant="outline"
-          onValueChange={(value) => handleValueChange("content_layout", value)}
+          onValueChange={handleContentLayoutChange}
         >
           <ToggleGroupItem
             aria-label="Centered layout"

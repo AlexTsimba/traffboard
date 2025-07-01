@@ -19,8 +19,8 @@ import { withDndColumn } from "../../../../../components/data-table/table-utils"
 import { dashboardColumns } from "./columns";
 import { type sectionSchema } from "./schema";
 
-export function DataTable({ data: initialData }: { data: z.infer<typeof sectionSchema>[] }) {
-  const [data, setData] = React.useState(() => initialData);
+export function DataTable({ data: initialData }: { readonly data: readonly z.infer<typeof sectionSchema>[] }) {
+  const [data, setData] = React.useState(() => [...initialData]);
   const columns = withDndColumn(dashboardColumns);
   const table = useDataTableInstance({ data, columns, getRowId: (row) => row.id.toString() });
 

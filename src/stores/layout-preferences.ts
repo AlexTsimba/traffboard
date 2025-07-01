@@ -41,7 +41,7 @@ const getValueFromCookie = (name: string): string | null => {
       ?.split("=")[1];
     return value ?? null;
   }
-  return null;
+  
 };
 
 // Layout preferences store

@@ -6,6 +6,23 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { SidebarVariant, SidebarCollapsible, ContentLayout } from "@/lib/layout-preferences";
 
+const formatLabel = (key: string, value: string) => {
+  switch (key) {
+    case "variant": {
+      return `Sidebar: ${value.charAt(0).toUpperCase() + value.slice(1)}`;
+    }
+    case "collapsible": {
+      return `Collapse: ${value === "icon" ? "Icon" : "Off-canvas"}`;
+    }
+    case "contentLayout": {
+      return `Content: ${value === "centered" ? "Centered" : "Full Width"}`;
+    }
+    default: {
+      return value;
+    }
+  }
+};
+
 export function LayoutPreview() {
   const [variant, setVariant] = useState<SidebarVariant>("sidebar");
   const [collapsible, setCollapsible] = useState<SidebarCollapsible>("icon");
@@ -21,7 +38,7 @@ export function LayoutPreview() {
           ?.split("=")[1];
         return value;
       }
-      return null;
+      return;
     };
 
     const updateValues = () => {
@@ -44,23 +61,6 @@ export function LayoutPreview() {
       clearInterval(interval);
     };
   }, []);
-
-  const formatLabel = (key: string, value: string) => {
-    switch (key) {
-      case "variant": {
-        return `Sidebar: ${value.charAt(0).toUpperCase() + value.slice(1)}`;
-      }
-      case "collapsible": {
-        return `Collapse: ${value === "icon" ? "Icon" : "Off-canvas"}`;
-      }
-      case "contentLayout": {
-        return `Content: ${value === "centered" ? "Centered" : "Full Width"}`;
-      }
-      default: {
-        return value;
-      }
-    }
-  };
 
   return (
     <Card>

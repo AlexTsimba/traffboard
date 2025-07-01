@@ -12,8 +12,8 @@ import {
 import { cn } from "@/lib/utils";
 
 interface DataTableColumnHeaderProps<TData, TValue> extends React.HTMLAttributes<HTMLDivElement> {
-  column: Column<TData, TValue>;
-  title: string;
+  readonly column: Column<TData, TValue>;
+  readonly title: string;
 }
 
 function getSortIcon(sort: "asc" | "desc" | false | undefined) {
@@ -23,6 +23,10 @@ function getSortIcon(sort: "asc" | "desc" | false | undefined) {
     }
     case "asc": {
       return <ArrowUp />;
+    }
+    case false:
+    case undefined: {
+      return <ChevronsUpDown />;
     }
     default: {
       return <ChevronsUpDown />;
