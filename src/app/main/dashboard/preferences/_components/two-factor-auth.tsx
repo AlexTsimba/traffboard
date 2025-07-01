@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { QrCode, CheckCircle, AlertTriangle, Copy } from "lucide-react";
+import { useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -31,25 +31,37 @@ export function TwoFactorAuth() {
         </Badge>
       </div>
 
-      {!isEnabled ? (
+      {isEnabled ? (
+        /* 2FA Enabled */
+        <div className="space-y-3">
+          <div className="space-y-2">
+            <Label className="text-xs">Recovery Codes</Label>
+            <div className="grid grid-cols-2 gap-1 font-mono text-xs">
+              <div className="bg-muted rounded p-1 text-xs">1A2B-3C4D</div>
+              <div className="bg-muted rounded p-1 text-xs">5E6F-7G8H</div>
+              <div className="bg-muted rounded p-1 text-xs">9I0J-1K2L</div>
+              <div className="bg-muted rounded p-1 text-xs">3M4N-5O6P</div>
+            </div>
+            <Button className="h-7 w-full text-xs" size="sm" variant="outline">
+              Download Recovery Codes
+            </Button>
+          </div>
+
+          <Button
+            className="h-7 w-full text-xs"
+            size="sm"
+            variant="destructive"
+            onClick={() => {
+              setIsEnabled(false);
+            }}
+          >
+            Disable Two-Factor Authentication
+          </Button>
+        </div>
+      ) : (
         /* Setup 2FA */
         <div className="space-y-3">
-          {!showQR ? (
-            <div className="space-y-3">
-              <p className="text-muted-foreground text-sm">
-                Use an authenticator app like Google Authenticator or Authy for additional security.
-              </p>
-              <Button
-                className="h-8 w-full"
-                size="sm"
-                onClick={() => {
-                  setShowQR(true);
-                }}
-              >
-                Setup Two-Factor Authentication
-              </Button>
-            </div>
-          ) : (
+          {showQR ? (
             /* QR Code Setup */
             <div className="space-y-3">
               {/* Mock QR Code */}
@@ -100,34 +112,22 @@ export function TwoFactorAuth() {
                 </Button>
               </div>
             </div>
-          )}
-        </div>
-      ) : (
-        /* 2FA Enabled */
-        <div className="space-y-3">
-          <div className="space-y-2">
-            <Label className="text-xs">Recovery Codes</Label>
-            <div className="grid grid-cols-2 gap-1 font-mono text-xs">
-              <div className="bg-muted rounded p-1 text-xs">1A2B-3C4D</div>
-              <div className="bg-muted rounded p-1 text-xs">5E6F-7G8H</div>
-              <div className="bg-muted rounded p-1 text-xs">9I0J-1K2L</div>
-              <div className="bg-muted rounded p-1 text-xs">3M4N-5O6P</div>
+          ) : (
+            <div className="space-y-3">
+              <p className="text-muted-foreground text-sm">
+                Use an authenticator app like Google Authenticator or Authy for additional security.
+              </p>
+              <Button
+                className="h-8 w-full"
+                size="sm"
+                onClick={() => {
+                  setShowQR(true);
+                }}
+              >
+                Setup Two-Factor Authentication
+              </Button>
             </div>
-            <Button className="h-7 w-full text-xs" size="sm" variant="outline">
-              Download Recovery Codes
-            </Button>
-          </div>
-
-          <Button
-            className="h-7 w-full text-xs"
-            size="sm"
-            variant="destructive"
-            onClick={() => {
-              setIsEnabled(false);
-            }}
-          >
-            Disable Two-Factor Authentication
-          </Button>
+          )}
         </div>
       )}
     </div>

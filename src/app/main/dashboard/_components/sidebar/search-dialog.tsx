@@ -1,7 +1,7 @@
 "use client";
-import * as React from "react";
-import { useRouter } from "next/navigation";
 import { ChartPie, Grid2X2, ChartLine, ShoppingBag, Search, Home } from "lucide-react";
+import { useRouter } from "next/navigation";
+import * as React from "react";
 
 import {
   CommandDialog,
@@ -29,15 +29,16 @@ export function SearchDialog() {
 
   return (
     <>
-      <div
+      <button
         className="text-muted-foreground flex cursor-pointer items-center gap-2 text-sm"
+        type="button"
         onClick={() => {
           setOpen(true);
         }}
       >
         <Search className="size-4" />
         Search
-      </div>
+      </button>
       <CommandDialog open={open} onOpenChange={setOpen}>
         <CommandInput placeholder="Search dashboards, users, and more…" />
         <CommandList>

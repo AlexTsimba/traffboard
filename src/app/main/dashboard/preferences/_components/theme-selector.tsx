@@ -13,36 +13,46 @@ export function ThemeSelector() {
 
   const getThemeDescription = () => {
     switch (theme) {
-      case "light":
+      case "light": {
         return "Light mode - easy on the eyes in bright environments";
-      case "dark":
+      }
+      case "dark": {
         return "Dark mode - perfect for low-light conditions";
-      case "system":
+      }
+      case "system": {
         return "System mode - automatically matches your device settings";
-      default:
+      }
+      default: {
         return "Choose your preferred theme";
+      }
     }
   };
 
   const getBackgroundClass = () => {
     switch (theme) {
-      case "light":
+      case "light": {
         return "bg-white";
-      case "dark":
+      }
+      case "dark": {
         return "bg-slate-900";
-      default:
+      }
+      default: {
         return "bg-gradient-to-r from-white to-slate-900";
+      }
     }
   };
 
   const getElementClass = (lightClass: string, darkClass: string, gradientClass: string) => {
     switch (theme) {
-      case "light":
+      case "light": {
         return lightClass;
-      case "dark":
+      }
+      case "dark": {
         return darkClass;
-      default:
+      }
+      default: {
         return gradientClass;
+      }
     }
   };
 

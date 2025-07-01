@@ -1,6 +1,6 @@
 "use client";
-import { useMemo } from "react";
 import { usePathname } from "next/navigation";
+import { useMemo } from "react";
 
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -19,7 +19,7 @@ export function DashboardHeader() {
   const rightContent = useMemo(() => {
     if (pathname.includes("/conversions")) return <FilterButton />;
     // Overview — ничего
-    return null;
+    return;
   }, [pathname]);
 
   return (

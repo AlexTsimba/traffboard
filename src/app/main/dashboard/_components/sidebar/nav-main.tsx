@@ -1,8 +1,8 @@
 "use client";
 
+import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronRight } from "lucide-react";
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
@@ -119,7 +119,6 @@ const NavItemCollapsed = ({
           {item.subItems?.map((subItem) => (
             <DropdownMenuItem key={subItem.title} asChild>
               <SidebarMenuSubButton
-                key={subItem.title}
                 asChild
                 aria-disabled={subItem.comingSoon}
                 className="focus-visible:ring-0"

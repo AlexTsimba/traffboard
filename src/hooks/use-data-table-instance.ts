@@ -1,4 +1,3 @@
-import * as React from "react";
 import {
   type ColumnDef,
   type ColumnFiltersState,
@@ -12,10 +11,11 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import * as React from "react";
 
 interface UseDataTableInstanceProps<TData extends { id: string | number }, TValue> {
   data: TData[];
-  columns: Array<ColumnDef<TData, TValue>>;
+  columns: ColumnDef<TData, TValue>[];
   enableRowSelection?: boolean;
   defaultPageIndex?: number;
   defaultPageSize?: number;

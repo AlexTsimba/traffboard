@@ -1,6 +1,6 @@
 "use client";
-import { useState, useEffect } from "react";
 import { Sidebar, Columns, Layout } from "lucide-react";
+import { useState, useEffect } from "react";
 
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
@@ -29,7 +29,7 @@ export function SidebarLayoutSwitcherModern() {
   const handleChange = (value: string) => {
     setCookie("sidebar_variant", value);
     setSelected(value);
-    window.location.reload();
+    globalThis.location.reload();
   };
 
   return (

@@ -1,7 +1,7 @@
 "use client";
 
-import * as React from "react";
 import { Plus } from "lucide-react";
+import * as React from "react";
 import { type z } from "zod";
 
 import { Badge } from "@/components/ui/badge";
@@ -19,7 +19,7 @@ import { withDndColumn } from "../../../../../components/data-table/table-utils"
 import { dashboardColumns } from "./columns";
 import { type sectionSchema } from "./schema";
 
-export function DataTable({ data: initialData }: { data: Array<z.infer<typeof sectionSchema>> }) {
+export function DataTable({ data: initialData }: { data: z.infer<typeof sectionSchema>[] }) {
   const [data, setData] = React.useState(() => initialData);
   const columns = withDndColumn(dashboardColumns);
   const table = useDataTableInstance({ data, columns, getRowId: (row) => row.id.toString() });

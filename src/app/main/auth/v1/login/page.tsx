@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { Command } from "lucide-react";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 

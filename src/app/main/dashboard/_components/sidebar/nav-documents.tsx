@@ -22,11 +22,11 @@ import {
 export function NavDocuments({
   items,
 }: {
-  readonly items: ReadonlyArray<{
+  readonly items: readonly {
     readonly name: string;
     readonly url: string;
     readonly icon: LucideIcon;
-  }>;
+  }[];
 }) {
   const { isMobile } = useSidebar();
 

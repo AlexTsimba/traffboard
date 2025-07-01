@@ -26,19 +26,24 @@ export function LoginFormV1() {
     },
   });
 
-  const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+  const onSubmit = (data: z.infer<typeof FormSchema>) => {
     toast("You submitted the following values", {
       description: (
         <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
+          <code className="text-white">{JSON.stringify(data, undefined, 2)}</code>
         </pre>
       ),
     });
   };
 
+  const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    void form.handleSubmit(onSubmit)(event);
+  };
+
   return (
     <Form {...form}>
-      <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+      <form className="space-y-4" onSubmit={handleFormSubmit}>
         <FormField
           control={form.control}
           name="email"

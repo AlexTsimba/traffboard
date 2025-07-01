@@ -1,5 +1,5 @@
-import { type ReactNode } from "react";
 import { cookies } from "next/headers";
+import { type ReactNode } from "react";
 
 import { AppSidebar } from "@/app/main/dashboard/_components/sidebar/app-sidebar";
 import { Separator } from "@/components/ui/separator";

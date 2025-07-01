@@ -18,12 +18,15 @@ interface DataTableColumnHeaderProps<TData, TValue> extends React.HTMLAttributes
 
 function getSortIcon(sort: "asc" | "desc" | false | undefined) {
   switch (sort) {
-    case "desc":
+    case "desc": {
       return <ArrowDown />;
-    case "asc":
+    }
+    case "asc": {
       return <ArrowUp />;
-    default:
+    }
+    default: {
       return <ChevronsUpDown />;
+    }
   }
 }
 

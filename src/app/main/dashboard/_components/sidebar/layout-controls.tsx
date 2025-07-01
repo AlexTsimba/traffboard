@@ -15,9 +15,23 @@ interface LayoutControlsProps {
   readonly contentLayout: ContentLayout;
 }
 
+// Move async function to outer scope
+const handleValueChange = async (key: string, value: string) => {
+  await setValueToCookie(key, value);
+};
+
 export function LayoutControls({ variant, collapsible, contentLayout }: LayoutControlsProps) {
-  const handleValueChange = async (key: string, value: string) => {
-    await setValueToCookie(key, value);
+  // Create wrapper functions for event handlers
+  const handleSidebarVariantChange = (value: string) => {
+    void handleValueChange("sidebar_variant", value);
+  };
+
+  const handleSidebarCollapsibleChange = (value: string) => {
+    void handleValueChange("sidebar_collapsible", value);
+  };
+
+  const handleContentLayoutChange = (value: string) => {
+    void handleValueChange("content_layout", value);
   };
 
   return (
@@ -43,7 +57,7 @@ export function LayoutControls({ variant, collapsible, contentLayout }: LayoutCo
                 type="single"
                 value={variant}
                 variant="outline"
-                onValueChange={(value) => handleValueChange("sidebar_variant", value)}
+                onValueChange={handleSidebarVariantChange}
               >
                 <ToggleGroupItem aria-label="Toggle inset" className="text-xs" value="inset">
                   Inset
@@ -65,7 +79,7 @@ export function LayoutControls({ variant, collapsible, contentLayout }: LayoutCo
                 type="single"
                 value={collapsible}
                 variant="outline"
-                onValueChange={(value) => handleValueChange("sidebar_collapsible", value)}
+                onValueChange={handleSidebarCollapsibleChange}
               >
                 <ToggleGroupItem aria-label="Toggle icon" className="text-xs" value="icon">
                   Icon

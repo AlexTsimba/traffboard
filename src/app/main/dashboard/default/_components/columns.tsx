@@ -22,7 +22,7 @@ import { DataTableColumnHeader } from "../../../../../components/data-table/data
 import { type sectionSchema } from "./schema";
 import { TableCellViewer } from "./table-cell-viewer";
 
-export const dashboardColumns: Array<ColumnDef<z.infer<typeof sectionSchema>>> = [
+export const dashboardColumns: ColumnDef<z.infer<typeof sectionSchema>>[] = [
   {
     id: "select",
     header: ({ table }) => (

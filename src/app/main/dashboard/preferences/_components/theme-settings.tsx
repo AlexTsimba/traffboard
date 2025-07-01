@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { Monitor, Moon, Sun, Palette, Sparkles, Contrast, Eye } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,23 +20,29 @@ export function ThemeSettings() {
 
   const getThemeBackgroundClass = () => {
     switch (theme) {
-      case "light":
+      case "light": {
         return "bg-white";
-      case "dark":
+      }
+      case "dark": {
         return "bg-slate-900";
-      default:
+      }
+      default: {
         return "bg-gradient-to-r from-white to-slate-900";
+      }
     }
   };
 
   const getThemeElementClass = (lightClass: string, darkClass: string, gradientClass: string) => {
     switch (theme) {
-      case "light":
+      case "light": {
         return lightClass;
-      case "dark":
+      }
+      case "dark": {
         return darkClass;
-      default:
+      }
+      default: {
         return gradientClass;
+      }
     }
   };
 

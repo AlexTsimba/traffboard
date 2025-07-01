@@ -1,4 +1,3 @@
-import * as React from "react";
 import {
   KeyboardSensor,
   MouseSensor,
@@ -13,6 +12,7 @@ import {
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import { SortableContext, verticalListSortingStrategy, arrayMove } from "@dnd-kit/sortable";
 import { type ColumnDef, flexRender, type Table as TanStackTable } from "@tanstack/react-table";
+import * as React from "react";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
@@ -20,7 +20,7 @@ import { DraggableRow } from "./draggable-row";
 
 interface DataTableProps<TData, TValue> {
   table: TanStackTable<TData>;
-  columns: Array<ColumnDef<TData, TValue>>;
+  columns: ColumnDef<TData, TValue>[];
   dndEnabled?: boolean;
   onReorder?: (newData: TData[]) => void;
 }
@@ -32,11 +32,11 @@ function renderTableBody<TData, TValue>({
   dataIds,
 }: {
   table: TanStackTable<TData>;
-  columns: Array<ColumnDef<TData, TValue>>;
+  columns: ColumnDef<TData, TValue>[];
   dndEnabled: boolean;
   dataIds: UniqueIdentifier[];
 }) {
-  if (!table.getRowModel().rows.length) {
+  if (table.getRowModel().rows.length === 0) {
     return (
       <TableRow>
         <TableCell className="h-24 text-center" colSpan={columns.length}>

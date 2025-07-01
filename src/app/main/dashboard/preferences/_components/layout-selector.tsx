@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { Settings, Sidebar, Maximize2 } from "lucide-react";
+import { useState, useEffect } from "react";
 
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";

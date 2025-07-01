@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { BadgeCheck, Bell, CreditCard, LogOut } from "lucide-react";
+import { useState } from "react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -17,13 +17,13 @@ import { cn, getInitials } from "@/lib/utils";
 export function AccountSwitcher({
   users,
 }: {
-  readonly users: ReadonlyArray<{
+  readonly users: readonly {
     readonly id: string;
     readonly name: string;
     readonly email: string;
     readonly avatar: string;
     readonly role: string;
-  }>;
+  }[];
 }) {
   const [activeUser, setActiveUser] = useState(users[0]);
 

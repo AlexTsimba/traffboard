@@ -47,14 +47,18 @@ export function LayoutPreview() {
 
   const formatLabel = (key: string, value: string) => {
     switch (key) {
-      case "variant":
+      case "variant": {
         return `Sidebar: ${value.charAt(0).toUpperCase() + value.slice(1)}`;
-      case "collapsible":
+      }
+      case "collapsible": {
         return `Collapse: ${value === "icon" ? "Icon" : "Off-canvas"}`;
-      case "contentLayout":
+      }
+      case "contentLayout": {
         return `Content: ${value === "centered" ? "Centered" : "Full Width"}`;
-      default:
+      }
+      default: {
         return value;
+      }
     }
   };
 

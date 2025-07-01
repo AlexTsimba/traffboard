@@ -1,7 +1,7 @@
 "use client";
-import { useState, useEffect } from "react";
 import { Sun, Moon, Laptop } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useState, useEffect } from "react";
 
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
