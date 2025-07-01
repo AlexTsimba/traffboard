@@ -118,4 +118,15 @@
   body {
     @apply bg-background text-foreground overscroll-none;
   }
+
+  /* Ensure proper viewport height for dashboards */
+  html,
+  body {
+    height: 100%;
+  }
+
+  /* Prevent layout shift when scrollbars appear/disappear */
+  html {
+    overflow-y: scroll;
+  }
 }

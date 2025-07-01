@@ -1,0 +1,209 @@
+"use client";
+
+import { useState, useEffect } from "react";
+
+import { Settings, Sidebar, Maximize2, Monitor, Grid } from "lucide-react";
+
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import type { SidebarVariant, SidebarCollapsible, ContentLayout } from "@/lib/layout-preferences";
+import { setValueToCookie } from "@/server/server-actions";
+
+export function LayoutSettings() {
+  const [variant, setVariant] = useState<SidebarVariant>("sidebar");
+  const [collapsible, setCollapsible] = useState<SidebarCollapsible>("icon");
+  const [contentLayout, setContentLayout] = useState<ContentLayout>("full-width");
+
+  useEffect(() => {
+    const getValueFromCookie = (name: string) => {
+      if (typeof document !== "undefined") {
+        const value = document.cookie
+          .split("; ")
+          .find((row) => row.startsWith(`${name}=`))
+          ?.split("=")[1];
+        return value;
+      }
+      return null;
+    };
+
+    const updateValues = () => {
+      const sidebarVariant = getValueFromCookie("sidebar_variant");
+      const sidebarCollapsible = getValueFromCookie("sidebar_collapsible");
+      const contentLayoutValue = getValueFromCookie("content_layout");
+
+      setVariant((sidebarVariant as SidebarVariant) ?? "sidebar");
+      setCollapsible((sidebarCollapsible as SidebarCollapsible) ?? "icon");
+      setContentLayout((contentLayoutValue as ContentLayout) ?? "full-width");
+    };
+
+    updateValues();
+    const interval = setInterval(updateValues, 300);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleValueChange = async (key: string, value: string) => {
+    await setValueToCookie(key, value);
+    if (key === "sidebar_variant") setVariant(value as SidebarVariant);
+    if (key === "sidebar_collapsible") setCollapsible(value as SidebarCollapsible);
+    if (key === "content_layout") setContentLayout(value as ContentLayout);
+  };
+
+  return (
+    <div className="grid gap-3 lg:grid-cols-2">
+      {/* Left Column */}
+      <div className="space-y-3">
+        {/* Current Configuration Preview */}
+        <Card className="gap-2 py-3">
+          <CardHeader className="pb-1">
+            <CardTitle className="flex items-center gap-2 text-sm">
+              <Monitor className="h-4 w-4" />
+              Current Layout
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <div className="flex flex-wrap gap-1">
+              <Badge variant="secondary" className="text-xs">
+                {variant.charAt(0).toUpperCase() + variant.slice(1)}
+              </Badge>
+              <Badge variant="secondary" className="text-xs">
+                {collapsible === "icon" ? "Icon" : "Off-canvas"}
+              </Badge>
+              <Badge variant="secondary" className="text-xs">
+                {contentLayout === "centered" ? "Centered" : "Full Width"}
+              </Badge>
+            </div>
+
+            {/* Visual Preview */}
+            <div className="bg-muted/30 rounded-md border p-2">
+              <div className="flex h-10 gap-1">
+                <div
+                  className={`bg-muted border-muted-foreground/30 rounded-sm border ${
+                    variant === "floating" ? "border-dashed" : ""
+                  } ${variant === "inset" ? "ml-0.5" : ""} ${collapsible === "icon" ? "w-2" : "w-5"}`}
+                />
+                <div
+                  className={`bg-background border-muted-foreground/20 flex-1 rounded-sm border ${
+                    contentLayout === "centered" ? "mx-auto max-w-16" : "w-full"
+                  }`}
+                >
+                  <div className="border-muted-foreground/30 flex h-full items-center justify-center rounded-sm border border-dashed">
+                    <Grid className="text-muted-foreground h-2 w-2" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Sidebar Behavior */}
+        <Card className="gap-2 py-3">
+          <CardHeader className="pb-1">
+            <CardTitle className="flex items-center gap-2 text-sm">
+              <Settings className="h-4 w-4" />
+              Sidebar Behavior
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ToggleGroup
+              className="grid w-full grid-cols-2 gap-2"
+              size="sm"
+              variant="outline"
+              type="single"
+              value={collapsible}
+              onValueChange={(value) => handleValueChange("sidebar_collapsible", value)}
+            >
+              <ToggleGroupItem value="icon" aria-label="Icon collapse" className="h-8">
+                <div className="text-center">
+                  <div className="text-xs font-medium">Icon</div>
+                  <div className="text-muted-foreground text-xs">Shows icons</div>
+                </div>
+              </ToggleGroupItem>
+              <ToggleGroupItem value="offcanvas" aria-label="Off-canvas collapse" className="h-8">
+                <div className="text-center">
+                  <div className="text-xs font-medium">Off-canvas</div>
+                  <div className="text-muted-foreground text-xs">Hides completely</div>
+                </div>
+              </ToggleGroupItem>
+            </ToggleGroup>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Right Column */}
+      <div className="space-y-3">
+        {/* Sidebar Style */}
+        <Card className="gap-2 py-3">
+          <CardHeader className="pb-1">
+            <CardTitle className="flex items-center gap-2 text-sm">
+              <Sidebar className="h-4 w-4" />
+              Sidebar Style
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ToggleGroup
+              className="grid w-full grid-cols-3 gap-1"
+              size="sm"
+              variant="outline"
+              type="single"
+              value={variant}
+              onValueChange={(value) => handleValueChange("sidebar_variant", value)}
+            >
+              <ToggleGroupItem value="inset" aria-label="Inset sidebar" className="h-8">
+                <div className="text-center">
+                  <div className="text-xs font-medium">Inset</div>
+                  <div className="text-muted-foreground text-xs">Within</div>
+                </div>
+              </ToggleGroupItem>
+              <ToggleGroupItem value="sidebar" aria-label="Standard sidebar" className="h-8">
+                <div className="text-center">
+                  <div className="text-xs font-medium">Standard</div>
+                  <div className="text-muted-foreground text-xs">Classic</div>
+                </div>
+              </ToggleGroupItem>
+              <ToggleGroupItem value="floating" aria-label="Floating sidebar" className="h-8">
+                <div className="text-center">
+                  <div className="text-xs font-medium">Floating</div>
+                  <div className="text-muted-foreground text-xs">Overlay</div>
+                </div>
+              </ToggleGroupItem>
+            </ToggleGroup>
+          </CardContent>
+        </Card>
+
+        {/* Content Layout */}
+        <Card className="gap-2 py-3">
+          <CardHeader className="pb-1">
+            <CardTitle className="flex items-center gap-2 text-sm">
+              <Maximize2 className="h-4 w-4" />
+              Content Width
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ToggleGroup
+              className="grid w-full grid-cols-2 gap-2"
+              size="sm"
+              variant="outline"
+              type="single"
+              value={contentLayout}
+              onValueChange={(value) => handleValueChange("content_layout", value)}
+            >
+              <ToggleGroupItem value="centered" aria-label="Centered layout" className="h-8">
+                <div className="text-center">
+                  <div className="text-xs font-medium">Centered</div>
+                  <div className="text-muted-foreground text-xs">Constrained</div>
+                </div>
+              </ToggleGroupItem>
+              <ToggleGroupItem value="full-width" aria-label="Full width layout" className="h-8">
+                <div className="text-center">
+                  <div className="text-xs font-medium">Full Width</div>
+                  <div className="text-muted-foreground text-xs">All space</div>
+                </div>
+              </ToggleGroupItem>
+            </ToggleGroup>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}

@@ -23,9 +23,9 @@ export default async function Layout({ children }: Readonly<{ children: ReactNod
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
       <AppSidebar variant={sidebarVariant} collapsible={sidebarCollapsible} />
-      <SidebarInset>
-        {/* Header always full width */}
-        <header className="flex h-12 shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+      <SidebarInset className="flex h-screen flex-col">
+        {/* Sticky Header */}
+        <header className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 flex h-12 shrink-0 items-center gap-2 border-b backdrop-blur transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
           <div className="flex w-full items-center justify-between px-4 lg:px-6">
             <div className="flex items-center gap-1 lg:gap-2">
               <SidebarTrigger className="-ml-1" />
@@ -38,8 +38,10 @@ export default async function Layout({ children }: Readonly<{ children: ReactNod
           </div>
         </header>
 
-        {/* Content area with configurable width */}
-        <div className={cn("p-4 md:p-6", contentLayout === "centered" && "mx-auto w-full max-w-6xl")}>{children}</div>
+        {/* Scrollable Content area */}
+        <div className="flex-1 overflow-auto">
+          <div className={cn("p-4 md:p-6", contentLayout === "centered" && "mx-auto w-full max-w-6xl")}>{children}</div>
+        </div>
       </SidebarInset>
     </SidebarProvider>
   );

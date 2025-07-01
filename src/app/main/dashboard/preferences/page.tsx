@@ -1,30 +1,51 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import { LayoutSelector } from "./_components/layout-selector";
-import { ThemeSelector } from "./_components/theme-selector";
+import { AccountProfile } from "./_components/account-profile";
+import { LayoutSettings } from "./_components/layout-settings";
+import { SecuritySettings } from "./_components/security-settings";
+import { ThemeSettings } from "./_components/theme-settings";
 
-export default function PreferencesPage() {
+export default function SettingsPage() {
   return (
-    <div className="@container/main flex flex-col gap-4 md:gap-6">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">Preferences</h1>
-        <p className="text-muted-foreground">Customize your TraffBoard experience and appearance settings</p>
-      </div>
+    <div className="@container/main flex flex-col gap-4">
+      <Tabs defaultValue="account" className="w-full">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
 
-      <Tabs defaultValue="appearance" className="w-full">
-        <TabsList className="grid w-full grid-cols-1 lg:w-[400px]">
-          <TabsTrigger value="appearance">Appearance</TabsTrigger>
-        </TabsList>
+          <TabsList className="grid h-10 grid-cols-4">
+            <TabsTrigger value="account" className="text-sm">
+              Account
+            </TabsTrigger>
+            <TabsTrigger value="security" className="text-sm">
+              Security
+            </TabsTrigger>
+            <TabsTrigger value="layout" className="text-sm">
+              Layout
+            </TabsTrigger>
+            <TabsTrigger value="theme" className="text-sm">
+              Theme
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
-        <TabsContent value="appearance" className="space-y-6">
-          <div className="rounded-lg border p-6">
-            <h3 className="mb-6 text-lg font-semibold">Theme & Layout</h3>
-            <div className="space-y-8">
-              <ThemeSelector />
-              <LayoutSelector />
-            </div>
-          </div>
-        </TabsContent>
+        {/* Content под табами */}
+        <div className="mt-4">
+          <TabsContent value="account" className="mt-0">
+            <AccountProfile />
+          </TabsContent>
+
+          <TabsContent value="security" className="mt-0">
+            <SecuritySettings />
+          </TabsContent>
+
+          <TabsContent value="layout" className="mt-0">
+            <LayoutSettings />
+          </TabsContent>
+
+          <TabsContent value="theme" className="mt-0">
+            <ThemeSettings />
+          </TabsContent>
+        </div>
       </Tabs>
     </div>
   );
