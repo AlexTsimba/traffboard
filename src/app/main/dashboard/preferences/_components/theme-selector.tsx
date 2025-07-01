@@ -88,31 +88,33 @@ export function ThemeSelector() {
         <ToggleGroup
           className="grid w-full grid-cols-1 gap-2 sm:grid-cols-3"
           size="sm"
-          variant="outline"
           type="single"
           value={theme}
-          onValueChange={(value) => setTheme(value)}
+          variant="outline"
+          onValueChange={(value) => {
+            setTheme(value);
+          }}
         >
           <ToggleGroupItem
-            value="light"
             aria-label="Light theme"
             className="flex h-10 items-center justify-center gap-2 px-3"
+            value="light"
           >
             <Sun className="h-4 w-4" />
             <span className="text-sm font-medium">Light</span>
           </ToggleGroupItem>
           <ToggleGroupItem
-            value="dark"
             aria-label="Dark theme"
             className="flex h-10 items-center justify-center gap-2 px-3"
+            value="dark"
           >
             <Moon className="h-4 w-4" />
             <span className="text-sm font-medium">Dark</span>
           </ToggleGroupItem>
           <ToggleGroupItem
-            value="system"
             aria-label="System theme"
             className="flex h-10 items-center justify-center gap-2 px-3"
+            value="system"
           >
             <Monitor className="h-4 w-4" />
             <span className="text-sm font-medium">System</span>

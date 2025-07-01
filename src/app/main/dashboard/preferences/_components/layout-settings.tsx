@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-
 import { Settings, Sidebar, Maximize2, Monitor, Grid } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -39,7 +38,9 @@ export function LayoutSettings() {
 
     updateValues();
     const interval = setInterval(updateValues, 300);
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+    };
   }, []);
 
   const handleValueChange = async (key: string, value: string) => {
@@ -63,13 +64,13 @@ export function LayoutSettings() {
           </CardHeader>
           <CardContent className="space-y-2">
             <div className="flex flex-wrap gap-1">
-              <Badge variant="secondary" className="text-xs">
+              <Badge className="text-xs" variant="secondary">
                 {variant.charAt(0).toUpperCase() + variant.slice(1)}
               </Badge>
-              <Badge variant="secondary" className="text-xs">
+              <Badge className="text-xs" variant="secondary">
                 {collapsible === "icon" ? "Icon" : "Off-canvas"}
               </Badge>
-              <Badge variant="secondary" className="text-xs">
+              <Badge className="text-xs" variant="secondary">
                 {contentLayout === "centered" ? "Centered" : "Full Width"}
               </Badge>
             </div>
@@ -108,18 +109,18 @@ export function LayoutSettings() {
             <ToggleGroup
               className="grid w-full grid-cols-2 gap-2"
               size="sm"
-              variant="outline"
               type="single"
               value={collapsible}
+              variant="outline"
               onValueChange={(value) => handleValueChange("sidebar_collapsible", value)}
             >
-              <ToggleGroupItem value="icon" aria-label="Icon collapse" className="h-8">
+              <ToggleGroupItem aria-label="Icon collapse" className="h-8" value="icon">
                 <div className="text-center">
                   <div className="text-xs font-medium">Icon</div>
                   <div className="text-muted-foreground text-xs">Shows icons</div>
                 </div>
               </ToggleGroupItem>
-              <ToggleGroupItem value="offcanvas" aria-label="Off-canvas collapse" className="h-8">
+              <ToggleGroupItem aria-label="Off-canvas collapse" className="h-8" value="offcanvas">
                 <div className="text-center">
                   <div className="text-xs font-medium">Off-canvas</div>
                   <div className="text-muted-foreground text-xs">Hides completely</div>
@@ -144,24 +145,24 @@ export function LayoutSettings() {
             <ToggleGroup
               className="grid w-full grid-cols-3 gap-1"
               size="sm"
-              variant="outline"
               type="single"
               value={variant}
+              variant="outline"
               onValueChange={(value) => handleValueChange("sidebar_variant", value)}
             >
-              <ToggleGroupItem value="inset" aria-label="Inset sidebar" className="h-8">
+              <ToggleGroupItem aria-label="Inset sidebar" className="h-8" value="inset">
                 <div className="text-center">
                   <div className="text-xs font-medium">Inset</div>
                   <div className="text-muted-foreground text-xs">Within</div>
                 </div>
               </ToggleGroupItem>
-              <ToggleGroupItem value="sidebar" aria-label="Standard sidebar" className="h-8">
+              <ToggleGroupItem aria-label="Standard sidebar" className="h-8" value="sidebar">
                 <div className="text-center">
                   <div className="text-xs font-medium">Standard</div>
                   <div className="text-muted-foreground text-xs">Classic</div>
                 </div>
               </ToggleGroupItem>
-              <ToggleGroupItem value="floating" aria-label="Floating sidebar" className="h-8">
+              <ToggleGroupItem aria-label="Floating sidebar" className="h-8" value="floating">
                 <div className="text-center">
                   <div className="text-xs font-medium">Floating</div>
                   <div className="text-muted-foreground text-xs">Overlay</div>
@@ -183,18 +184,18 @@ export function LayoutSettings() {
             <ToggleGroup
               className="grid w-full grid-cols-2 gap-2"
               size="sm"
-              variant="outline"
               type="single"
               value={contentLayout}
+              variant="outline"
               onValueChange={(value) => handleValueChange("content_layout", value)}
             >
-              <ToggleGroupItem value="centered" aria-label="Centered layout" className="h-8">
+              <ToggleGroupItem aria-label="Centered layout" className="h-8" value="centered">
                 <div className="text-center">
                   <div className="text-xs font-medium">Centered</div>
                   <div className="text-muted-foreground text-xs">Constrained</div>
                 </div>
               </ToggleGroupItem>
-              <ToggleGroupItem value="full-width" aria-label="Full width layout" className="h-8">
+              <ToggleGroupItem aria-label="Full width layout" className="h-8" value="full-width">
                 <div className="text-center">
                   <div className="text-xs font-medium">Full Width</div>
                   <div className="text-muted-foreground text-xs">All space</div>

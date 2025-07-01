@@ -1,5 +1,5 @@
 import { useSortable } from "@dnd-kit/sortable";
-import { ColumnDef } from "@tanstack/react-table";
+import { type ColumnDef } from "@tanstack/react-table";
 import { GripVertical } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -13,9 +13,9 @@ function DragHandle({ id }: { id: number }) {
     <Button
       {...attributes}
       {...listeners}
-      variant="ghost"
-      size="icon"
       className="text-muted-foreground size-7 hover:bg-transparent"
+      size="icon"
+      variant="ghost"
     >
       <GripVertical className="text-muted-foreground size-3" />
       <span className="sr-only">Drag to reorder</span>

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-
 import { QrCode, CheckCircle, AlertTriangle, Copy } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -17,7 +16,7 @@ export function TwoFactorAuth() {
     <div className="space-y-3">
       {/* Status */}
       <div className="flex items-center justify-between">
-        <Badge variant={isEnabled ? "default" : "secondary"} className="flex items-center gap-1">
+        <Badge className="flex items-center gap-1" variant={isEnabled ? "default" : "secondary"}>
           {isEnabled ? (
             <>
               <CheckCircle className="h-3 w-3" />
@@ -40,7 +39,13 @@ export function TwoFactorAuth() {
               <p className="text-muted-foreground text-sm">
                 Use an authenticator app like Google Authenticator or Authy for additional security.
               </p>
-              <Button onClick={() => setShowQR(true)} size="sm" className="h-8 w-full">
+              <Button
+                className="h-8 w-full"
+                size="sm"
+                onClick={() => {
+                  setShowQR(true);
+                }}
+              >
                 Setup Two-Factor Authentication
               </Button>
             </div>
@@ -58,8 +63,8 @@ export function TwoFactorAuth() {
               <div className="space-y-1">
                 <Label className="text-xs">Manual Setup Code</Label>
                 <div className="flex items-center gap-2">
-                  <Input readOnly value="JBSWY3DPEHPK3PXP" className="h-7 font-mono text-xs" />
-                  <Button variant="outline" size="sm" className="h-7 w-7 p-0">
+                  <Input readOnly className="h-7 font-mono text-xs" value="JBSWY3DPEHPK3PXP" />
+                  <Button className="h-7 w-7 p-0" size="sm" variant="outline">
                     <Copy className="h-3 w-3" />
                   </Button>
                 </div>
@@ -67,17 +72,30 @@ export function TwoFactorAuth() {
 
               {/* Verification */}
               <div className="space-y-1">
-                <Label htmlFor="verificationCode" className="text-xs">
+                <Label className="text-xs" htmlFor="verificationCode">
                   Verification Code
                 </Label>
-                <Input id="verificationCode" placeholder="Enter 6-digit code" maxLength={6} className="h-7 text-sm" />
+                <Input className="h-7 text-sm" id="verificationCode" maxLength={6} placeholder="Enter 6-digit code" />
               </div>
 
               <div className="flex gap-2">
-                <Button variant="outline" onClick={() => setShowQR(false)} size="sm" className="h-7 flex-1 text-xs">
+                <Button
+                  className="h-7 flex-1 text-xs"
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    setShowQR(false);
+                  }}
+                >
                   Back
                 </Button>
-                <Button onClick={() => setIsEnabled(true)} size="sm" className="h-7 flex-1 text-xs">
+                <Button
+                  className="h-7 flex-1 text-xs"
+                  size="sm"
+                  onClick={() => {
+                    setIsEnabled(true);
+                  }}
+                >
                   Verify & Enable
                 </Button>
               </div>
@@ -95,12 +113,19 @@ export function TwoFactorAuth() {
               <div className="bg-muted rounded p-1 text-xs">9I0J-1K2L</div>
               <div className="bg-muted rounded p-1 text-xs">3M4N-5O6P</div>
             </div>
-            <Button variant="outline" size="sm" className="h-7 w-full text-xs">
+            <Button className="h-7 w-full text-xs" size="sm" variant="outline">
               Download Recovery Codes
             </Button>
           </div>
 
-          <Button variant="destructive" onClick={() => setIsEnabled(false)} size="sm" className="h-7 w-full text-xs">
+          <Button
+            className="h-7 w-full text-xs"
+            size="sm"
+            variant="destructive"
+            onClick={() => {
+              setIsEnabled(false);
+            }}
+          >
             Disable Two-Factor Authentication
           </Button>
         </div>

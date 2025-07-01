@@ -9,11 +9,11 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import type { SidebarVariant, SidebarCollapsible, ContentLayout } from "@/lib/layout-preferences";
 import { setValueToCookie } from "@/server/server-actions";
 
-type LayoutControlsProps = {
+interface LayoutControlsProps {
   readonly variant: SidebarVariant;
   readonly collapsible: SidebarCollapsible;
   readonly contentLayout: ContentLayout;
-};
+}
 
 export function LayoutControls({ variant, collapsible, contentLayout }: LayoutControlsProps) {
   const handleValueChange = async (key: string, value: string) => {
@@ -40,18 +40,18 @@ export function LayoutControls({ variant, collapsible, contentLayout }: LayoutCo
               <ToggleGroup
                 className="w-full"
                 size="sm"
-                variant="outline"
                 type="single"
                 value={variant}
+                variant="outline"
                 onValueChange={(value) => handleValueChange("sidebar_variant", value)}
               >
-                <ToggleGroupItem className="text-xs" value="inset" aria-label="Toggle inset">
+                <ToggleGroupItem aria-label="Toggle inset" className="text-xs" value="inset">
                   Inset
                 </ToggleGroupItem>
-                <ToggleGroupItem className="text-xs" value="sidebar" aria-label="Toggle sidebar">
+                <ToggleGroupItem aria-label="Toggle sidebar" className="text-xs" value="sidebar">
                   Sidebar
                 </ToggleGroupItem>
-                <ToggleGroupItem className="text-xs" value="floating" aria-label="Toggle floating">
+                <ToggleGroupItem aria-label="Toggle floating" className="text-xs" value="floating">
                   Floating
                 </ToggleGroupItem>
               </ToggleGroup>
@@ -62,15 +62,15 @@ export function LayoutControls({ variant, collapsible, contentLayout }: LayoutCo
               <ToggleGroup
                 className="w-full"
                 size="sm"
-                variant="outline"
                 type="single"
                 value={collapsible}
+                variant="outline"
                 onValueChange={(value) => handleValueChange("sidebar_collapsible", value)}
               >
-                <ToggleGroupItem className="text-xs" value="icon" aria-label="Toggle icon">
+                <ToggleGroupItem aria-label="Toggle icon" className="text-xs" value="icon">
                   Icon
                 </ToggleGroupItem>
-                <ToggleGroupItem className="text-xs" value="offcanvas" aria-label="Toggle offcanvas">
+                <ToggleGroupItem aria-label="Toggle offcanvas" className="text-xs" value="offcanvas">
                   OffCanvas
                 </ToggleGroupItem>
               </ToggleGroup>
@@ -81,15 +81,15 @@ export function LayoutControls({ variant, collapsible, contentLayout }: LayoutCo
               <ToggleGroup
                 className="w-full"
                 size="sm"
-                variant="outline"
                 type="single"
                 value={contentLayout}
+                variant="outline"
                 onValueChange={(value) => handleValueChange("content_layout", value)}
               >
-                <ToggleGroupItem className="text-xs" value="centered" aria-label="Toggle centered">
+                <ToggleGroupItem aria-label="Toggle centered" className="text-xs" value="centered">
                   Centered
                 </ToggleGroupItem>
-                <ToggleGroupItem className="text-xs" value="full-width" aria-label="Toggle full-width">
+                <ToggleGroupItem aria-label="Toggle full-width" className="text-xs" value="full-width">
                   Full Width
                 </ToggleGroupItem>
               </ToggleGroup>

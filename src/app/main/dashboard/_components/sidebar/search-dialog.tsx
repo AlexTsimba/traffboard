@@ -1,8 +1,6 @@
 "use client";
 import * as React from "react";
-
 import { useRouter } from "next/navigation";
-
 import { ChartPie, Grid2X2, ChartLine, ShoppingBag, Search, Home } from "lucide-react";
 
 import {
@@ -33,7 +31,9 @@ export function SearchDialog() {
     <>
       <div
         className="text-muted-foreground flex cursor-pointer items-center gap-2 text-sm"
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          setOpen(true);
+        }}
       >
         <Search className="size-4" />
         Search
@@ -45,20 +45,20 @@ export function SearchDialog() {
           {[...new Set(searchItems.map((item) => item.group))].map((group, i) => (
             <React.Fragment key={group}>
               {i !== 0 && <CommandSeparator />}
-              <CommandGroup heading={group} key={group}>
+              <CommandGroup key={group} heading={group}>
                 {searchItems
                   .filter((item) => item.group === group)
                   .map((item) => (
                     <CommandItem
-                      className="!py-1.5"
                       key={item.label}
+                      className="!py-1.5"
+                      disabled={item.disabled}
                       onSelect={() => {
                         setOpen(false);
                         if (item.url && !item.disabled) {
                           router.push(item.url);
                         }
                       }}
-                      disabled={item.disabled}
                     >
                       {item.icon && <item.icon />}
                       <span>{item.label}</span>

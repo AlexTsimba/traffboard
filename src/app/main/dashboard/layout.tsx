@@ -1,5 +1,4 @@
-import { ReactNode } from "react";
-
+import { type ReactNode } from "react";
 import { cookies } from "next/headers";
 
 import { AppSidebar } from "@/app/main/dashboard/_components/sidebar/app-sidebar";
@@ -20,17 +19,17 @@ export default async function Layout({ children }: Readonly<{ children: ReactNod
 
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
-      <AppSidebar variant={sidebarVariant} collapsible={sidebarCollapsible} />
+      <AppSidebar collapsible={sidebarCollapsible} variant={sidebarVariant} />
       <SidebarInset className="flex h-screen flex-col">
         {/* Sticky Header */}
         <header className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 flex h-12 shrink-0 items-center gap-2 border-b backdrop-blur transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
           <div className="flex w-full items-center justify-between px-4 lg:px-6">
             <div className="flex items-center gap-1 lg:gap-2">
               <SidebarTrigger className="-ml-1" />
-              <Separator orientation="vertical" className="mx-2 data-[orientation=vertical]:h-4" />
+              <Separator className="mx-2 data-[orientation=vertical]:h-4" orientation="vertical" />
               <SearchDialog />
             </div>
-            <div className="flex items-center gap-2"></div>
+            <div className="flex items-center gap-2" />
           </div>
         </header>
 

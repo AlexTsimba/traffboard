@@ -1,10 +1,9 @@
 import * as React from "react";
-
 import {
-  ColumnDef,
-  ColumnFiltersState,
-  SortingState,
-  VisibilityState,
+  type ColumnDef,
+  type ColumnFiltersState,
+  type SortingState,
+  type VisibilityState,
   getCoreRowModel,
   getFacetedRowModel,
   getFacetedUniqueValues,
@@ -14,14 +13,14 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
-type UseDataTableInstanceProps<TData extends { id: string | number }, TValue> = {
+interface UseDataTableInstanceProps<TData extends { id: string | number }, TValue> {
   data: TData[];
-  columns: ColumnDef<TData, TValue>[];
+  columns: Array<ColumnDef<TData, TValue>>;
   enableRowSelection?: boolean;
   defaultPageIndex?: number;
   defaultPageSize?: number;
   getRowId?: (row: TData, index: number) => string;
-};
+}
 
 export function useDataTableInstance<TData extends { id: string | number }, TValue>({
   data,

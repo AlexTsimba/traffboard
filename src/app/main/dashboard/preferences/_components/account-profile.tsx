@@ -23,13 +23,13 @@ export function AccountProfile() {
         <CardContent className="space-y-3">
           <div className="flex items-center gap-3">
             <Avatar className="h-14 w-14">
-              <AvatarImage src="/placeholder-avatar.png" alt="Profile picture" />
+              <AvatarImage alt="Profile picture" src="/placeholder-avatar.png" />
               <AvatarFallback>
                 <User className="h-5 w-5" />
               </AvatarFallback>
             </Avatar>
             <div className="space-y-1">
-              <Button variant="outline" size="sm" className="h-7 text-xs">
+              <Button className="h-7 text-xs" size="sm" variant="outline">
                 <Camera className="mr-1 h-3 w-3" />
                 Change
               </Button>
@@ -39,16 +39,16 @@ export function AccountProfile() {
 
           <div className="grid grid-cols-2 gap-2">
             <div className="space-y-1">
-              <Label htmlFor="firstName" className="text-xs">
+              <Label className="text-xs" htmlFor="firstName">
                 First Name
               </Label>
-              <Input id="firstName" defaultValue="John" className="h-7 text-sm" />
+              <Input className="h-7 text-sm" defaultValue="John" id="firstName" />
             </div>
             <div className="space-y-1">
-              <Label htmlFor="lastName" className="text-xs">
+              <Label className="text-xs" htmlFor="lastName">
                 Last Name
               </Label>
-              <Input id="lastName" defaultValue="Doe" className="h-7 text-sm" />
+              <Input className="h-7 text-sm" defaultValue="Doe" id="lastName" />
             </div>
           </div>
         </CardContent>
@@ -66,8 +66,8 @@ export function AccountProfile() {
           <div className="space-y-1">
             <Label className="text-xs">Email Address</Label>
             <div className="flex items-center gap-2">
-              <Input type="email" defaultValue="john.doe@example.com" className="h-7 flex-1 text-sm" />
-              <Badge variant="secondary" className="text-xs">
+              <Input className="h-7 flex-1 text-sm" defaultValue="john.doe@example.com" type="email" />
+              <Badge className="text-xs" variant="secondary">
                 Verified
               </Badge>
             </div>
@@ -82,10 +82,10 @@ export function AccountProfile() {
           </div>
 
           <div className="flex gap-2 pt-1">
-            <Button variant="outline" size="sm" className="h-7 flex-1 text-xs">
+            <Button className="h-7 flex-1 text-xs" size="sm" variant="outline">
               Cancel
             </Button>
-            <Button size="sm" className="h-7 flex-1 text-xs">
+            <Button className="h-7 flex-1 text-xs" size="sm">
               Save Changes
             </Button>
           </div>

@@ -1,5 +1,4 @@
 import * as React from "react";
-
 import {
   KeyboardSensor,
   MouseSensor,
@@ -13,7 +12,7 @@ import {
 } from "@dnd-kit/core";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import { SortableContext, verticalListSortingStrategy, arrayMove } from "@dnd-kit/sortable";
-import { ColumnDef, flexRender, type Table as TanStackTable } from "@tanstack/react-table";
+import { type ColumnDef, flexRender, type Table as TanStackTable } from "@tanstack/react-table";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
@@ -21,7 +20,7 @@ import { DraggableRow } from "./draggable-row";
 
 interface DataTableProps<TData, TValue> {
   table: TanStackTable<TData>;
-  columns: ColumnDef<TData, TValue>[];
+  columns: Array<ColumnDef<TData, TValue>>;
   dndEnabled?: boolean;
   onReorder?: (newData: TData[]) => void;
 }
@@ -33,14 +32,14 @@ function renderTableBody<TData, TValue>({
   dataIds,
 }: {
   table: TanStackTable<TData>;
-  columns: ColumnDef<TData, TValue>[];
+  columns: Array<ColumnDef<TData, TValue>>;
   dndEnabled: boolean;
   dataIds: UniqueIdentifier[];
 }) {
   if (!table.getRowModel().rows.length) {
     return (
       <TableRow>
-        <TableCell colSpan={columns.length} className="h-24 text-center">
+        <TableCell className="h-24 text-center" colSpan={columns.length}>
           No results.
         </TableCell>
       </TableRow>
@@ -111,10 +110,10 @@ export function DataTable<TData, TValue>({
     return (
       <DndContext
         collisionDetection={closestCenter}
-        modifiers={[restrictToVerticalAxis]}
-        onDragEnd={handleDragEnd}
-        sensors={sensors}
         id={sortableId}
+        modifiers={[restrictToVerticalAxis]}
+        sensors={sensors}
+        onDragEnd={handleDragEnd}
       >
         {tableContent}
       </DndContext>

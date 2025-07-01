@@ -40,7 +40,9 @@ export function LayoutPreview() {
     // Listen for cookie changes with reduced interval
     const interval = setInterval(updateValues, 300);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+    };
   }, []);
 
   const formatLabel = (key: string, value: string) => {
@@ -64,13 +66,13 @@ export function LayoutPreview() {
       </CardHeader>
       <CardContent className="space-y-1.5 px-6 pt-0 pb-2">
         <div className="flex flex-wrap gap-1">
-          <Badge variant="secondary" className="px-2 py-0.5 text-xs">
+          <Badge className="px-2 py-0.5 text-xs" variant="secondary">
             {formatLabel("variant", variant)}
           </Badge>
-          <Badge variant="secondary" className="px-2 py-0.5 text-xs">
+          <Badge className="px-2 py-0.5 text-xs" variant="secondary">
             {formatLabel("collapsible", collapsible)}
           </Badge>
-          <Badge variant="secondary" className="px-2 py-0.5 text-xs">
+          <Badge className="px-2 py-0.5 text-xs" variant="secondary">
             {formatLabel("contentLayout", contentLayout)}
           </Badge>
         </div>

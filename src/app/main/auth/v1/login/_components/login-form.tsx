@@ -38,7 +38,7 @@ export function LoginFormV1() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
         <FormField
           control={form.control}
           name="email"
@@ -46,7 +46,7 @@ export function LoginFormV1() {
             <FormItem>
               <FormLabel>Email Address</FormLabel>
               <FormControl>
-                <Input id="email" type="email" placeholder="you@example.com" autoComplete="email" {...field} />
+                <Input autoComplete="email" id="email" placeholder="you@example.com" type="email" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -60,10 +60,10 @@ export function LoginFormV1() {
               <FormLabel>Password</FormLabel>
               <FormControl>
                 <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
                   autoComplete="current-password"
+                  id="password"
+                  placeholder="••••••••"
+                  type="password"
                   {...field}
                 />
               </FormControl>
@@ -78,13 +78,13 @@ export function LoginFormV1() {
             <FormItem className="flex flex-row items-center">
               <FormControl>
                 <Checkbox
-                  id="login-remember"
                   checked={field.value}
-                  onCheckedChange={field.onChange}
                   className="size-4"
+                  id="login-remember"
+                  onCheckedChange={field.onChange}
                 />
               </FormControl>
-              <FormLabel htmlFor="login-remember" className="text-muted-foreground ml-1 text-sm font-medium">
+              <FormLabel className="text-muted-foreground ml-1 text-sm font-medium" htmlFor="login-remember">
                 Remember me for 30 days
               </FormLabel>
             </FormItem>

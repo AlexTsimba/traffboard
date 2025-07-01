@@ -42,7 +42,7 @@ export function RegisterFormV1() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
         <FormField
           control={form.control}
           name="email"
@@ -50,7 +50,7 @@ export function RegisterFormV1() {
             <FormItem>
               <FormLabel>Email Address</FormLabel>
               <FormControl>
-                <Input id="email" type="email" placeholder="you@example.com" autoComplete="email" {...field} />
+                <Input autoComplete="email" id="email" placeholder="you@example.com" type="email" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -63,7 +63,7 @@ export function RegisterFormV1() {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input id="password" type="password" placeholder="••••••••" autoComplete="new-password" {...field} />
+                <Input autoComplete="new-password" id="password" placeholder="••••••••" type="password" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -77,10 +77,10 @@ export function RegisterFormV1() {
               <FormLabel>Confirm Password</FormLabel>
               <FormControl>
                 <Input
-                  id="confirmPassword"
-                  type="password"
-                  placeholder="••••••••"
                   autoComplete="new-password"
+                  id="confirmPassword"
+                  placeholder="••••••••"
+                  type="password"
                   {...field}
                 />
               </FormControl>

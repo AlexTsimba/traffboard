@@ -3,161 +3,121 @@
     "tasks": [
       {
         "id": 1,
-        "title": "Setup Template & Dependencies",
-        "description": "Set up the project template and install all required dependencies for the TraffBoardLite MVP.",
-        "details": "1. Clone the starter template from https://github.com/arhamkhnz/next-shadcn-admin-dashboard\n2. Clean up the repository by removing unnecessary pages and components\n3. Install and configure the following dependencies:\n   - TanStack Query for data fetching\n   - Zustand for state management\n   - Drizzle ORM for database operations\n   - PapaParse for CSV parsing\n   - NextAuth.js for authentication\n   - shadcn/ui and Tailwind CSS for UI components\n   - Zod for validation\n4. Set up TypeScript configuration\n5. Create basic folder structure following Next.js 15 App Router conventions\n6. Configure ESLint and Prettier for code quality\n7. Set up environment variables structure (.env.example)",
-        "testStrategy": "1. Verify all dependencies are correctly installed by checking package.json\n2. Ensure the application builds without errors using 'npm run build'\n3. Confirm the development server starts correctly with 'npm run dev'\n4. Validate TypeScript configuration by checking for type errors\n5. Test basic navigation to ensure the template is working correctly",
-        "priority": "high",
+        "title": "Анализ текущей инфраструктуры и планирование архитектуры проекта",
+        "description": "Выполнить комплексный анализ текущего состояния инфраструктуры проекта TraffBoard и разработать поэтапный план её модернизации с учётом современных практик Next.js 15, TypeScript 5.8, Vitest, ESLint 9 flat config и других инструментов.",
+        "details": "1. Провести аудит следующих компонентов: ESLint flat config (eslint.config.mjs), конфигурация TypeScript (tsconfig.json), Prettier и форматирование кода, pre-commit и pre-push хуки, CI/CD инфраструктура (наличие/отсутствие), система тестирования, переменные окружения, Docker и контейнеризация, возможности деплоя на DigitalOcean.\n2. Для каждого компонента подготовить отчёт о текущем состоянии: выявить устаревшие или отсутствующие элементы, соответствие современным стандартам (Next.js 15, TypeScript 5.8, Vitest, ESLint 9 flat config, best practices 2025 года[1][2][3]).\n3. На основе анализа составить поэтапный план модернизации: определить последовательность внедрения изменений, указать необходимые шаги для каждого компонента.\n4. Сформировать список рекомендуемых технологий и инструментов для каждого этапа (например, Vitest для тестирования, ESLint 9 flat config, Prettier, Husky для git-хуков, Docker Compose, DigitalOcean App Platform и др.).\n5. Разработать архитектурные решения для CI/CD: выбрать подходящие инструменты (например, GitHub Actions, GitLab CI), описать pipeline, интеграцию с тестированием и деплоем.\n6. Определить стратегию тестирования: виды тестов (юнит, интеграционные, e2e), инструменты (Vitest, Playwright), интеграцию с CI/CD.\n7. Оформить результаты в виде структурированного отчёта с выводами и рекомендациями.",
+        "testStrategy": "1. Проверить наличие подробного отчёта по каждому компоненту инфраструктуры с анализом текущего состояния.\n2. Убедиться, что план модернизации содержит этапы, последовательность действий и обоснование выбора технологий.\n3. Проверить, что список технологий и инструментов соответствует современным best practices и требованиям проекта.\n4. Оценить полноту архитектурных решений для CI/CD и стратегии тестирования.\n5. Провести внутреннее ревью отчёта с командой и получить подтверждение, что рекомендации понятны и реализуемы.",
+        "status": "pending",
         "dependencies": [],
-        "status": "pending",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Клонировать шаблон next-shadcn-admin-dashboard",
-            "description": "Склонировать репозиторий https://github.com/arhamkhnz/next-shadcn-admin-dashboard как основу для проекта.",
-            "details": "Выполнить git clone, убедиться, что проект запускается локально.",
-            "status": "done",
-            "dependencies": [],
-            "parentTaskId": 1
-          },
-          {
-            "id": 2,
-            "title": "Clean up the repository",
-            "description": "Remove unnecessary pages and components from the starter template to keep only the essentials.",
-            "details": "Delete demo pages, unused components, and example content. Ensure the codebase is minimal and ready for customization.",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 1
-          },
-          {
-            "id": 3,
-            "title": "Install and configure dependencies",
-            "description": "Install and set up all required libraries for the MVP.",
-            "details": "Install TanStack Query, Zustand, Drizzle ORM, PapaParse, NextAuth.js, shadcn/ui, Tailwind CSS, and Zod. Ensure all dependencies are properly configured and working.",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 1
-          },
-          {
-            "id": 4,
-            "title": "Set up TypeScript configuration",
-            "description": "Configure TypeScript for the project.",
-            "details": "Adjust tsconfig.json and related files for optimal type safety and compatibility with Next.js 15.",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 1
-          },
-          {
-            "id": 5,
-            "title": "Create basic folder structure",
-            "description": "Organize the project folders following Next.js 15 App Router conventions.",
-            "details": "Set up folders for app, components, hooks, utils, config, and other essentials.",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 1
-          },
-          {
-            "id": 6,
-            "title": "Configure ESLint and Prettier",
-            "description": "Set up code quality tools for the project.",
-            "details": "Add and configure ESLint and Prettier for consistent code style and linting.",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 1
-          },
-          {
-            "id": 7,
-            "title": "Set up environment variables structure",
-            "description": "Prepare .env.example and document required environment variables.",
-            "details": "List all necessary environment variables for local and production environments. Create .env.example file.",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 1
-          }
-        ]
-      },
-      {
-        "id": 2,
-        "title": "Database Setup & Models",
-        "description": "Configure the database connection and create the required data models using Drizzle ORM with PostgreSQL.",
-        "details": "1. Set up Drizzle ORM configuration for PostgreSQL connection\n2. Create database schema files for the following models:\n   - users table with fields: id, email, passwordHash, role, totpSecret, createdAt\n   - conversions table with fields: id, date, partnerId, campaignId, clicks, registrations, revenue, createdAt\n3. Implement the exact schema as defined in the PRD:\n```typescript\nexport const users = pgTable('users', {\n  id: serial('id').primaryKey(),\n  email: varchar('email', { length: 255 }).unique().notNull(),\n  passwordHash: text('password_hash').notNull(),\n  role: varchar('role', { length: 50 }).default('user').notNull(),\n  totpSecret: text('totp_secret'),\n  createdAt: timestamp('created_at').defaultNow().notNull(),\n})\n\nexport const conversions = pgTable('conversions', {\n  id: serial('id').primaryKey(),\n  date: date('date').notNull(),\n  partnerId: varchar('partner_id', { length: 100 }).notNull(),\n  campaignId: varchar('campaign_id', { length: 100 }).notNull(),\n  clicks: integer('clicks').default(0).notNull(),\n  registrations: integer('registrations').default(0).notNull(),\n  revenue: decimal('revenue', { precision: 10, scale: 2 }).default('0').notNull(),\n  createdAt: timestamp('created_at').defaultNow().notNull(),\n})\n```\n4. Set up drizzle-kit for database migrations\n5. Create seed data script for testing with sample users and conversions\n6. Implement database utility functions for common operations",
-        "testStrategy": "1. Test database connection using a simple query\n2. Verify migrations run successfully\n3. Confirm seed data is correctly inserted\n4. Test CRUD operations on both models\n5. Validate constraints (e.g., unique email, not null fields)\n6. Ensure proper error handling for database operations",
         "priority": "high",
-        "dependencies": [1],
-        "status": "pending",
-        "subtasks": []
-      },
-      {
-        "id": 3,
-        "title": "Authentication & 2FA",
-        "description": "Implement user authentication with NextAuth.js including 2FA support using TOTP and role-based access control.",
-        "details": "1. Configure NextAuth.js with the following:\n   - Custom Drizzle adapter for user storage\n   - Credentials provider for email/password login\n   - Session handling and JWT configuration\n2. Implement TOTP (Time-based One-Time Password) 2FA:\n   - Generate and store TOTP secrets in the user model\n   - Create QR code generation for initial setup\n   - Implement TOTP verification during login\n3. Create protected route middleware:\n   - Check for authenticated sessions\n   - Implement role-based access control (user/superuser)\n   - Redirect unauthenticated users to login\n4. Build authentication UI components:\n   - Login form with email/password\n   - 2FA verification input\n   - 2FA setup flow for new users\n5. Implement logout functionality\n6. Add session persistence and refresh logic",
-        "testStrategy": "1. Test user registration and login flows\n2. Verify 2FA setup and verification works correctly\n3. Test protected routes with authenticated and unauthenticated users\n4. Confirm role-based access control functions properly\n5. Validate session persistence across page refreshes\n6. Test error handling for invalid credentials\n7. Verify logout functionality clears session data",
-        "priority": "high",
-        "dependencies": [1, 2],
-        "status": "pending",
-        "subtasks": []
-      },
-      {
-        "id": 4,
-        "title": "Basic Layout & Navigation",
-        "description": "Create the application layout with responsive design and role-based navigation using shadcn/ui components.",
-        "details": "1. Update the sidebar navigation from the template:\n   - Dashboard link (all users)\n   - Upload link (superusers only)\n   - Users management link (superusers only)\n2. Create page structure following Next.js App Router:\n   - app/dashboard/page.tsx\n   - app/upload/page.tsx\n   - app/users/page.tsx\n3. Implement responsive layout with shadcn/ui:\n   - Mobile-friendly sidebar with collapse/expand\n   - Header with user profile dropdown\n   - Main content area with proper padding\n4. Add role-based menu visibility:\n   - Use session data to determine user role\n   - Conditionally render navigation items based on role\n   - Handle unauthorized access attempts\n5. Create loading and error states for all pages\n6. Implement theme support (light/dark mode)",
-        "testStrategy": "1. Test navigation between all pages\n2. Verify role-based menu items display correctly for different user types\n3. Test responsive design on various screen sizes\n4. Confirm unauthorized users cannot access restricted pages\n5. Validate loading and error states display correctly\n6. Test theme switching functionality",
-        "priority": "medium",
-        "dependencies": [1, 3],
-        "status": "pending",
-        "subtasks": []
-      },
-      {
-        "id": 5,
-        "title": "CSV Upload & Processing",
-        "description": "Implement CSV file upload functionality with validation and processing to store conversion data in the database.",
-        "details": "1. Create file upload form using shadcn/ui components:\n   - Drag and drop area\n   - File selection button\n   - Upload progress indicator\n2. Implement server action for file processing:\n   - Use PapaParse to parse CSV data\n   - Apply Zod schema validation to ensure data integrity\n   - Map CSV columns to conversion model fields\n3. Add validation rules for CSV structure:\n   - Required columns: date, partnerId, campaignId, clicks, registrations, revenue\n   - Data type validation for each field\n   - Date format validation\n4. Implement database operations:\n   - Batch insert processed records into conversions table\n   - Handle duplicate entries\n   - Transaction support for atomicity\n5. Create error handling and reporting:\n   - Display validation errors to user\n   - Show summary of processed records\n   - Allow retrying failed uploads\n6. Add superuser-only access control to the upload functionality",
-        "testStrategy": "1. Test file upload with valid CSV files\n2. Verify validation catches malformed CSV data\n3. Test processing of large files (performance test)\n4. Confirm data is correctly inserted into the database\n5. Validate error handling for various failure scenarios\n6. Test access control to ensure only superusers can upload\n7. Verify the upload summary displays accurate information",
-        "priority": "high",
-        "dependencies": [2, 3, 4],
-        "status": "pending",
-        "subtasks": []
-      },
-      {
-        "id": 6,
-        "title": "Analytics Dashboard",
-        "description": "Develop the analytics dashboard with filters, KPI cards, and charts to visualize conversion data.",
-        "details": "1. Implement global filter components using Zustand:\n```typescript\ninterface FilterState {\n  dateRange: [Date, Date]\n  partners: string[]\n  campaigns: string[]\n  setFilters: (filters: Partial<FilterState>) => void\n  resetFilters: () => void\n}\n\nexport const useFilterStore = create<FilterState>((set) => ({\n  dateRange: [startOfMonth(new Date()), new Date()],\n  partners: [],\n  campaigns: [],\n  setFilters: (filters) => set((state) => ({ ...state, ...filters })),\n  resetFilters: () => set({\n    dateRange: [startOfMonth(new Date()), new Date()],\n    partners: [],\n    campaigns: []\n  })\n}))\n```\n2. Create data fetching with TanStack Query:\n```typescript\nexport const useAnalytics = () => {\n  const filters = useFilterStore()\n  \n  return useQuery({\n    queryKey: ['analytics', filters],\n    queryFn: () => fetchAnalytics(filters),\n    staleTime: 5 * 60 * 1000, // 5 minutes\n  })\n}\n```\n3. Implement filter UI components:\n   - Date range picker\n   - Partner multi-select dropdown\n   - Campaign multi-select dropdown\n   - Reset filters button\n4. Create KPI cards for key metrics:\n   - Total clicks\n   - Total registrations\n   - Total revenue\n   - Conversion rate\n5. Implement charts using shadcn/ui charts (Recharts wrapper):\n   - Line chart for trends over time\n   - Bar chart for partner comparison\n   - Pie chart for campaign distribution\n6. Add responsive design for dashboard components",
-        "testStrategy": "1. Test filter functionality with various combinations\n2. Verify data fetching with TanStack Query works correctly\n3. Confirm charts render properly with different data sets\n4. Test responsive design on various screen sizes\n5. Validate KPI calculations are accurate\n6. Test performance with large data sets\n7. Verify filter state persists across page refreshes",
-        "priority": "high",
-        "dependencies": [2, 4],
-        "status": "pending",
-        "subtasks": []
-      },
-      {
-        "id": 7,
-        "title": "User Management",
-        "description": "Create user management interface for superusers to create, read, update, and delete users with role assignment.",
-        "details": "1. Implement user list view with data table:\n   - Display user email, role, and creation date\n   - Add sorting and pagination\n   - Include search functionality\n2. Create user forms:\n   - New user creation form with email, password, and role\n   - Edit user form for updating existing users\n   - Delete confirmation dialog\n3. Implement role management:\n   - Role selection dropdown (user/superuser)\n   - Role-based permission explanation\n4. Add 2FA management:\n   - Reset 2FA option for administrators\n   - 2FA status indicator\n5. Implement server actions for user operations:\n   - Create user with password hashing\n   - Update user details\n   - Delete user with confirmation\n6. Add superuser-only access control to all user management features\n7. Implement optimistic updates for better UX",
-        "testStrategy": "1. Test CRUD operations for user management\n2. Verify role assignment works correctly\n3. Test search, sort, and pagination functionality\n4. Confirm access control restricts user management to superusers only\n5. Validate form validation for all user forms\n6. Test error handling for various failure scenarios\n7. Verify optimistic updates provide good user experience",
-        "priority": "medium",
-        "dependencies": [2, 3, 4],
-        "status": "pending",
-        "subtasks": []
-      },
-      {
-        "id": 8,
-        "title": "Deploy to App Platform",
-        "description": "Configure and deploy the application to DigitalOcean App Platform with managed PostgreSQL database.",
-        "details": "1. Create app.yaml configuration file as specified in the PRD:\n```yaml\nname: traffboard-mvp\nservices:\n- name: web\n  source_dir: /\n  github:\n    repo: your-username/traffboard-mvp\n    branch: main\n  build_command: npm run build\n  run_command: npm start\n  environment_slug: node-js\n  instance_count: 1\n  instance_size_slug: basic-xxs\n  envs:\n  - key: DATABASE_URL\n    scope: RUN_TIME\n    type: SECRET\n  - key: NEXTAUTH_SECRET\n    scope: RUN_TIME\n    type: SECRET\n  - key: NEXTAUTH_URL\n    scope: RUN_TIME\n    value: ${APP_URL}\n\ndatabases:\n- engine: PG\n  name: traffboard-db\n  num_nodes: 1\n  size: db-s-1vcpu-1gb\n```\n2. Set up DigitalOcean Managed PostgreSQL:\n   - Create database instance\n   - Configure connection settings\n   - Set up firewall rules\n3. Configure environment variables:\n   - Database connection string\n   - NextAuth secret\n   - Other application secrets\n4. Run database migrations on deployment:\n   - Create migration script\n   - Add to build or post-deploy process\n5. Set up domain and HTTPS:\n   - Configure custom domain\n   - Enable automatic HTTPS\n6. Implement CI/CD pipeline:\n   - Configure auto-deploy on git push\n   - Add build checks\n7. Create monitoring and logging setup",
-        "testStrategy": "1. Test deployment process end-to-end\n2. Verify database connection works in production\n3. Confirm migrations run successfully\n4. Test application functionality in production environment\n5. Validate HTTPS is working correctly\n6. Check environment variables are properly set\n7. Test CI/CD pipeline with a sample change\n8. Verify performance meets targets (page load <3s, CSV processing <60s for 50K records, filter updates <1s)",
-        "priority": "medium",
-        "dependencies": [1, 2, 3, 4, 5, 6, 7],
-        "status": "pending",
         "subtasks": []
       }
     ],
     "metadata": {
-      "created": "2025-06-30T06:05:46.989Z",
-      "updated": "2025-06-30T06:27:43.671Z",
-      "description": "Tasks for master context"
+      "created": "2025-07-01T22:25:22.680Z",
+      "updated": "2025-07-01T22:27:03.557Z",
+      "description": "Infrastructure refactoring tasks: modern 2025 best practices for ESLint, TypeScript, Prettier, CI/CD, testing, deployment"
+    }
+  },
+  "infrastructure-refactor": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Анализ и планирование модернизации инфраструктуры TraffBoard",
+        "description": "Выполнить комплексный аудит текущей инфраструктуры TraffBoard и разработать детальный поэтапный план модернизации с учетом лучших практик 2025 года.",
+        "details": "1. Провести исследование паттернов инфраструктуры Next.js 2025 года, используя данные из памяти neo4j и современные источники (Context7, web research).\n2. Проанализировать текущие конфигурационные файлы проекта: package.json, eslint.config.mjs, tsconfig.json, .prettierrc, .husky/.\n3. Оценить наличие и качество компонентов: тестирование, CI/CD, Docker, управление переменными окружения.\n4. Зафиксировать выявленные паттерны и несоответствия для дальнейших задач.\n5. Разработать архитектурный план модернизации, включающий рекомендации по внедрению современных инструментов и практик.\n6. Провести локальное тестирование текущей конфигурации для выявления технических ограничений.\n7. Сформировать подробный отчёт с поэтапным планом модернизации и рекомендациями по внедрению.\n<info added on 2025-07-01T22:41:47.177Z>\n## ✅ ЗАВЕРШЁН КОМПЛЕКСНЫЙ АНАЛИЗ ИНФРАСТРУКТУРЫ TRAFFBOARD\n\n### 📊 ТЕКУЩЕЕ СОСТОЯНИЕ (после research + анализа файлов + качественных тестов)\n\n#### ✅ ЧТО РАБОТАЕТ ОТЛИЧНО:\n1. **ESLint Flat Config** - современная конфигурация ESLint 9.29.0\n   - Хорошие плагины: security, sonarjs, unicorn, import, typescript-eslint\n   - Правила для Next.js, TypeScript, React настроены\n   - ⚠️ Проблема: Next.js plugin warning (FlatCompat вместо нативной поддержки)\n   \n2. **TypeScript 5.8.3** - актуальная версия\n   - Strict mode ✅, bundler module resolution ✅\n   - Правильная конфигурация для Next.js 15\n   \n3. **Next.js 15.3.4 + React 19.1.0** - самые новые версии\n   - **Quality Gates:** ✅ lint, ✅ type-check, ✅ build (все проходят успешно!)\n   - Сборка: 16 страниц, optimized, production ready\n   \n4. **Prettier + Husky** - работают корректно\n   - Tailwind plugin настроен ✅\n   - Pre-commit hook с lint-staged ✅\n\n#### ❌ КРИТИЧЕСКИЕ ПРОБЕЛЫ:\n\n1. **ОТСУТСТВУЕТ СИСТЕМА ТЕСТИРОВАНИЯ**\n   - ❌ Нет Jest/Vitest (npm test = Missing script)\n   - ❌ Нет React Testing Library\n   - ❌ Нет coverage reporting\n   \n2. **ОТСУТСТВУЕТ CI/CD ПОЛНОСТЬЮ**\n   - ❌ Нет .github/ директории\n   - ❌ Нет автоматизированного тестирования\n   - ❌ Нет deployment workflows\n   \n3. **ОТСУТСТВУЕТ КОНТЕЙНЕРИЗАЦИЯ**\n   - ❌ Нет Dockerfile/docker-compose.yml\n   - ❌ Нет .dockerignore\n   \n4. **НЕПОЛНОЕ ENV MANAGEMENT**\n   - ✅ Есть .env/.env.example\n   - ❌ Нет .env.development/.env.production\n   - ❌ Нет валидации с Zod\n\n5. **БАЗОВЫЕ GIT HOOKS**\n   - ❌ Нет pre-push hooks (только pre-commit)\n   - ❌ Нет commitlint/conventional commits\n\n### 🎯 АРХИТЕКТУРНЫЙ ПЛАН МОДЕРНИЗАЦИИ:\n\n#### ТЕХНОЛОГИЧЕСКАЯ СТРАТЕГИЯ 2025:\n- **Тестирование:** Vitest (ESM native, быстрее Jest) + React Testing Library + jsdom\n- **CI/CD:** GitHub Actions с matrix testing Node 18/20/22 + aggressive caching\n- **Docker:** Multi-stage Alpine build + оптимизированный .dockerignore\n- **Environment:** .env.local/.env.production + Zod runtime validation\n- **Git Workflow:** pre-push tests + commitlint conventional commits\n- **Deployment:** DigitalOcean App Platform с automated deployment\n\n#### ПОЭТАПНАЯ РЕАЛИЗАЦИЯ:\n1. **ESLint нативная поддержка Next.js** (убрать FlatCompat warnings)\n2. **Vitest + RTL** полная настройка тестирования\n3. **GitHub Actions CI/CD** с quality gates + deployment\n4. **Docker + env management** production готовность\n5. **Advanced git hooks** developer experience\n6. **DigitalOcean deployment** финальная интеграция\n\n### ✅ ГОТОВНОСТЬ:\n**Код высокого качества** - все текущие quality gates проходят успешно\n**Современная база** - Next.js 15 + TS 5.8 + React 19 ready для модернизации\n</info added on 2025-07-01T22:41:47.177Z>",
+        "testStrategy": "1. Проверить полноту аудита: все ключевые файлы и компоненты должны быть проанализированы.\n2. Убедиться, что отчёт содержит актуальные паттерны Next.js 2025 и рекомендации по их внедрению.\n3. В отчёте должны быть отражены все выявленные недостатки и предложены конкретные шаги по модернизации.\n4. Провести ревью отчёта с техническими экспертами для подтверждения его полноты и актуальности.\n5. Проверить, что архитектурный план учитывает современные практики и совместим с целями проекта.",
+        "status": "done",
+        "dependencies": [],
+        "priority": "high",
+        "subtasks": []
+      },
+      {
+        "id": 2,
+        "title": "Анализ текущего eslint.config.mjs и выявление устаревших правил",
+        "description": "Провести детальный анализ существующего файла eslint.config.mjs, определить устаревшие и неактуальные правила, а также выявить возможности для перехода на flat config и современные best practices.",
+        "details": "1. Изучите текущий eslint.config.mjs, включая используемые плагины, правила и структуру конфигурации.\n2. Сравните текущие правила с официальной документацией ESLint 9 и рекомендациями по flat config (например, использование defineConfig, globalIgnores, extends, languageOptions)[1][2][4].\n3. Определите устаревшие или несовместимые правила, плагины и настройки, которые не поддерживаются или не рекомендуются в 2025 году.\n4. Зафиксируйте список устаревших правил и потенциальных проблем миграции (например, несовместимость с Next.js 15, React 19, TypeScript 5.8+).\n5. Подготовьте рекомендации по удалению или замене устаревших правил и настройке flat config для будущей миграции.",
+        "testStrategy": "- Проверьте, что проведён полный аудит всех разделов eslint.config.mjs, включая плагины, extends, overrides и глобальные настройки.\n- Составьте список всех устаревших или неактуальных правил и плагинов с пояснениями.\n- Подготовьте отчёт с рекомендациями по обновлению конфигурации, который можно использовать для последующих задач по миграции.\n- В отчёте должны быть ссылки на официальные источники или документацию ESLint 9/Next.js/React/TypeScript, подтверждающие устаревание правил.",
+        "status": "in-progress",
+        "dependencies": [
+          1
+        ],
+        "priority": "high",
+        "subtasks": []
+      },
+      {
+        "id": 3,
+        "title": "Конфигурация React Testing Library для тестирования компонентов",
+        "description": "Настроить React Testing Library для интеграции с Vitest и обеспечить современную инфраструктуру тестирования компонентов в проекте TraffBoard.",
+        "details": "1. Установите необходимые зависимости: @testing-library/react, @testing-library/jest-dom, @testing-library/user-event и jsdom с помощью npm или yarn.\n2. Создайте файл setupTests.ts (или setup.ts) в директории src/test или src, где импортируйте '@testing-library/jest-dom' для расширения матчеров и настройте дополнительные глобальные параметры тестирования.\n3. В файле vitest.config.ts (или vite.config.ts) добавьте или обновите секцию test: укажите 'environment: \"jsdom\"', 'globals: true', 'setupFiles: \"./src/test/setup.ts\"' (или соответствующий путь), и при необходимости включите поддержку CSS и другие параметры.\n4. Проверьте, что tsconfig.json включает типы 'vitest/globals' и файл setupTests.ts в секции include.\n5. Убедитесь, что все тестовые файлы корректно используют расширенные матчеры и userEvent для имитации пользовательских действий.\n6. Документируйте структуру и паттерны подключения React Testing Library для будущих тестов.",
+        "testStrategy": "- Проверьте, что тесты компонентов успешно выполняются с использованием React Testing Library и Vitest.\n- Убедитесь, что кастомные матчеры из @testing-library/jest-dom доступны во всех тестах.\n- Проверьте, что userEvent корректно работает для имитации пользовательских сценариев.\n- Запустите тесты с помощью 'npm run test' и убедитесь в отсутствии ошибок конфигурации.\n- Проверьте, что setup-файл корректно подключается и выполняется перед тестами.",
+        "status": "pending",
+        "dependencies": [
+          2
+        ],
+        "priority": "medium",
+        "subtasks": []
+      },
+      {
+        "id": 4,
+        "title": "Конфигурация матричного тестирования (Node.js версии) в GitHub Actions",
+        "description": "Настроить матричное тестирование в CI workflow для одновременного запуска тестов, линтинга и сборки на нескольких версиях Node.js.",
+        "details": "1. В файле workflow (например, .github/workflows/ci.yml) добавьте секцию jobs с использованием matrix strategy для Node.js (например, versions: [18.x, 20.x, 22.x]).\n2. Для каждого значения matrix Node.js версии выполните шаги: checkout, setup-node (используя matrix.version), установка зависимостей, запуск lint, type-check, тестов и сборки.\n3. Убедитесь, что все шаги используют кэширование node_modules для ускорения повторных запусков.\n4. Пример matrix-конфигурации:\n\n```yaml\njobs:\n  build-test:\n    runs-on: ubuntu-latest\n    strategy:\n      matrix:\n        node-version: [18.x, 20.x, 22.x]\n    steps:\n      - uses: actions/checkout@v4\n      - name: Use Node.js ${{ matrix.node-version }}\n        uses: actions/setup-node@v4\n        with:\n          node-version: ${{ matrix.node-version }}\n      - run: npm ci\n      - run: npm run lint\n      - run: npm run type-check\n      - run: npm test\n      - run: npm run build\n```\n5. Добавьте badge matrix build status в README для визуализации поддержки нескольких Node.js версий.\n6. Документируйте поддерживаемые версии Node.js в CONTRIBUTING.md и package.json (engines).",
+        "testStrategy": "- Запустите workflow вручную и убедитесь, что все задачи успешно выполняются на всех указанных версиях Node.js.\n- Проверьте, что ошибки в тестах, линтинге или сборке на любой из версий приводят к падению соответствующего job.\n- Убедитесь, что результаты тестов и артефакты корректно отображаются для каждой версии.\n- Проверьте, что badge matrix build status отображается в README и обновляется при изменениях.\n- Проведите ревью YAML-конфигурации на предмет дублирования и оптимальности.",
+        "status": "pending",
+        "dependencies": [
+          1,
+          3
+        ],
+        "priority": "high",
+        "subtasks": []
+      },
+      {
+        "id": 5,
+        "title": "Настройка .dockerignore для исключения ненужных файлов",
+        "description": "Создать и настроить файл .dockerignore для исключения из Docker-образа временных, конфиденциальных и неиспользуемых файлов, чтобы минимизировать размер контейнера и повысить безопасность.",
+        "details": "1. Проанализируйте структуру проекта и определите файлы и директории, которые не должны попадать в Docker-образ (например, node_modules, .git, .env*, тестовые директории, логи, кэш, документация, локальные настройки).\n2. Создайте файл .dockerignore в корне проекта.\n3. Добавьте в .dockerignore шаблоны для исключения: node_modules, .git, .env*, *.log, coverage, dist, build, .DS_Store, tmp, cache, test, docs и других нерелевантных файлов.\n4. Убедитесь, что исключены все чувствительные и временные файлы, чтобы предотвратить их попадание в контейнер и утечку данных.\n5. Проверьте, что .dockerignore не исключает файлы, необходимые для сборки и работы приложения.\n6. При необходимости обновляйте .dockerignore при изменении структуры проекта или появлении новых временных файлов.",
+        "testStrategy": "- Соберите Docker-образ и проверьте его размер до и после применения .dockerignore.\n- Запустите контейнер и убедитесь, что все необходимые файлы присутствуют, а исключённые — отсутствуют.\n- Проверьте, что чувствительные данные (например, .env) и временные файлы не попали в образ.\n- Проведите ревью .dockerignore на предмет полноты и актуальности шаблонов.",
+        "status": "pending",
+        "dependencies": [
+          1,
+          4
+        ],
+        "priority": "medium",
+        "subtasks": []
+      },
+      {
+        "id": 6,
+        "title": "Конфигурация commitlint для conventional commits",
+        "description": "Настроить и интегрировать commitlint для проверки сообщений коммитов на соответствие стандарту conventional commits в процессе commit и push.",
+        "details": "1. Установите commitlint и @commitlint/config-conventional как dev-зависимости проекта.\n2. Создайте файл конфигурации commitlint (например, commitlint.config.js) с использованием пресета @commitlint/config-conventional.\n3. Интегрируйте commitlint с husky, добавив проверку commit-msg в соответствующий hook через husky add .husky/commit-msg 'npx --no-install commitlint --edit $1'.\n4. Проверьте, что commitlint корректно блокирует коммиты с некорректными сообщениями и выводит информативные ошибки.\n5. Обеспечьте версионирование конфигурации commitlint и добавьте инструкции по использованию в документацию проекта.\n6. Убедитесь, что команда знает о возможности обхода проверки с помощью --no-verify, но используйте это только в исключительных случаях[2][3].\n7. Следите за актуальностью зависимостей commitlint и обновляйте их при необходимости.",
+        "testStrategy": "- Попробуйте сделать коммит с некорректным сообщением и убедитесь, что commitlint блокирует его с понятным сообщением об ошибке.\n- Сделайте коммит с корректным conventional commit сообщением и убедитесь, что он проходит.\n- Проверьте, что hook работает на всех платформах, используемых командой.\n- Проверьте, что обход проверки с помощью --no-verify действительно отключает commitlint.\n- Убедитесь, что инструкция по использованию и обходу проверки присутствует в документации.",
+        "status": "pending",
+        "dependencies": [
+          1,
+          3
+        ],
+        "priority": "medium",
+        "subtasks": []
+      },
+      {
+        "id": 7,
+        "title": "Создание backup стратегии для данных на DigitalOcean",
+        "description": "Разработать и внедрить стратегию резервного копирования для всех критически важных данных и сервисов, развернутых на DigitalOcean.",
+        "details": "1. Проанализируйте архитектуру приложения и определите все компоненты, требующие резервного копирования (например, базы данных Neo4j, пользовательские файлы, конфигурации).\n2. Изучите возможности DigitalOcean для резервного копирования: встроенные Backups и Snapshots для Droplets, автоматические бэкапы в App Platform, а также сторонние решения (например, автоматизация через GitHub Actions или cron-скрипты).\n3. Для баз данных настройте регулярное создание дампов с сохранением на отдельном DigitalOcean Space или внешнем облачном хранилище.\n4. Для файловых данных реализуйте автоматическую синхронизацию с резервным хранилищем.\n5. Определите политику хранения: частота бэкапов, срок хранения, ротация и восстановление.\n6. Документируйте процесс восстановления данных для каждого компонента.\n7. Проведите тестовое восстановление для проверки работоспособности стратегии.",
+        "testStrategy": "- Проверьте, что для всех критических компонентов (БД, файловое хранилище, конфигурации) настроено регулярное резервное копирование.\n- Проведите тестовое восстановление из резервной копии для каждого типа данных и убедитесь в целостности и актуальности восстановленных данных.\n- Проверьте автоматизацию процесса (скрипты, расписания, уведомления об ошибках).\n- Убедитесь, что документация по восстановлению понятна и воспроизводима.",
+        "status": "pending",
+        "dependencies": [
+          1
+        ],
+        "priority": "high",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "created": "2025-07-01T22:28:10.873Z",
+      "updated": "2025-07-01T22:42:03.858Z",
+      "description": "Infrastructure refactoring: ESLint flat config, TypeScript, testing, CI/CD, Docker, deployment - 2025 best practices"
     }
   }
 }

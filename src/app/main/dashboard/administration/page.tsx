@@ -8,13 +8,13 @@ export default function AdministrationPage() {
         <p className="text-muted-foreground">Manage data imports, user accounts, and system administration</p>
       </div>
 
-      <Tabs defaultValue="data" className="w-full">
+      <Tabs className="w-full" defaultValue="data">
         <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
           <TabsTrigger value="data">Data Management</TabsTrigger>
           <TabsTrigger value="users">User Management</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="data" className="space-y-6">
+        <TabsContent className="space-y-6" value="data">
           <div className="rounded-lg border p-6">
             <h3 className="mb-4 text-lg font-semibold">CSV Data Import</h3>
             <div className="space-y-4">
@@ -22,15 +22,15 @@ export default function AdministrationPage() {
                 <div className="mx-auto max-w-sm">
                   <svg
                     className="mx-auto h-12 w-12 text-gray-400"
-                    stroke="currentColor"
                     fill="none"
+                    stroke="currentColor"
                     viewBox="0 0 48 48"
                   >
                     <path
                       d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                      strokeWidth={2}
                       strokeLinecap="round"
                       strokeLinejoin="round"
+                      strokeWidth={2}
                     />
                   </svg>
                   <h4 className="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">Upload CSV Files</h4>
@@ -51,7 +51,7 @@ export default function AdministrationPage() {
           </div>
         </TabsContent>
 
-        <TabsContent value="users" className="space-y-6">
+        <TabsContent className="space-y-6" value="users">
           <div className="rounded-lg border p-6">
             <h3 className="mb-4 text-lg font-semibold">User Management</h3>
             <div className="mb-4 flex items-center justify-between">

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-
 import { Shield, Key, Eye, EyeOff, Smartphone, Monitor, MapPin, Clock } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -36,16 +35,18 @@ export function SecuritySettings() {
               <Label className="text-xs">Current Password</Label>
               <div className="relative">
                 <Input
-                  type={showCurrentPassword ? "text" : "password"}
-                  placeholder="Enter current password"
                   className="h-7 pr-7 text-sm"
+                  placeholder="Enter current password"
+                  type={showCurrentPassword ? "text" : "password"}
                 />
                 <Button
+                  className="absolute top-0 right-0 h-7 w-7 p-0"
+                  size="sm"
                   type="button"
                   variant="ghost"
-                  size="sm"
-                  className="absolute top-0 right-0 h-7 w-7 p-0"
-                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                  onClick={() => {
+                    setShowCurrentPassword(!showCurrentPassword);
+                  }}
                 >
                   {showCurrentPassword ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
                 </Button>
@@ -57,16 +58,18 @@ export function SecuritySettings() {
                 <Label className="text-xs">New Password</Label>
                 <div className="relative">
                   <Input
-                    type={showNewPassword ? "text" : "password"}
-                    placeholder="New password"
                     className="h-7 pr-7 text-sm"
+                    placeholder="New password"
+                    type={showNewPassword ? "text" : "password"}
                   />
                   <Button
+                    className="absolute top-0 right-0 h-7 w-7 p-0"
+                    size="sm"
                     type="button"
                     variant="ghost"
-                    size="sm"
-                    className="absolute top-0 right-0 h-7 w-7 p-0"
-                    onClick={() => setShowNewPassword(!showNewPassword)}
+                    onClick={() => {
+                      setShowNewPassword(!showNewPassword);
+                    }}
                   >
                     {showNewPassword ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
                   </Button>
@@ -74,11 +77,11 @@ export function SecuritySettings() {
               </div>
               <div className="space-y-1">
                 <Label className="text-xs">Confirm</Label>
-                <Input type="password" placeholder="Confirm password" className="h-7 text-sm" />
+                <Input className="h-7 text-sm" placeholder="Confirm password" type="password" />
               </div>
             </div>
 
-            <Button size="sm" className="h-7 w-full text-xs">
+            <Button className="h-7 w-full text-xs" size="sm">
               Update Password
             </Button>
           </CardContent>
@@ -151,7 +154,7 @@ export function SecuritySettings() {
                   </div>
                 </div>
               </div>
-              <Badge variant="secondary" className="text-xs">
+              <Badge className="text-xs" variant="secondary">
                 Current
               </Badge>
             </div>
@@ -170,12 +173,12 @@ export function SecuritySettings() {
                   </div>
                 </div>
               </div>
-              <Button variant="outline" size="sm" className="h-6 px-2 text-xs">
+              <Button className="h-6 px-2 text-xs" size="sm" variant="outline">
                 Revoke
               </Button>
             </div>
 
-            <Button variant="outline" size="sm" className="h-7 w-full text-xs">
+            <Button className="h-7 w-full text-xs" size="sm" variant="outline">
               Sign out all other sessions
             </Button>
           </CardContent>

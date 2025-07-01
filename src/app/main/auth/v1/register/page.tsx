@@ -1,5 +1,4 @@
 import Link from "next/link";
-
 import { Command } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -24,7 +23,7 @@ export default function RegisterV1() {
             </Button>
             <p className="text-muted-foreground text-center text-xs font-medium">
               Already have an account?{" "}
-              <Link href="login" className="text-primary font-semibold">
+              <Link className="text-primary font-semibold" href="login">
                 Login
               </Link>
             </p>

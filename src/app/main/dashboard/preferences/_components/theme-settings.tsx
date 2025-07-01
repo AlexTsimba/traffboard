@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-
 import { Monitor, Moon, Sun, Palette, Sparkles, Contrast, Eye } from "lucide-react";
 import { useTheme } from "next-themes";
 
@@ -81,13 +80,13 @@ export function ThemeSettings() {
             </div>
 
             <div className="flex flex-wrap gap-1">
-              <Badge variant="secondary" className="text-xs">
+              <Badge className="text-xs" variant="secondary">
                 {theme ? theme.charAt(0).toUpperCase() + theme.slice(1) : "—"}
               </Badge>
-              <Badge variant="secondary" className="text-xs">
+              <Badge className="text-xs" variant="secondary">
                 {accentColor}
               </Badge>
-              <Badge variant="secondary" className="text-xs">
+              <Badge className="text-xs" variant="secondary">
                 {borderRadius[0]}px
               </Badge>
             </div>
@@ -106,24 +105,26 @@ export function ThemeSettings() {
             <ToggleGroup
               className="grid w-full grid-cols-3 gap-1"
               size="sm"
-              variant="outline"
               type="single"
               value={theme}
-              onValueChange={(value) => setTheme(value)}
+              variant="outline"
+              onValueChange={(value) => {
+                setTheme(value);
+              }}
             >
-              <ToggleGroupItem value="light" aria-label="Light theme" className="h-10">
+              <ToggleGroupItem aria-label="Light theme" className="h-10" value="light">
                 <div className="text-center">
                   <Sun className="mx-auto mb-0.5 h-3 w-3" />
                   <div className="text-xs font-medium">Light</div>
                 </div>
               </ToggleGroupItem>
-              <ToggleGroupItem value="dark" aria-label="Dark theme" className="h-10">
+              <ToggleGroupItem aria-label="Dark theme" className="h-10" value="dark">
                 <div className="text-center">
                   <Moon className="mx-auto mb-0.5 h-3 w-3" />
                   <div className="text-xs font-medium">Dark</div>
                 </div>
               </ToggleGroupItem>
-              <ToggleGroupItem value="system" aria-label="System theme" className="h-10">
+              <ToggleGroupItem aria-label="System theme" className="h-10" value="system">
                 <div className="text-center">
                   <Monitor className="mx-auto mb-0.5 h-3 w-3" />
                   <div className="text-xs font-medium">System</div>
@@ -173,12 +174,14 @@ export function ThemeSettings() {
               {accentColors.map((color) => (
                 <button
                   key={color.value}
-                  onClick={() => setAccentColor(color.value)}
                   className={`relative h-8 w-full rounded-md border-2 transition-all ${
                     accentColor === color.value
                       ? "border-primary ring-primary/20 ring-2"
                       : "border-muted hover:border-muted-foreground/30"
                   }`}
+                  onClick={() => {
+                    setAccentColor(color.value);
+                  }}
                 >
                   <div className={`h-full w-full rounded-sm ${color.class}`} />
                   {accentColor === color.value && (
@@ -207,12 +210,12 @@ export function ThemeSettings() {
                 <span className="text-muted-foreground text-xs">{borderRadius[0]}px</span>
               </div>
               <Slider
-                value={borderRadius}
-                onValueChange={setBorderRadius}
+                className="w-full"
                 max={16}
                 min={0}
                 step={1}
-                className="w-full"
+                value={borderRadius}
+                onValueChange={setBorderRadius}
               />
               <div className="text-muted-foreground flex justify-between text-xs">
                 <span>Sharp</span>

@@ -1,13 +1,12 @@
 "use client";
 import { useMemo } from "react";
-
 import { usePathname } from "next/navigation";
 
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 
-import { SearchDialog } from "../_components/sidebar/search-dialog";
+import { SearchDialog } from "./sidebar/search-dialog";
 
 function FilterButton() {
   return (
@@ -28,7 +27,7 @@ export function DashboardHeader() {
       <div className={cn("flex w-full items-center justify-between px-4 lg:px-6")}>
         <div className="flex items-center gap-1 lg:gap-2">
           <SidebarTrigger className="-ml-1" />
-          <Separator orientation="vertical" className="mx-2 data-[orientation=vertical]:h-4" />
+          <Separator className="mx-2 data-[orientation=vertical]:h-4" orientation="vertical" />
           <SearchDialog />
         </div>
         <div className="flex items-center gap-2">{rightContent}</div>
