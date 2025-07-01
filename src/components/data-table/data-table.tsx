@@ -93,7 +93,7 @@ export function DataTable<TData, TValue>({
             {headerGroup.headers.map((header) => {
               return (
                 <TableHead key={header.id} colSpan={header.colSpan}>
-                  {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                  {header.isPlaceholder ? undefined : flexRender(header.column.columnDef.header, header.getContext())}
                 </TableHead>
               );
             })}

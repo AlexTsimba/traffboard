@@ -4,7 +4,6 @@ import { useMemo } from "react";
 
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { cn } from "@/lib/utils";
 
 import { SearchDialog } from "./sidebar/search-dialog";
 
