@@ -1,13 +1,4 @@
-import {
-  Home,
-  ChartPie,
-  Grid2X2,
-  ChartLine,
-  ShoppingBag,
-  Users,
-  SquareArrowUpRight,
-  type LucideIcon,
-} from "lucide-react";
+import { Home, ChartPie, Grid2X2, ChartLine, ShoppingBag, type LucideIcon } from "lucide-react";
 
 export interface NavSubItem {
   title: string;

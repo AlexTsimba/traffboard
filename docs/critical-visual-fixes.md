@@ -3,6 +3,7 @@
 ## Issues Identified from Screenshot
 
 ### 🔍 **Problems Found**
+
 1. **Uneven Card Heights**: Theme card ends much higher than Layout & Interface card
 2. **Dark Theme Preview Bug**: Sidebar not visible in dark theme preview (invisible against background)
 3. **Layout Imbalance**: Two-column grid doesn't align properly at the bottom
@@ -12,31 +13,36 @@
 ### 🎨 **1. Dark Theme Preview Fix**
 
 **Problem**: Sidebar invisible in dark theme due to poor contrast
+
 ```tsx
 // Before: Poor visibility in dark mode
 <div className="bg-muted rounded-sm">
 
-// After: Better contrast for both themes  
+// After: Better contrast for both themes
 <div className="bg-muted/60 border border-muted-foreground/30 rounded-sm">
 ```
 
 **Complete Preview Component Fix**:
+
 ```tsx
-{/* Sidebar representation */}
+{
+  /* Sidebar representation */
+}
 <div
-  className={`bg-muted/60 border border-muted-foreground/30 rounded-sm ${
-    variant === "floating" ? "border-dashed border-muted-foreground/50" : ""
-  } ${variant === "inset" ? "ml-0.5" : ""} ${
-    collapsible === "icon" ? "w-3" : "w-6"
-  }`}
-/>
-{/* Content area */}
-<div className="flex-1 rounded-sm bg-background/50 border border-muted-foreground/20">
-  <div className="h-full rounded-sm border border-dashed border-muted-foreground/30" />
-</div>
+  className={`bg-muted/60 border-muted-foreground/30 rounded-sm border ${
+    variant === "floating" ? "border-muted-foreground/50 border-dashed" : ""
+  } ${variant === "inset" ? "ml-0.5" : ""} ${collapsible === "icon" ? "w-3" : "w-6"}`}
+/>;
+{
+  /* Content area */
+}
+<div className="bg-background/50 border-muted-foreground/20 flex-1 rounded-sm border">
+  <div className="border-muted-foreground/30 h-full rounded-sm border border-dashed" />
+</div>;
 ```
 
 **Improvements**:
+
 - `bg-muted/60` - Semi-transparent background for better visibility
 - `border border-muted-foreground/30` - Visible borders in all themes
 - `bg-background/50` - Content area distinguishable from sidebar
@@ -70,6 +76,7 @@
 ### 🎯 **3. Responsive Behavior**
 
 #### Desktop (lg and up):
+
 ```
 ┌─────────────┬─────────────┐
 │ Preview     │ Layout &    │
@@ -80,6 +87,7 @@
 ```
 
 #### Mobile/Tablet:
+
 ```
 ┌─────────────────────────┐
 │ Preview                 │
@@ -93,16 +101,19 @@
 ### ⚡ **4. Key Improvements**
 
 #### Visual Consistency:
+
 - **Perfect alignment**: Both cards end at same height on desktop
 - **Better space usage**: Preview card utilizes vertical space efficiently
 - **Responsive design**: Optimal layout for both mobile and desktop
 
 #### Dark Theme Support:
+
 - **Visible preview**: Sidebar always visible regardless of theme
 - **Consistent contrast**: Borders and backgrounds work in all themes
 - **Enhanced accessibility**: Better visual differentiation of elements
 
 #### Grid Optimization:
+
 - **Semantic structure**: Preview logically grouped with settings
 - **Space efficiency**: No wasted vertical space
 - **Mobile-first**: Single column stacking on smaller screens
@@ -110,6 +121,7 @@
 ## Technical Implementation
 
 ### 🔧 **CSS Grid Properties**
+
 ```css
 /* Desktop grid layout */
 lg:grid-cols-2           /* 2 equal columns */
@@ -122,6 +134,7 @@ hidden lg:block          /* Show only on desktop */
 ```
 
 ### 🎨 **Theme-Aware Colors**
+
 ```css
 /* Sidebar visibility in all themes */
 bg-muted/60                    /* 60% opacity background */
@@ -135,21 +148,25 @@ border-muted-foreground/20     /* 20% opacity border */
 ## Results Achieved
 
 ### ✅ **Perfect Visual Alignment**
+
 - Both main cards now end at exactly the same height
 - No more visual "raggedness" at the bottom
 - Clean, professional two-column layout
 
-### ✅ **Dark Theme Compatibility** 
+### ✅ **Dark Theme Compatibility**
+
 - Preview component fully visible in dark theme
 - Sidebar representation clearly distinguishable
 - Consistent visual hierarchy across all themes
 
 ### ✅ **Improved Layout Logic**
+
 - Preview positioned prominently on the left
 - Settings logically grouped in right column
 - Better content organization and flow
 
 ### ✅ **Enhanced Mobile Experience**
+
 - Single-column stacking maintains readability
 - Logical content order preserved
 - Touch-friendly spacing maintained

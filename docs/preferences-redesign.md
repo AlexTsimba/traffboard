@@ -1,23 +1,27 @@
 # Preferences Page Redesign
 
 ## Overview
+
 Redesigned the preferences/appearance page with modern best practices for settings interfaces.
 
 ## Key Improvements
 
 ### 🎨 **Visual Design**
+
 - **Constrained width**: Added `max-w-4xl` for better readability on wide screens
 - **Card-based layout**: Separated theme and layout settings into distinct cards
 - **Improved spacing**: Better visual hierarchy with consistent spacing
 - **Responsive grid**: Toggle groups now use responsive CSS Grid instead of flex
 
 ### 🔧 **User Experience**
+
 - **Descriptive cards**: Each setting section has clear titles and descriptions
 - **Enhanced options**: Toggle items now show descriptions for each choice
 - **Visual feedback**: Added LayoutPreview component to show current settings
 - **Better accessibility**: Improved ARIA labels and keyboard navigation
 
 ### 📱 **Responsive Design**
+
 - **Mobile-first**: Toggle groups stack on mobile, grid on larger screens
 - **Flexible layout**: Settings adapt to screen size automatically
 - **Touch-friendly**: Larger touch targets for mobile users
@@ -36,17 +40,21 @@ preferences/
 ## Design Patterns Used
 
 ### Card-based Settings
+
 Each major setting group is in its own card with:
+
 - Clear title and description in CardHeader
 - Settings controls in CardContent
 - Visual separation with Separator components
 
 ### Responsive Toggle Groups
+
 - Grid layout: `grid-cols-1 sm:grid-cols-2/3`
 - Vertical layout for toggle items
 - Descriptive text under each option
 
 ### Visual Feedback
+
 - Live preview of current settings
 - Badge indicators for active settings
 - Simplified visual representation of layout

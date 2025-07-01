@@ -38,6 +38,20 @@ export default function ConversionsPage() {
           <p className="text-muted-foreground">Charts will appear after CSV upload</p>
         </div>
       </div>
+
+      {/* Demographics Section */}
+      {/*
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="rounded-lg border p-6 flex flex-col items-center">
+          <h3 className="mb-4 text-lg font-semibold">Age Distribution</h3>
+          <DemographicsAgeChart />
+        </div>
+        <div className="rounded-lg border p-6 flex flex-col items-center">
+          <h3 className="mb-4 text-lg font-semibold">Gender Distribution</h3>
+          <DemographicsGenderChart />
+        </div>
+      </div>
+      */}
     </div>
   );
 }

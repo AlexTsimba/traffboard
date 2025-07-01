@@ -29,9 +29,9 @@ export function LayoutPreview() {
       const sidebarCollapsible = getValueFromCookie("sidebar_collapsible");
       const contentLayoutValue = getValueFromCookie("content_layout");
 
-      setVariant((sidebarVariant as SidebarVariant) ?? "sidebar");
-      setCollapsible((sidebarCollapsible as SidebarCollapsible) ?? "icon");
-      setContentLayout((contentLayoutValue as ContentLayout) ?? "full-width");
+      setVariant(sidebarVariant as SidebarVariant);
+      setCollapsible(sidebarCollapsible as SidebarCollapsible);
+      setContentLayout(contentLayoutValue as ContentLayout);
     };
 
     // Initial load

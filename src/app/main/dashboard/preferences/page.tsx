@@ -1,7 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { AccountProfile } from "./_components/account-profile";
-import { AppearanceSettings } from "./_components/appearance-settings";
+import AppearanceSettings from "./_components/appearance-settings";
 import { SecuritySettings } from "./_components/security-settings";
 
 export default function SettingsPage() {

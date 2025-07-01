@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, ReactNode } from "react";
+import { useMemo } from "react";
 
 import { usePathname } from "next/navigation";
 
@@ -15,10 +15,10 @@ function FilterButton() {
   );
 }
 
-export function DashboardHeader({ contentLayout }: { contentLayout?: string }) {
+export function DashboardHeader() {
   const pathname = usePathname();
   const rightContent = useMemo(() => {
-    if (pathname?.includes("/conversions")) return <FilterButton />;
+    if (pathname.includes("/conversions")) return <FilterButton />;
     // Overview — ничего
     return null;
   }, [pathname]);

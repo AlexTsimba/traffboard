@@ -82,7 +82,7 @@ export function ThemeSettings() {
 
             <div className="flex flex-wrap gap-1">
               <Badge variant="secondary" className="text-xs">
-                {theme?.charAt(0).toUpperCase() + theme?.slice(1)}
+                {theme ? theme.charAt(0).toUpperCase() + theme.slice(1) : "—"}
               </Badge>
               <Badge variant="secondary" className="text-xs">
                 {accentColor}

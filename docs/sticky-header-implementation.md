@@ -1,6 +1,7 @@
 # Sticky Header Implementation
 
 ## Overview
+
 Implemented a sticky header for all dashboard pages to improve navigation and maintain context while scrolling through content.
 
 ## Changes Made
@@ -8,6 +9,7 @@ Implemented a sticky header for all dashboard pages to improve navigation and ma
 ### 🔧 **Layout Structure (`src/app/main/dashboard/layout.tsx`)**
 
 **Before:**
+
 ```tsx
 <SidebarInset>
   <header className="flex h-12 shrink-0 items-center...">
@@ -20,6 +22,7 @@ Implemented a sticky header for all dashboard pages to improve navigation and ma
 ```
 
 **After:**
+
 ```tsx
 <SidebarInset className="flex h-screen flex-col">
   <header className="sticky top-0 z-50 flex h-12 shrink-0 items-center... bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -36,10 +39,12 @@ Implemented a sticky header for all dashboard pages to improve navigation and ma
 ### 📏 **Key Layout Changes:**
 
 1. **SidebarInset Container:**
+
    - Added `flex h-screen flex-col` to create full-height flex container
    - This ensures proper height distribution between header and content
 
 2. **Sticky Header:**
+
    - Added `sticky top-0 z-50` for sticky positioning
    - Added `bg-background/95 backdrop-blur` for glass effect
    - Added `supports-[backdrop-filter]:bg-background/60` for better transparency support
@@ -70,16 +75,19 @@ html {
 ## Features
 
 ### ✨ **Visual Effects:**
+
 - **Glass morphism**: Semi-transparent background with backdrop blur
 - **Smooth transitions**: Existing transition animations preserved
 - **Proper layering**: z-index ensures header stays above content
 
 ### 📱 **Responsive Behavior:**
+
 - Header remains sticky on all screen sizes
 - Sidebar collapse/expand still works correctly
 - Mobile and desktop layouts both supported
 
 ### 🔄 **Maintains Existing Functionality:**
+
 - All sidebar variants (inset, floating, sidebar) work correctly
 - Content layout preferences (centered/full-width) preserved
 - Search dialog and account switcher remain functional
@@ -88,6 +96,7 @@ html {
 ## Technical Details
 
 ### Flexbox Layout Strategy:
+
 ```
 SidebarInset (flex h-screen flex-col)
 ├── Header (sticky top-0, shrink-0)
@@ -96,6 +105,7 @@ SidebarInset (flex h-screen flex-col)
 ```
 
 ### CSS Properties Used:
+
 - `sticky top-0` - Makes header stick to top of viewport
 - `z-50` - Ensures header appears above content
 - `backdrop-blur` - Creates glass effect

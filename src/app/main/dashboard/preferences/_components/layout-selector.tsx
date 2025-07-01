@@ -32,9 +32,9 @@ export function LayoutSelector() {
     const sidebarCollapsible = getValueFromCookie("sidebar_collapsible");
     const contentLayoutValue = getValueFromCookie("content_layout");
 
-    setVariant((sidebarVariant as SidebarVariant) ?? "sidebar");
-    setCollapsible((sidebarCollapsible as SidebarCollapsible) ?? "icon");
-    setContentLayout((contentLayoutValue as ContentLayout) ?? "full-width");
+    if (sidebarVariant) setVariant(sidebarVariant as SidebarVariant);
+    if (sidebarCollapsible) setCollapsible(sidebarCollapsible as SidebarCollapsible);
+    if (contentLayoutValue) setContentLayout(contentLayoutValue as ContentLayout);
   }, []);
 
   const handleValueChange = async (key: string, value: string) => {

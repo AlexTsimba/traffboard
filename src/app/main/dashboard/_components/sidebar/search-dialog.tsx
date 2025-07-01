@@ -1,7 +1,9 @@
 "use client";
 import * as React from "react";
 
-import { ChartPie, Grid2X2, ChartLine, ShoppingBag, BookA, Forklift, Search, Home } from "lucide-react";
+import { useRouter } from "next/navigation";
+
+import { ChartPie, Grid2X2, ChartLine, ShoppingBag, Search, Home } from "lucide-react";
 
 import {
   CommandDialog,
@@ -14,27 +16,18 @@ import {
 } from "@/components/ui/command";
 
 const searchItems = [
-  { group: "Reports", icon: Home, label: "Overview" },
-  { group: "Reports", icon: ChartPie, label: "Conversions" },
-  { group: "Reports", icon: Grid2X2, label: "Quality Breakdown", disabled: true },
-  { group: "Reports", icon: ChartLine, label: "Cohorts", disabled: true },
-  { group: "Reports", icon: ShoppingBag, label: "Landings", disabled: true },
-  { group: "Authentication", label: "Login v1" },
-  { group: "Authentication", label: "Register v1" },
+  { group: "Reports", icon: Home, label: "Overview", url: "/main/dashboard/overview" },
+  { group: "Reports", icon: ChartPie, label: "Conversions", url: "/main/dashboard/conversions" },
+  { group: "Reports", icon: Grid2X2, label: "Quality Breakdown", disabled: true, url: "/main/dashboard/traffic" },
+  { group: "Reports", icon: ChartLine, label: "Cohorts", disabled: true, url: "/main/dashboard/cohorts" },
+  { group: "Reports", icon: ShoppingBag, label: "Landings", disabled: true, url: "/main/dashboard/landings" },
+  { group: "Authentication", label: "Login v1", url: "/main/dashboard/auth/v1/login" },
+  { group: "Authentication", label: "Register v1", url: "/main/dashboard/auth/v1/register" },
 ];
 
 export function SearchDialog() {
   const [open, setOpen] = React.useState(false);
-  React.useEffect(() => {
-    const down = (e: KeyboardEvent) => {
-      if (e.key === "j" && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault();
-        setOpen((open) => !open);
-      }
-    };
-    document.addEventListener("keydown", down);
-    return () => document.removeEventListener("keydown", down);
-  }, []);
+  const router = useRouter();
 
   return (
     <>
@@ -44,9 +37,6 @@ export function SearchDialog() {
       >
         <Search className="size-4" />
         Search
-        <kbd className="bg-muted inline-flex h-5 items-center gap-1 rounded border px-1.5 text-[10px] font-medium select-none">
-          <span className="text-xs">⌘</span>J
-        </kbd>
       </div>
       <CommandDialog open={open} onOpenChange={setOpen}>
         <CommandInput placeholder="Search dashboards, users, and more…" />
@@ -59,10 +49,19 @@ export function SearchDialog() {
                 {searchItems
                   .filter((item) => item.group === group)
                   .map((item) => (
-                    <CommandItem className="!py-1.5" key={item.label} onSelect={() => setOpen(false)}>
+                    <CommandItem
+                      className="!py-1.5"
+                      key={item.label}
+                      onSelect={() => {
+                        setOpen(false);
+                        if (item.url && !item.disabled) {
+                          router.push(item.url);
+                        }
+                      }}
+                      disabled={item.disabled}
+                    >
                       {item.icon && <item.icon />}
                       <span>{item.label}</span>
-                      {/* {item.shortcut && <CommandShortcut>{item.shortcut}</CommandShortcut>} */}
                     </CommandItem>
                   ))}
               </CommandGroup>
