@@ -1,0 +1,37 @@
+# Task ID: 6
+# Title: Develop Analytics Dashboard
+# Status: pending
+# Dependencies: 2, 4, 5
+# Priority: high
+# Description: Create a simple analytics dashboard with key metrics and basic charts.
+# Details:
+1. Implement global filter components for date range, partner, and campaign using Zustand (v4.3.8 or later) for state management
+2. Create a Zustand store for filter state:
+   ```typescript
+   interface FilterState {
+     dateRange: [Date, Date]
+     partners: string[]
+     campaigns: string[]
+     setFilters: (filters: Partial<FilterState>) => void
+     resetFilters: () => void
+   }
+   ```
+3. Use TanStack Query (v5.0.0 or later) for data fetching with proper caching strategies
+4. Implement API routes for fetching analytics data based on filters
+5. Create KPI cards for total clicks, registrations, and revenue
+6. Implement the following charts using shadcn/ui charts (Recharts wrapper):
+   - Line chart for daily metrics
+   - Bar chart for top partners
+   - Pie chart for campaign distribution
+7. Ensure all components are responsive and mobile-friendly
+8. Implement loading states and error handling for data fetching
+9. Add a date range picker component for custom date selection
+
+# Test Strategy:
+1. Test filter functionality and state management
+2. Verify data fetching and caching with TanStack Query
+3. Ensure charts render correctly with various data sets
+4. Test responsiveness on different screen sizes
+5. Validate loading states and error handling
+6. Performance test dashboard with large datasets
+7. Verify date range picker functionality

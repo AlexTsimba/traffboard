@@ -1,77 +1,141 @@
 {
-  "meta": {
-    "generatedAt": "2025-06-30T06:07:41.974Z",
-    "tasksAnalyzed": 8,
-    "totalTasks": 8,
-    "analysisCount": 8,
-    "thresholdScore": 5,
-    "projectName": "Taskmaster",
-    "usedResearch": false
-  },
-  "complexityAnalysis": [
-    {
-      "taskId": 1,
-      "taskTitle": "Setup Template & Dependencies",
-      "complexityScore": 5,
-      "recommendedSubtasks": 4,
-      "expansionPrompt": "Break down the 'Setup Template & Dependencies' task into 4 subtasks: 1) Template setup and cleanup, 2) Core dependencies installation, 3) Configuration setup (TypeScript, ESLint, Prettier), and 4) Project structure organization. For each subtask, include specific steps, acceptance criteria, and estimated time.",
-      "reasoning": "This task involves standard project setup with known dependencies. While comprehensive, it follows established patterns and has clear steps. The complexity comes from ensuring all dependencies work together correctly and configuring the development environment properly."
-    },
-    {
-      "taskId": 2,
-      "taskTitle": "Database Setup & Models",
-      "complexityScore": 6,
-      "recommendedSubtasks": 3,
-      "expansionPrompt": "Divide the 'Database Setup & Models' task into 3 subtasks: 1) Drizzle ORM configuration and connection setup, 2) Schema implementation with migrations, and 3) Seed data and utility functions. Include detailed implementation steps, validation criteria, and potential challenges for each subtask.",
-      "reasoning": "Database setup requires careful implementation of schemas, migrations, and seed data. The complexity is moderate as the schema is well-defined, but proper ORM configuration and ensuring data integrity add complexity. The task requires technical precision but follows established patterns."
-    },
-    {
-      "taskId": 3,
-      "taskTitle": "Authentication & 2FA",
-      "complexityScore": 8,
-      "recommendedSubtasks": 5,
-      "expansionPrompt": "Split the 'Authentication & 2FA' task into 5 subtasks: 1) NextAuth.js base configuration, 2) Custom Drizzle adapter implementation, 3) TOTP 2FA implementation, 4) Protected routes and RBAC middleware, and 5) Authentication UI components. For each subtask, specify implementation details, security considerations, and testing approaches.",
-      "reasoning": "Authentication with 2FA is highly complex due to security implications, multiple integration points, and the need for robust error handling. The TOTP implementation adds significant complexity, as does the custom Drizzle adapter. This task requires careful attention to security details and extensive testing."
-    },
-    {
-      "taskId": 4,
-      "taskTitle": "Basic Layout & Navigation",
-      "complexityScore": 4,
-      "recommendedSubtasks": 3,
-      "expansionPrompt": "Divide the 'Basic Layout & Navigation' task into 3 subtasks: 1) Page structure and routing setup, 2) Responsive layout implementation with shadcn/ui, and 3) Role-based navigation with theme support. For each subtask, include UI mockups, component hierarchy, and responsive design considerations.",
-      "reasoning": "This task involves standard UI implementation with established components. The complexity is relatively low since it uses shadcn/ui components and follows Next.js conventions. The role-based visibility adds some complexity but is straightforward to implement with the authentication system in place."
-    },
-    {
-      "taskId": 5,
-      "taskTitle": "CSV Upload & Processing",
-      "complexityScore": 7,
-      "recommendedSubtasks": 4,
-      "expansionPrompt": "Break down the 'CSV Upload & Processing' task into 4 subtasks: 1) File upload UI implementation, 2) CSV parsing and validation with Zod, 3) Database operations for batch processing, and 4) Error handling and reporting. For each subtask, include detailed implementation steps, edge cases to handle, and performance considerations.",
-      "reasoning": "CSV processing involves multiple technical challenges including file handling, data validation, batch database operations, and error management. The complexity comes from handling various edge cases, ensuring data integrity, and providing good user feedback. Performance considerations for large files add additional complexity."
-    },
-    {
-      "taskId": 6,
-      "taskTitle": "Analytics Dashboard",
-      "complexityScore": 7,
-      "recommendedSubtasks": 4,
-      "expansionPrompt": "Divide the 'Analytics Dashboard' task into 4 subtasks: 1) Filter state management with Zustand, 2) Data fetching layer with TanStack Query, 3) KPI cards and metrics calculation, and 4) Chart implementation with Recharts. For each subtask, include data flow diagrams, component specifications, and optimization strategies.",
-      "reasoning": "The analytics dashboard involves complex state management, data fetching, and visualization components. The implementation requires careful consideration of performance, especially with filtering large datasets. The integration of multiple libraries (Zustand, TanStack Query, Recharts) and ensuring responsive design add to the complexity."
-    },
-    {
-      "taskId": 7,
-      "taskTitle": "User Management",
-      "complexityScore": 6,
-      "recommendedSubtasks": 3,
-      "expansionPrompt": "Split the 'User Management' task into 3 subtasks: 1) User listing with search and pagination, 2) User CRUD operations with forms, and 3) Role and 2FA management. For each subtask, include UI mockups, server action implementations, and security considerations.",
-      "reasoning": "User management involves standard CRUD operations with additional complexity from role management and 2FA handling. The implementation is straightforward but requires careful attention to security and access control. The optimistic updates add some complexity to the frontend implementation."
-    },
-    {
-      "taskId": 8,
-      "taskTitle": "Deploy to App Platform",
-      "complexityScore": 5,
-      "recommendedSubtasks": 3,
-      "expansionPrompt": "Divide the 'Deploy to App Platform' task into 3 subtasks: 1) DigitalOcean App Platform configuration, 2) Database setup and migration strategy, and 3) CI/CD and monitoring setup. For each subtask, include detailed configuration steps, validation procedures, and troubleshooting guidelines.",
-      "reasoning": "Deployment involves standard configuration for DigitalOcean App Platform with moderate complexity. The task is well-defined with clear configuration requirements. The main challenges are ensuring proper environment setup, database migrations, and monitoring configuration. While important, it follows established patterns for cloud deployment."
-    }
-  ]
+	"meta": {
+		"generatedAt": "2025-07-02T08:24:43.289Z",
+		"tasksAnalyzed": 8,
+		"totalTasks": 8,
+		"analysisCount": 16,
+		"thresholdScore": 5,
+		"projectName": "Taskmaster",
+		"usedResearch": true
+	},
+	"complexityAnalysis": [
+		{
+			"taskId": 1,
+			"taskTitle": "Setup Template & Dependencies",
+			"complexityScore": 5,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Break down the 'Setup Template & Dependencies' task into 4 subtasks: 1) Template setup and cleanup, 2) Core dependencies installation, 3) Configuration setup (TypeScript, ESLint, Prettier), and 4) Project structure organization. For each subtask, include specific steps, acceptance criteria, and estimated time.",
+			"reasoning": "This task involves standard project setup with known dependencies. While comprehensive, it follows established patterns and has clear steps. The complexity comes from ensuring all dependencies work together correctly and configuring the development environment properly."
+		},
+		{
+			"taskId": 2,
+			"taskTitle": "Database Setup & Models",
+			"complexityScore": 6,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Divide the 'Database Setup & Models' task into 3 subtasks: 1) Drizzle ORM configuration and connection setup, 2) Schema implementation with migrations, and 3) Seed data and utility functions. Include detailed implementation steps, validation criteria, and potential challenges for each subtask.",
+			"reasoning": "Database setup requires careful implementation of schemas, migrations, and seed data. The complexity is moderate as the schema is well-defined, but proper ORM configuration and ensuring data integrity add complexity. The task requires technical precision but follows established patterns."
+		},
+		{
+			"taskId": 3,
+			"taskTitle": "Authentication & 2FA",
+			"complexityScore": 8,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Split the 'Authentication & 2FA' task into 5 subtasks: 1) NextAuth.js base configuration, 2) Custom Drizzle adapter implementation, 3) TOTP 2FA implementation, 4) Protected routes and RBAC middleware, and 5) Authentication UI components. For each subtask, specify implementation details, security considerations, and testing approaches.",
+			"reasoning": "Authentication with 2FA is highly complex due to security implications, multiple integration points, and the need for robust error handling. The TOTP implementation adds significant complexity, as does the custom Drizzle adapter. This task requires careful attention to security details and extensive testing."
+		},
+		{
+			"taskId": 4,
+			"taskTitle": "Basic Layout & Navigation",
+			"complexityScore": 4,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Divide the 'Basic Layout & Navigation' task into 3 subtasks: 1) Page structure and routing setup, 2) Responsive layout implementation with shadcn/ui, and 3) Role-based navigation with theme support. For each subtask, include UI mockups, component hierarchy, and responsive design considerations.",
+			"reasoning": "This task involves standard UI implementation with established components. The complexity is relatively low since it uses shadcn/ui components and follows Next.js conventions. The role-based visibility adds some complexity but is straightforward to implement with the authentication system in place."
+		},
+		{
+			"taskId": 5,
+			"taskTitle": "CSV Upload & Processing",
+			"complexityScore": 7,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Break down the 'CSV Upload & Processing' task into 4 subtasks: 1) File upload UI implementation, 2) CSV parsing and validation with Zod, 3) Database operations for batch processing, and 4) Error handling and reporting. For each subtask, include detailed implementation steps, edge cases to handle, and performance considerations.",
+			"reasoning": "CSV processing involves multiple technical challenges including file handling, data validation, batch database operations, and error management. The complexity comes from handling various edge cases, ensuring data integrity, and providing good user feedback. Performance considerations for large files add additional complexity."
+		},
+		{
+			"taskId": 6,
+			"taskTitle": "Analytics Dashboard",
+			"complexityScore": 7,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Divide the 'Analytics Dashboard' task into 4 subtasks: 1) Filter state management with Zustand, 2) Data fetching layer with TanStack Query, 3) KPI cards and metrics calculation, and 4) Chart implementation with Recharts. For each subtask, include data flow diagrams, component specifications, and optimization strategies.",
+			"reasoning": "The analytics dashboard involves complex state management, data fetching, and visualization components. The implementation requires careful consideration of performance, especially with filtering large datasets. The integration of multiple libraries (Zustand, TanStack Query, Recharts) and ensuring responsive design add to the complexity."
+		},
+		{
+			"taskId": 7,
+			"taskTitle": "User Management",
+			"complexityScore": 6,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Split the 'User Management' task into 3 subtasks: 1) User listing with search and pagination, 2) User CRUD operations with forms, and 3) Role and 2FA management. For each subtask, include UI mockups, server action implementations, and security considerations.",
+			"reasoning": "User management involves standard CRUD operations with additional complexity from role management and 2FA handling. The implementation is straightforward but requires careful attention to security and access control. The optimistic updates add some complexity to the frontend implementation."
+		},
+		{
+			"taskId": 8,
+			"taskTitle": "Deploy to App Platform",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Divide the 'Deploy to App Platform' task into 3 subtasks: 1) DigitalOcean App Platform configuration, 2) Database setup and migration strategy, and 3) CI/CD and monitoring setup. For each subtask, include detailed configuration steps, validation procedures, and troubleshooting guidelines.",
+			"reasoning": "Deployment involves standard configuration for DigitalOcean App Platform with moderate complexity. The task is well-defined with clear configuration requirements. The main challenges are ensuring proper environment setup, database migrations, and monitoring configuration. While important, it follows established patterns for cloud deployment."
+		},
+		{
+			"taskId": 18,
+			"taskTitle": "Setup Project Template and Dependencies",
+			"complexityScore": 6,
+			"recommendedSubtasks": 8,
+			"expansionPrompt": "Decompose the setup process into subtasks for each major step: cloning the template, cleaning up the project, updating Next.js, installing each dependency, configuring TypeScript, organizing the folder structure, setting up ESLint/Prettier, and writing the README.",
+			"reasoning": "This task involves multiple distinct setup activities, each with its own configuration and verification steps. While not algorithmically complex, it requires attention to detail and sequential execution to ensure a clean, maintainable foundation for the project[1][5]."
+		},
+		{
+			"taskId": 19,
+			"taskTitle": "Database Setup and Models Implementation",
+			"complexityScore": 7,
+			"recommendedSubtasks": 7,
+			"expansionPrompt": "Break down the database setup into subtasks: install/configure Drizzle ORM, set up PostgreSQL connection, implement each schema, configure migrations, create seed data, implement utility functions, and write unit tests.",
+			"reasoning": "This task requires both infrastructure setup and schema design, as well as implementing and testing utility functions. Each step is critical for data integrity and future scalability, and mistakes can have downstream effects."
+		},
+		{
+			"taskId": 20,
+			"taskTitle": "Implement Authentication and 2FA",
+			"complexityScore": 9,
+			"recommendedSubtasks": 10,
+			"expansionPrompt": "Expand into subtasks for each authentication aspect: NextAuth.js config, email/password logic, TOTP 2FA, protected middleware, RBAC, UI for login/2FA, API routes, password hashing, session management, and security/CSRF setup.",
+			"reasoning": "Authentication and 2FA are security-critical and involve backend, frontend, and middleware logic. Each component must be robust and thoroughly tested, increasing both complexity and the need for granular subtasks."
+		},
+		{
+			"taskId": 21,
+			"taskTitle": "Develop Basic Layout and Navigation",
+			"complexityScore": 6,
+			"recommendedSubtasks": 8,
+			"expansionPrompt": "Decompose into subtasks for sidebar navigation, each page creation, RBAC menu logic, responsive layout, header, breadcrumbs, 404 page, and SEO meta tags.",
+			"reasoning": "While mostly UI-focused, this task requires careful attention to access control, responsive design, and navigation logic, each of which can be developed and tested independently."
+		},
+		{
+			"taskId": 22,
+			"taskTitle": "Implement CSV Upload and Processing",
+			"complexityScore": 8,
+			"recommendedSubtasks": 9,
+			"expansionPrompt": "Break down into subtasks for upload form, server action, CSV parsing, data validation, transformation/insertion, error handling, progress indicator, performance optimization, and file restrictions.",
+			"reasoning": "This task combines file handling, data validation, performance optimization, and error feedback. Handling large files and ensuring robust validation increases the technical complexity."
+		},
+		{
+			"taskId": 23,
+			"taskTitle": "Develop Analytics Dashboard",
+			"complexityScore": 8,
+			"recommendedSubtasks": 9,
+			"expansionPrompt": "Expand into subtasks for filter components, Zustand store, TanStack Query setup, API routes, KPI cards, each chart type, responsiveness, loading/error states, and date picker.",
+			"reasoning": "Building a dashboard involves state management, data fetching, API design, and complex UI components. Each metric and chart requires separate logic and integration, making the task multifaceted."
+		},
+		{
+			"taskId": 24,
+			"taskTitle": "Implement User Management",
+			"complexityScore": 7,
+			"recommendedSubtasks": 11,
+			"expansionPrompt": "Decompose into subtasks for user list page, add/edit forms, user creation, editing, deletion, API routes, pagination, search/filter, error handling, role management, and audit logging.",
+			"reasoning": "User management is CRUD-heavy but also requires robust validation, access control, and auditability. Each operation (create, read, update, delete) and feature (pagination, search, logging) is a logical subtask."
+		},
+		{
+			"taskId": 25,
+			"taskTitle": "Deploy to DigitalOcean App Platform",
+			"complexityScore": 8,
+			"recommendedSubtasks": 11,
+			"expansionPrompt": "Break down into subtasks for account setup, App Platform project, app.yaml config, managed DB setup, env vars, GitHub integration, migrations, domain/HTTPS, logging/monitoring, health check, and build script.",
+			"reasoning": "Deployment involves cloud infrastructure, CI/CD, environment configuration, and production readiness. Each step is critical for a successful, secure, and maintainable deployment."
+		}
+	]
 }

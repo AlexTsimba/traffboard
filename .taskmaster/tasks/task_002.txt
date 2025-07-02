@@ -1,0 +1,37 @@
+# Task ID: 2
+# Title: Database Setup and Models Implementation
+# Status: pending
+# Dependencies: 1
+# Priority: high
+# Description: Set up the database connection and implement the data models using Drizzle ORM.
+# Details:
+1. Install and configure Drizzle ORM with PostgreSQL adapter
+2. Set up connection to PostgreSQL database
+3. Implement the following schemas using Drizzle:
+   - users table:
+     * id: serial primary key
+     * email: varchar(255) unique not null
+     * passwordHash: text not null
+     * role: varchar(50) default 'user' not null
+     * totpSecret: text
+     * createdAt: timestamp default now() not null
+   - conversions table:
+     * id: serial primary key
+     * date: date not null
+     * partnerId: varchar(100) not null
+     * campaignId: varchar(100) not null
+     * clicks: integer default 0 not null
+     * registrations: integer default 0 not null
+     * revenue: decimal(10,2) default 0 not null
+     * createdAt: timestamp default now() not null
+4. Set up migrations using drizzle-kit
+5. Create seed data for testing purposes
+6. Implement database utility functions for common operations
+
+# Test Strategy:
+1. Verify database connection
+2. Run and test migrations
+3. Validate schema creation
+4. Test seed data insertion
+5. Write unit tests for database utility functions
+6. Ensure proper error handling for database operations
