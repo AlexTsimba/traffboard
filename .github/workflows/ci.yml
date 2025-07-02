@@ -145,8 +145,8 @@ jobs:
         run: |
           # Scan for vulnerabilities using multiple tools
           echo "Scanning dependencies for security vulnerabilities..."
-          # Check package.json for known vulnerable packages
-          npx better-npm-audit audit || true
+          # Check package.json for known vulnerable packages with pnpm audit
+          pnpm audit --audit-level moderate || true
           # Scan for outdated packages with security implications
           pnpm outdated --format json > outdated-packages.json || true
         continue-on-error: true
@@ -226,12 +226,14 @@ jobs:
             npx tsc --noEmit --strict --noImplicitAny --noImplicitReturns --noFallthroughCasesInSwitch --noUncheckedIndexedAccess 2>&1 | tee ts-strict.log || true
             
             # Generate type coverage report if possible
-            if command -v npx type-coverage > /dev/null 2>&1; then
+            if npm list type-coverage > /dev/null 2>&1; then
               echo "Generating type coverage report..."
               npx type-coverage --detail --strict --ignoreFiles "**/*.test.*" --ignoreFiles "**/__tests__/**" > type-coverage.txt || true
               if [ -f "type-coverage.txt" ]; then
                 echo "- 📊 Type coverage: $(cat type-coverage.txt | head -1)" >> $GITHUB_STEP_SUMMARY
               fi
+            else
+              echo "type-coverage not installed, skipping type coverage report"
             fi
             
             # Project statistics
