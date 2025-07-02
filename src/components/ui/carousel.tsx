@@ -1,20 +1,20 @@
 "use client"
 
+import * as React from "react"
 import useEmblaCarousel, {
   type UseEmblaCarouselType,
 } from "embla-carousel-react"
 import { ArrowLeft, ArrowRight } from "lucide-react"
-import * as React from "react"
 
-import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
 
 type CarouselApi = UseEmblaCarouselType[1]
 type UseCarouselParameters = Parameters<typeof useEmblaCarousel>
 type CarouselOptions = UseCarouselParameters[0]
 type CarouselPlugin = UseCarouselParameters[1]
 
-interface CarouselProps {
+type CarouselProps = {
   opts?: CarouselOptions
   plugins?: CarouselPlugin
   orientation?: "horizontal" | "vertical"
@@ -119,11 +119,11 @@ function Carousel({
       }}
     >
       <div
-        aria-roledescription="carousel"
-        className={cn("relative", className)}
-        data-slot="carousel"
-        role="region"
         onKeyDownCapture={handleKeyDown}
+        className={cn("relative", className)}
+        role="region"
+        aria-roledescription="carousel"
+        data-slot="carousel"
         {...props}
       >
         {children}
@@ -158,14 +158,14 @@ function CarouselItem({ className, ...props }: React.ComponentProps<"div">) {
 
   return (
     <div
+      role="group"
       aria-roledescription="slide"
+      data-slot="carousel-item"
       className={cn(
         "min-w-0 shrink-0 grow-0 basis-full",
         orientation === "horizontal" ? "pl-4" : "pt-4",
         className
       )}
-      data-slot="carousel-item"
-      role="group"
       {...props}
     />
   )
@@ -181,6 +181,9 @@ function CarouselPrevious({
 
   return (
     <Button
+      data-slot="carousel-previous"
+      variant={variant}
+      size={size}
       className={cn(
         "absolute size-8 rounded-full",
         orientation === "horizontal"
@@ -188,10 +191,7 @@ function CarouselPrevious({
           : "-top-12 left-1/2 -translate-x-1/2 rotate-90",
         className
       )}
-      data-slot="carousel-previous"
       disabled={!canScrollPrev}
-      size={size}
-      variant={variant}
       onClick={scrollPrev}
       {...props}
     >
@@ -211,6 +211,9 @@ function CarouselNext({
 
   return (
     <Button
+      data-slot="carousel-next"
+      variant={variant}
+      size={size}
       className={cn(
         "absolute size-8 rounded-full",
         orientation === "horizontal"
@@ -218,10 +221,7 @@ function CarouselNext({
           : "-bottom-12 left-1/2 -translate-x-1/2 rotate-90",
         className
       )}
-      data-slot="carousel-next"
       disabled={!canScrollNext}
-      size={size}
-      variant={variant}
       onClick={scrollNext}
       {...props}
     >
