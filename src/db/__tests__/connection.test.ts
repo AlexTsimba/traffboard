@@ -4,7 +4,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 vi.mock("postgres", () => ({
   default: vi.fn(() => {
     const queryFn = Object.assign(vi.fn().mockResolvedValue([{ health_check: 1 }]), {
-      end: vi.fn().mockResolvedValue(null),
+      end: vi.fn().mockResolvedValue(void 0),
     });
     return queryFn;
   }),

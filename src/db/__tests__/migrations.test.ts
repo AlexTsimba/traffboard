@@ -16,8 +16,8 @@ describe("Database Migration System", () => {
       try {
         const stats = await stat(drizzleConfigPath);
         expect(stats.isFile()).toBe(true);
-      } catch (error) {
-        throw new Error(`drizzle.config.ts not found: ${error}`);
+      } catch (error: unknown) {
+        throw new Error(`drizzle.config.ts not found: ${String(error)}`);
       }
     });
 
@@ -34,7 +34,8 @@ describe("Database Migration System", () => {
 
   describe("Migration Generation", () => {
     it("should have package.json scripts for migration commands", async () => {
-      const packageJson = JSON.parse(await readFile("package.json", "utf8"));
+      const packageJsonContent = await readFile("package.json", "utf8");
+      const packageJson = JSON.parse(packageJsonContent) as { scripts: Record<string, string> };
 
       expect(packageJson.scripts).toHaveProperty("db:generate");
       expect(packageJson.scripts).toHaveProperty("db:migrate");
@@ -103,15 +104,10 @@ describe("Database Migration System", () => {
   describe("Environment Configuration", () => {
     it("should use environment variables for database connection", () => {
       // Check that required env vars are defined or have defaults
-      const requiredEnvs = ["DATABASE_URL"];
+      const databaseUrl = process.env.DATABASE_URL;
+      const hasDefault = true; // We have defaults in database config
 
-      for (const envVar of requiredEnvs) {
-        // Should either be defined or have a fallback in config
-        const hasEnv = process.env[envVar];
-        const hasDefault = true; // We have defaults in database config
-
-        expect(hasEnv ?? hasDefault).toBe(true);
-      }
+      expect(databaseUrl ?? hasDefault).toBe(true);
     });
 
     it("should support different environments", async () => {
@@ -126,7 +122,8 @@ describe("Database Migration System", () => {
 
   describe("Database Scripts Validation", () => {
     it("should have working db:generate script", async () => {
-      const packageJson = JSON.parse(await readFile("package.json", "utf8"));
+      const packageJsonContent = await readFile("package.json", "utf8");
+      const packageJson = JSON.parse(packageJsonContent) as { scripts: Record<string, string> };
       const generateScript = packageJson.scripts["db:generate"];
 
       expect(generateScript).toContain("drizzle-kit");
@@ -134,7 +131,8 @@ describe("Database Migration System", () => {
     });
 
     it("should have working db:push script", async () => {
-      const packageJson = JSON.parse(await readFile("package.json", "utf8"));
+      const packageJsonContent = await readFile("package.json", "utf8");
+      const packageJson = JSON.parse(packageJsonContent) as { scripts: Record<string, string> };
       const pushScript = packageJson.scripts["db:push"];
 
       expect(pushScript).toContain("drizzle-kit");
@@ -142,7 +140,8 @@ describe("Database Migration System", () => {
     });
 
     it("should have working db:studio script", async () => {
-      const packageJson = JSON.parse(await readFile("package.json", "utf8"));
+      const packageJsonContent = await readFile("package.json", "utf8");
+      const packageJson = JSON.parse(packageJsonContent) as { scripts: Record<string, string> };
       const studioScript = packageJson.scripts["db:studio"];
 
       expect(studioScript).toContain("drizzle-kit");
@@ -156,8 +155,8 @@ describe("Database Migration System", () => {
       try {
         await import("../schema");
         expect(true).toBe(true); // Schema imports successfully
-      } catch (error) {
-        throw new Error(`Schema validation failed: ${error}`);
+      } catch (error: unknown) {
+        throw new Error(`Schema validation failed: ${String(error)}`);
       }
     });
 

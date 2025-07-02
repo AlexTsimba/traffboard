@@ -27,25 +27,25 @@ export const userSessions = pgTable("user_sessions", {
   // Device and Browser Information
   deviceInfo: jsonb("device_info").default({
     type: "unknown",
-    model: null,
-    vendor: null,
+    model: undefined,
+    vendor: undefined,
   }),
   browserInfo: jsonb("browser_info").default({
     name: "unknown",
-    version: null,
-    engine: null,
+    version: undefined,
+    engine: undefined,
   }),
   osInfo: jsonb("os_info").default({
     name: "unknown",
-    version: null,
+    version: undefined,
   }),
 
   // Network Information
   ipAddress: varchar("ip_address", { length: 45 }), // IPv6 support
   location: jsonb("location").default({
-    country: null,
-    city: null,
-    region: null,
+    country: undefined,
+    city: undefined,
+    region: undefined,
   }),
 
   // Session State
