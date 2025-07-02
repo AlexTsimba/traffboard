@@ -10,22 +10,22 @@ TraffBoard uses GitHub Actions secrets to securely store and access sensitive in
 
 ### Production Secrets (Required for DigitalOcean deployment)
 
-| Secret Name | Description | Example Value | Required For |
-|-------------|-------------|---------------|--------------|
-| `DATABASE_URL` | PostgreSQL connection string | `postgresql://user:pass@host:5432/db` | Production deployment |
-| `NEXTAUTH_SECRET` | NextAuth.js secret key | `your-secret-key-here` | Authentication |
-| `NEXTAUTH_URL` | Production URL | `https://traffboard.yourdomain.com` | Authentication |
-| `DO_APP_ID` | DigitalOcean App Platform ID | `your-app-id` | Deployment |
-| `DO_API_TOKEN` | DigitalOcean API token | `dop_v1_...` | Deployment |
+| Secret Name       | Description                  | Example Value                         | Required For          |
+| ----------------- | ---------------------------- | ------------------------------------- | --------------------- |
+| `DATABASE_URL`    | PostgreSQL connection string | `postgresql://user:pass@host:5432/db` | Production deployment |
+| `NEXTAUTH_SECRET` | NextAuth.js secret key       | `your-secret-key-here`                | Authentication        |
+| `NEXTAUTH_URL`    | Production URL               | `https://traffboard.yourdomain.com`   | Authentication        |
+| `DO_APP_ID`       | DigitalOcean App Platform ID | `your-app-id`                         | Deployment            |
+| `DO_API_TOKEN`    | DigitalOcean API token       | `dop_v1_...`                          | Deployment            |
 
 ### Optional API Secrets (Add as needed)
 
-| Secret Name | Description | When to Add |
-|-------------|-------------|-------------|
-| `OPENAI_API_KEY` | OpenAI API key | If using AI features |
-| `STRIPE_SECRET_KEY` | Stripe payment processing | If adding payments |
-| `SENTRY_DSN` | Error tracking with Sentry | If using error monitoring |
-| `ANALYTICS_API_KEY` | Analytics service API key | If using external analytics |
+| Secret Name         | Description                | When to Add                 |
+| ------------------- | -------------------------- | --------------------------- |
+| `OPENAI_API_KEY`    | OpenAI API key             | If using AI features        |
+| `STRIPE_SECRET_KEY` | Stripe payment processing  | If adding payments          |
+| `SENTRY_DSN`        | Error tracking with Sentry | If using error monitoring   |
+| `ANALYTICS_API_KEY` | Analytics service API key  | If using external analytics |
 
 ## 🛠️ Setting Up Secrets
 
@@ -50,7 +50,7 @@ Secret: postgresql://username:password@localhost:5432/traffboard_prod
 For different environments (development, staging, production), use GitHub Environments:
 
 - **development**: `DATABASE_URL_DEV`
-- **staging**: `DATABASE_URL_STAGING`  
+- **staging**: `DATABASE_URL_STAGING`
 - **production**: `DATABASE_URL_PROD`
 
 ## 🔧 Using Secrets in Workflows
@@ -120,6 +120,7 @@ jobs:
 ### 1. Audit Log
 
 GitHub provides audit logs for secret access:
+
 - Repository Settings → Audit log
 - Filter by "secret" actions
 
@@ -140,6 +141,7 @@ GitHub provides audit logs for secret access:
 ### If Secret is Compromised
 
 1. **Immediate Actions**:
+
    ```bash
    # 1. Revoke the compromised secret immediately
    # 2. Update the secret in GitHub repository settings
@@ -192,4 +194,4 @@ NODE_ENV=production
 - [ ] Configure DigitalOcean App Platform environment variables
 - [ ] Test secret access in staging environment
 - [ ] Document secret rotation schedule
-- [ ] Set up monitoring and alerts 
+- [ ] Set up monitoring and alerts

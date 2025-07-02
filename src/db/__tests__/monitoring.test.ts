@@ -49,14 +49,14 @@ describe("Database Monitoring Utilities", () => {
   describe("monitorDatabase", () => {
     it("should return comprehensive monitoring data", async () => {
       const { monitorDatabase } = await import("@/db/utils/monitoring");
-      
+
       const result = await monitorDatabase();
-      
+
       expect(result).toHaveProperty("timestamp");
       expect(result).toHaveProperty("health");
       expect(result).toHaveProperty("metrics");
       expect(result).toHaveProperty("queryPerformance");
-      
+
       expect(result.health.status).toBe("healthy");
       expect(result.metrics.environment).toBe("test");
       expect(result.queryPerformance).toBeDefined();
@@ -70,9 +70,9 @@ describe("Database Monitoring Utilities", () => {
       });
 
       const { monitorDatabase } = await import("@/db/utils/monitoring");
-      
+
       const result = await monitorDatabase();
-      
+
       expect(result.health.status).toBe("unhealthy");
       expect(result.queryPerformance).toBeUndefined();
     });
@@ -81,7 +81,7 @@ describe("Database Monitoring Utilities", () => {
   describe("formatMonitoringResult", () => {
     it("should format monitoring result for display", async () => {
       const { formatMonitoringResult } = await import("@/db/utils/monitoring");
-      
+
       const mockResult = {
         timestamp: "2025-01-01T00:00:00.000Z",
         health: {
@@ -107,9 +107,9 @@ describe("Database Monitoring Utilities", () => {
           connectionTestLatency: 30,
         },
       };
-      
+
       const formatted = formatMonitoringResult(mockResult);
-      
+
       expect(formatted).toContain("✅ Database Status: healthy");
       expect(formatted).toContain("Latency: 50ms");
       expect(formatted).toContain("Pool: 5/10 active");
@@ -121,7 +121,7 @@ describe("Database Monitoring Utilities", () => {
     it("should identify no issues when everything is healthy", async () => {
       // Reset mocks to ensure clean state
       vi.clearAllMocks();
-      
+
       const { checkDatabaseHealth, getConnectionMetrics } = await import("@/db/connection");
       vi.mocked(checkDatabaseHealth).mockResolvedValue({
         status: "healthy",
@@ -132,7 +132,7 @@ describe("Database Monitoring Utilities", () => {
           activeConnections: 5,
         },
       });
-      
+
       vi.mocked(getConnectionMetrics).mockReturnValue({
         environment: "test",
         poolMax: 10,
@@ -144,9 +144,9 @@ describe("Database Monitoring Utilities", () => {
       });
 
       const { troubleshootConnection } = await import("@/db/utils/monitoring");
-      
+
       const result = await troubleshootConnection();
-      
+
       expect(result.issues).toContain("No issues detected");
       expect(result.recommendations).toContain("Database connection appears to be healthy");
     });
@@ -164,36 +164,39 @@ describe("Database Monitoring Utilities", () => {
       });
 
       const { troubleshootConnection } = await import("@/db/utils/monitoring");
-      
+
       const result = await troubleshootConnection();
-      
-      expect(result.issues.some(issue => issue.includes("High database latency"))).toBe(true);
-      expect(result.recommendations.some(rec => rec.includes("network connection"))).toBe(true);
+
+      expect(result.issues.some((issue) => issue.includes("High database latency"))).toBe(true);
+      expect(result.recommendations.some((rec) => rec.includes("network connection"))).toBe(true);
     });
   });
 
   describe("startDatabaseMonitoring", () => {
     it("should start periodic monitoring", async () => {
       const { startDatabaseMonitoring } = await import("@/db/utils/monitoring");
-      
+
       const onResult = vi.fn();
       const cleanup = startDatabaseMonitoring(100, onResult); // Very short interval for testing
-      
+
       // Wait for the monitoring to execute at least once
-      await vi.waitFor(() => {
-        expect(onResult).toHaveBeenCalled();
-      }, { timeout: 1000 });
-      
+      await vi.waitFor(
+        () => {
+          expect(onResult).toHaveBeenCalled();
+        },
+        { timeout: 1000 },
+      );
+
       cleanup();
     }, 15000); // Extended timeout for this test
 
     it("should return cleanup function", async () => {
       const { startDatabaseMonitoring } = await import("@/db/utils/monitoring");
-      
+
       const cleanup = startDatabaseMonitoring(1000);
-      
+
       expect(typeof cleanup).toBe("function");
-      
+
       // Should not throw when called
       expect(() => cleanup()).not.toThrow();
     });

@@ -3,14 +3,14 @@ run-name: 🚀 ${{ github.actor }} - ${{ github.ref_name }}
 
 on:
   push:
-    branches: 
+    branches:
       - main
       - develop
       - refactor/*
       - feature/*
       - fix/*
   pull_request:
-    branches: 
+    branches:
       - main
       - develop
   workflow_dispatch:
@@ -23,7 +23,7 @@ permissions:
   security-events: write
 
 env:
-  PNPM_VERSION: '9'
+  PNPM_VERSION: "9"
   CI: true
   FORCE_COLOR: 3
 
@@ -37,7 +37,7 @@ jobs:
     name: Build & Test
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    
+
     steps:
       - name: 📥 Checkout
         uses: actions/checkout@v4
@@ -51,8 +51,8 @@ jobs:
       - name: 🚀 Setup Node.js 20.x
         uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
-          cache: 'pnpm'
+          node-version: "20.x"
+          cache: "pnpm"
 
       - name: 🔨 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -75,12 +75,12 @@ jobs:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
-    
+
     strategy:
       fail-fast: false
       matrix:
         os: [windows-latest, macos-latest]
-    
+
     steps:
       - name: 📥 Checkout
         uses: actions/checkout@v4
@@ -94,8 +94,8 @@ jobs:
       - name: 🚀 Setup Node.js 20.x
         uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
-          cache: 'pnpm'
+          node-version: "20.x"
+          cache: "pnpm"
 
       - name: 🔨 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -111,7 +111,7 @@ jobs:
     name: 🔒 Security Scan
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    
+
     steps:
       - name: 📥 Checkout
         uses: actions/checkout@v4
@@ -125,8 +125,8 @@ jobs:
       - name: 🚀 Setup Node.js 20.x
         uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
-          cache: 'pnpm'
+          node-version: "20.x"
+          cache: "pnpm"
 
       - name: 🔨 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -142,7 +142,7 @@ jobs:
     needs: [ci, security]
     if: github.ref == 'refs/heads/main'
     timeout-minutes: 10
-    
+
     steps:
       - name: 📥 Checkout
         uses: actions/checkout@v4
@@ -156,8 +156,8 @@ jobs:
       - name: 🚀 Setup Node.js 20.x
         uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
-          cache: 'pnpm'
+          node-version: "20.x"
+          cache: "pnpm"
 
       - name: 🔨 Install dependencies
         run: pnpm install --frozen-lockfile
@@ -170,4 +170,4 @@ jobs:
       - name: ✅ Ready for DigitalOcean deployment
         run: |
           echo "🎉 Build successful! Ready for DigitalOcean deployment."
-          echo "Build artifacts are ready for production deployment." 
+          echo "Build artifacts are ready for production deployment."

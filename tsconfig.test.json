@@ -14,15 +14,10 @@
   "include": [
     "**/*.test.ts",
     "**/*.test.tsx",
-    "**/*.spec.ts", 
+    "**/*.spec.ts",
     "**/*.spec.tsx",
     "src/__tests__/**/*",
     "vitest.config.ts"
   ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    ".next",
-    "coverage"
-  ]
-} 
+  "exclude": ["node_modules", "dist", ".next", "coverage"]
+}

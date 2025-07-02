@@ -39,14 +39,15 @@ function createPool() {
     }),
 
     // Production optimizations for DigitalOcean Managed Database
-    ...(!isDevelopment && !isTest && {
-      // Add SSL for production DigitalOcean connections
-      ssl: { rejectUnauthorized: false },
-      // Optimized keepalive settings for cloud connections
-      keepalives_idle: 60,
-      keepalives_interval: 30,
-      keepalives_count: 3,
-    }),
+    ...(!isDevelopment &&
+      !isTest && {
+        // Add SSL for production DigitalOcean connections
+        ssl: { rejectUnauthorized: false },
+        // Optimized keepalive settings for cloud connections
+        keepalives_idle: 60,
+        keepalives_interval: 30,
+        keepalives_count: 3,
+      }),
   });
 }
 
@@ -125,8 +126,8 @@ export async function checkDatabaseHealth(): Promise<{
     // Get connection pool information
     const connectionInfo = {
       poolSize: pool.options.max || 0,
-      idleConnections: pool.idle?.length || 0,
-      activeConnections: (pool.options.max || 0) - (pool.idle?.length || 0),
+      idleConnections: 0, // Not directly accessible in postgres.js
+      activeConnections: 0, // Not directly accessible in postgres.js
     };
 
     return {
@@ -149,13 +150,13 @@ export async function closeDatabaseConnection(): Promise<void> {
   try {
     // Close the current pool instance
     await pool.end();
-    
+
     // Clean up global references in development
     if (isDevelopment && !isTest) {
       globalThis.__db = undefined;
       globalThis.__dbPool = undefined;
     }
-    
+
     console.log("✅ Database connection closed successfully");
   } catch (error) {
     console.error("❌ Error closing database connection:", error);
@@ -178,7 +179,7 @@ export async function executeWithRetry<T>(
       return await operation();
     } catch (error) {
       lastError = error instanceof Error ? error : new Error("Unknown error");
-      
+
       if (attempt === maxRetries) {
         console.error(`❌ Database operation failed after ${maxRetries} attempts:`, lastError.message);
         throw lastError;
@@ -186,8 +187,8 @@ export async function executeWithRetry<T>(
 
       const delay = baseDelay * Math.pow(2, attempt - 1); // Exponential backoff
       console.warn(`⚠️ Database operation failed (attempt ${attempt}/${maxRetries}). Retrying in ${delay}ms...`);
-      
-      await new Promise(resolve => setTimeout(resolve, delay));
+
+      await new Promise((resolve) => setTimeout(resolve, delay));
     }
   }
 
@@ -203,9 +204,9 @@ export function getConnectionMetrics() {
     poolMax: pool.options.max,
     poolIdleTimeout: pool.options.idle_timeout,
     poolConnectTimeout: pool.options.connect_timeout,
-    idleConnections: pool.idle?.length || 0,
+    idleConnections: 0, // Not directly accessible in postgres.js
     totalConnections: pool.options.max || 0,
-    activeConnections: (pool.options.max || 0) - (pool.idle?.length || 0),
+    activeConnections: 0, // Not directly accessible in postgres.js
   };
 }
 

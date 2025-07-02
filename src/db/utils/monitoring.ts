@@ -1,6 +1,6 @@
 /**
  * Database monitoring utilities for TraffBoard
- * 
+ *
  * Provides utilities for monitoring database performance, connection health,
  * and troubleshooting connection issues in DigitalOcean managed database environments.
  */
@@ -32,7 +32,7 @@ export async function monitorDatabase(): Promise<DatabaseMonitoringResult> {
 
   // Query performance test (optional)
   let queryPerformance: DatabaseMonitoringResult["queryPerformance"];
-  
+
   if (health.status === "healthy") {
     try {
       const start = Date.now();
@@ -69,12 +69,12 @@ export async function monitorDatabase(): Promise<DatabaseMonitoringResult> {
  */
 export function startDatabaseMonitoring(
   interval: number = healthCheckConfig.checkInterval,
-  onResult?: (result: DatabaseMonitoringResult) => void
+  onResult?: (result: DatabaseMonitoringResult) => void,
 ): () => void {
   const intervalId = setInterval(async () => {
     try {
       const result = await monitorDatabase();
-      
+
       // Log critical issues
       if (result.health.status === "unhealthy") {
         console.error("🚨 Database health check failed:", result.health.error);
@@ -109,7 +109,7 @@ export function startDatabaseMonitoring(
 export function formatMonitoringResult(result: DatabaseMonitoringResult): string {
   const status = result.health.status === "healthy" ? "✅" : "❌";
   const latency = result.health.latency ? `${result.health.latency}ms` : "N/A";
-  
+
   return [
     `${status} Database Status: ${result.health.status}`,
     `   Latency: ${latency}`,
@@ -117,7 +117,9 @@ export function formatMonitoringResult(result: DatabaseMonitoringResult): string
     `   Idle: ${result.metrics.idleConnections}`,
     result.queryPerformance && `   Query Performance: ${result.queryPerformance.simpleQueryLatency}ms`,
     `   Timestamp: ${result.timestamp}`,
-  ].filter(Boolean).join("\n");
+  ]
+    .filter(Boolean)
+    .join("\n");
 }
 
 /**
@@ -167,7 +169,6 @@ export async function troubleshootConnection(): Promise<{
       issues.push("No issues detected");
       recommendations.push("Database connection appears to be healthy");
     }
-
   } catch (error) {
     issues.push(`Failed to perform troubleshooting: ${error}`);
     recommendations.push("Check if database configuration is correct");

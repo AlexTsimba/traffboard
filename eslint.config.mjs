@@ -18,7 +18,7 @@ export default tseslint.config(
   pluginJs.configs.recommended,
   ...tseslint.configs.strictTypeChecked,
   ...tseslint.configs.stylisticTypeChecked,
-  
+
   // Main configuration
   {
     files: ["**/*.{js,mjs,cjs,ts,tsx}"],
@@ -40,15 +40,15 @@ export default tseslint.config(
     },
     plugins: {
       "@typescript-eslint": tseslint.plugin,
-      "react": pluginReact,
+      react: pluginReact,
       "react-hooks": pluginReactHooks,
       "jsx-a11y": pluginJsxA11y,
       "@next/next": pluginNext,
-      "import": pluginImport,
-      "security": securityPlugin,
-      "prettier": prettier,
-      "unicorn": unicorn,
-      "sonarjs": sonarjs,
+      import: pluginImport,
+      security: securityPlugin,
+      prettier: prettier,
+      unicorn: unicorn,
+      sonarjs: sonarjs,
       "unused-imports": unusedImports,
     },
     rules: {
@@ -64,93 +64,101 @@ export default tseslint.config(
           argsIgnorePattern: "^_",
         },
       ],
-      
+
       // TypeScript strict rules - make more pragmatic for real projects
       "@typescript-eslint/no-unsafe-assignment": "warn",
-      "@typescript-eslint/no-unsafe-call": "warn", 
+      "@typescript-eslint/no-unsafe-call": "warn",
       "@typescript-eslint/no-unsafe-member-access": "warn",
       "@typescript-eslint/no-unsafe-return": "warn",
       "@typescript-eslint/no-unsafe-argument": "warn",
-      "@typescript-eslint/restrict-template-expressions": ["warn", {
-        allowNumber: true,
-        allowBoolean: true,
-        allowAny: false,
-        allowNullish: true,
-        allowRegExp: false,
-      }],
+      "@typescript-eslint/restrict-template-expressions": [
+        "warn",
+        {
+          allowNumber: true,
+          allowBoolean: true,
+          allowAny: false,
+          allowNullish: true,
+          allowRegExp: false,
+        },
+      ],
       "@typescript-eslint/switch-exhaustiveness-check": "error",
       "@typescript-eslint/require-await": "error",
-      "@typescript-eslint/consistent-type-imports": ["error", {
-        prefer: "type-imports",
-        fixStyle: "separate-type-imports",
-      }],
-      
+      "@typescript-eslint/consistent-type-imports": [
+        "error",
+        {
+          prefer: "type-imports",
+          fixStyle: "separate-type-imports",
+        },
+      ],
+
       // Reduce strictness for better DX
       "@typescript-eslint/prefer-nullish-coalescing": "warn",
       "@typescript-eslint/no-unnecessary-condition": "warn",
       "@typescript-eslint/no-redundant-type-constituents": "warn",
-      
+
       // React rules
       ...pluginReact.configs.recommended.rules,
       ...pluginReactHooks.configs.recommended.rules,
       "react/react-in-jsx-scope": "off",
       "react/prop-types": "off",
-      "react/jsx-sort-props": ["warn", {
-        callbacksLast: true,
-        shorthandFirst: true,
-        reservedFirst: true,
-      }],
-      
+      "react/jsx-sort-props": [
+        "warn",
+        {
+          callbacksLast: true,
+          shorthandFirst: true,
+          reservedFirst: true,
+        },
+      ],
+
       // Next.js rules - using core-web-vitals config
       ...pluginNext.configs.recommended.rules,
       ...pluginNext.configs["core-web-vitals"].rules,
-      
+
       // JSX A11y rules - balanced approach
       ...pluginJsxA11y.configs.recommended.rules,
       "jsx-a11y/click-events-have-key-events": "warn",
       "jsx-a11y/no-static-element-interactions": "warn",
       "jsx-a11y/anchor-has-content": "warn",
-      "jsx-a11y/anchor-is-valid": ["error", {
-        components: ["Link"],
-        specialLinkComponents: ["hrefLeft", "hrefRight"],
-        aspects: ["invalidHref", "preferButton"],
-      }],
-      
-      // Import rules
-      "import/order": ["warn", {
-        groups: [
-          "builtin",
-          "external", 
-          "internal",
-          "parent",
-          "sibling",
-          "index",
-        ],
-        "newlines-between": "always",
-        alphabetize: {
-          order: "asc",
-          caseInsensitive: true,
+      "jsx-a11y/anchor-is-valid": [
+        "error",
+        {
+          components: ["Link"],
+          specialLinkComponents: ["hrefLeft", "hrefRight"],
+          aspects: ["invalidHref", "preferButton"],
         },
-      }],
-      
+      ],
+
+      // Import rules
+      "import/order": [
+        "warn",
+        {
+          groups: ["builtin", "external", "internal", "parent", "sibling", "index"],
+          "newlines-between": "always",
+          alphabetize: {
+            order: "asc",
+            caseInsensitive: true,
+          },
+        },
+      ],
+
       // Security
       ...securityPlugin.configs.recommended.rules,
       "security/detect-object-injection": "warn",
-      
+
       // Code quality - make less strict
       ...sonarjs.configs.recommended.rules,
       "sonarjs/prefer-read-only-props": "warn",
-      "sonarjs/no-nested-conditional": "warn", 
+      "sonarjs/no-nested-conditional": "warn",
       "sonarjs/table-header": "warn",
       "sonarjs/pseudo-random": "warn",
-      
+
       ...unicorn.configs.recommended.rules,
       "unicorn/prevent-abbreviations": "off",
       "unicorn/filename-case": "off",
       "unicorn/no-null": "warn",
       "unicorn/no-document-cookie": "warn",
       "unicorn/explicit-length-check": "warn",
-      
+
       // Prettier integration - change to warn to not block CI
       "prettier/prettier": "warn",
     },
@@ -169,7 +177,7 @@ export default tseslint.config(
       },
     },
   },
-  
+
   // Add specific Next.js configuration for better plugin detection
   {
     files: ["**/*.{js,mjs,cjs,ts,tsx}"],
@@ -179,12 +187,12 @@ export default tseslint.config(
       "@next/next/no-page-custom-font": "error",
     },
   },
-  
+
   // Global ignores
   {
     ignores: [
       "**/.next/**",
-      "**/dist/**", 
+      "**/dist/**",
       "**/build/**",
       "**/node_modules/**",
       "**/.git/**",
@@ -198,7 +206,7 @@ export default tseslint.config(
       "**/*.config.ts",
       // Exclude UI library components from strict linting
       "src/components/ui/**/*.tsx",
-      "src/components/ui/**/*.ts"
+      "src/components/ui/**/*.ts",
     ],
-  }
+  },
 );

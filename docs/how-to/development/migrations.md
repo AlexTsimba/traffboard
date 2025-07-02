@@ -22,18 +22,18 @@ Migration configuration is defined in `drizzle.config.ts`:
 
 ```typescript
 export default defineConfig({
-  schema: './src/db/schema/*',
-  out: './src/db/migrations',
-  dialect: 'postgresql',
+  schema: "./src/db/schema/*",
+  out: "./src/db/migrations",
+  dialect: "postgresql",
   dbCredentials: {
-    url: process.env.DATABASE_URL || 'postgresql://localhost:5432/traffboard_dev',
+    url: process.env.DATABASE_URL || "postgresql://localhost:5432/traffboard_dev",
   },
-  verbose: process.env.NODE_ENV === 'development',
+  verbose: process.env.NODE_ENV === "development",
   strict: true,
   migrations: {
-    prefix: 'timestamp',
-    table: 'migrations',
-    schema: 'public',
+    prefix: "timestamp",
+    table: "migrations",
+    schema: "public",
   },
 });
 ```
@@ -46,7 +46,7 @@ Required environment variables for different environments:
 # Development (.env.local)
 DATABASE_URL=postgresql://localhost:5432/traffboard_dev
 
-# Testing (.env.test)  
+# Testing (.env.test)
 DATABASE_URL=postgresql://localhost:5432/traffboard_test
 
 # Production (server environment)
@@ -77,22 +77,26 @@ pnpm db:drop
 ### Command Details
 
 #### `pnpm db:generate`
+
 - Compares current schema with database state
 - Generates SQL migration files in `src/db/migrations/`
 - Creates metadata in `meta/_journal.json`
 - Safe to run multiple times
 
 #### `pnpm db:migrate`
+
 - Applies pending migrations to database
 - Updates migration tracking table
 - Should be used in production deployments
 
 #### `pnpm db:push`
+
 - Directly pushes schema to database without migrations
 - **Development only** - bypasses migration history
 - Useful for rapid prototyping
 
 #### `pnpm db:studio`
+
 - Launches web-based database browser
 - View and edit data through GUI
 - Automatically connects using `DATABASE_URL`
@@ -163,7 +167,7 @@ psql $DATABASE_URL -f src/db/migrations/TIMESTAMP_migration_name.down.sql
 These operations require extra caution:
 
 - **Dropping columns**: Data will be permanently lost
-- **Changing column types**: May fail if data incompatible  
+- **Changing column types**: May fail if data incompatible
 - **Adding NOT NULL constraints**: Requires default values or data migration
 - **Dropping tables**: All data permanently deleted
 
@@ -195,17 +199,20 @@ These operations require extra caution:
 ### Common Issues
 
 #### "No schema changes, nothing to migrate"
+
 - Schema already matches database state
 - Check if you saved schema files
 - Verify schema syntax is correct
 
 #### Migration fails during apply
+
 - Check database connection
 - Verify user permissions
 - Review SQL for syntax errors
 - Check for data conflicts
 
 #### Migration conflicts
+
 - Occurs when multiple developers change schema
 - Resolve by rebasing migrations
 - May require manual conflict resolution
@@ -213,6 +220,7 @@ These operations require extra caution:
 ### Recovery Procedures
 
 #### Failed Migration
+
 1. **Don't panic** - most issues are recoverable
 2. **Check error message** for specific issue
 3. **Backup current state** before attempting fixes
@@ -220,6 +228,7 @@ These operations require extra caution:
 5. **Re-run migration** or apply rollback
 
 #### Corrupted Migration State
+
 1. **Backup database** immediately
 2. **Check migration table** state
 3. **Manually fix tracking** if needed
@@ -228,16 +237,19 @@ These operations require extra caution:
 ## Environment-Specific Notes
 
 ### Development
+
 - Use `db:push` for rapid iteration
 - Regular `db:generate` for proper migrations
 - Keep local database in sync with team
 
 ### Testing
+
 - Use separate test database
 - Reset schema between test runs
 - Consider in-memory database for unit tests
 
 ### Production
+
 - **Always backup** before migrations
 - **Test in staging** first
 - **Monitor during deployment**
@@ -246,12 +258,14 @@ These operations require extra caution:
 ## Security Considerations
 
 ### Database Access
+
 - Use least-privilege database users
 - Rotate credentials regularly
 - Monitor database access logs
 - Encrypt connections (SSL/TLS)
 
 ### Migration Security
+
 - Review migration SQL for injection risks
 - Validate schema changes for security impact
 - Test with real-world data volumes
@@ -276,10 +290,10 @@ CREATE INDEX "idx_player_data_date_partner" ON "player_data" ("date","partner_id
 CREATE INDEX "idx_player_data_partner_campaign" ON "player_data" ("partner_id","campaign_id");
 CREATE UNIQUE INDEX "unique_player_per_upload" ON "player_data" ("upload_id","player_id");
 
--- Traffic Reports Analytics  
-CREATE INDEX "idx_traffic_reports_analytics" ON "traffic_reports" 
+-- Traffic Reports Analytics
+CREATE INDEX "idx_traffic_reports_analytics" ON "traffic_reports"
   ("date","foreign_partner_id","foreign_campaign_id","device_type");
-CREATE INDEX "idx_traffic_reports_source_device" ON "traffic_reports" 
+CREATE INDEX "idx_traffic_reports_source_device" ON "traffic_reports"
   ("traffic_source","device_type");
 
 -- Upload Management
@@ -291,14 +305,14 @@ CREATE INDEX "idx_conversion_uploads_user_type" ON "conversion_uploads" ("user_i
 
 ```sql
 -- Data Integrity Constraints
-ALTER TABLE "player_data" ADD CONSTRAINT "chk_player_data_positive_amounts" 
+ALTER TABLE "player_data" ADD CONSTRAINT "chk_player_data_positive_amounts"
   CHECK ("ftd_sum" >= 0 AND "deposits_sum" >= 0 AND "casino_wins_sum" >= 0);
 
-ALTER TABLE "traffic_reports" ADD CONSTRAINT "chk_traffic_reports_clicks_logic" 
+ALTER TABLE "traffic_reports" ADD CONSTRAINT "chk_traffic_reports_clicks_logic"
   CHECK ("unique_clicks" <= "all_clicks");
 
 -- File Upload Validation
-ALTER TABLE "conversion_uploads" ADD CONSTRAINT "chk_conversion_uploads_valid_status" 
+ALTER TABLE "conversion_uploads" ADD CONSTRAINT "chk_conversion_uploads_valid_status"
   CHECK ("status" IN ('pending', 'processing', 'completed', 'failed'));
 ```
 
@@ -323,6 +337,7 @@ src/db/migrations/
 ### Migration File Contents
 
 Each migration includes:
+
 - **Table Definitions**: Complete table structures
 - **Indexes**: Performance optimization indexes
 - **Constraints**: Data validation rules
@@ -331,11 +346,13 @@ Each migration includes:
 ## Environment Configuration
 
 ### Development
+
 - **Auto-apply**: Migrations applied automatically
 - **Schema Sync**: Direct schema push available
 - **Test Data**: Seeding with demo data
 
-### Production  
+### Production
+
 - **Manual Control**: Explicit migration commands required
 - **Backup Required**: Always backup before migrations
 - **Monitoring**: Track migration performance and rollback plans
@@ -343,6 +360,7 @@ Each migration includes:
 ## Common Issues & Solutions
 
 ### **Migration Generation Fails**
+
 ```bash
 # Clear migration cache
 rm -rf src/db/migrations/meta
@@ -350,6 +368,7 @@ pnpm db:generate
 ```
 
 ### **Database Out of Sync**
+
 ```bash
 # Reset to match schema
 pnpm db:drop
@@ -357,19 +376,21 @@ pnpm db:push  # Direct schema application
 ```
 
 ### **Performance Issues After Migration**
+
 ```bash
 # Analyze query plans
 EXPLAIN ANALYZE SELECT * FROM player_data WHERE date >= '2024-01-01';
 
 # Check index usage
-SELECT schemaname, tablename, indexname, idx_scan 
-FROM pg_stat_user_indexes 
+SELECT schemaname, tablename, indexname, idx_scan
+FROM pg_stat_user_indexes
 WHERE schemaname = 'public';
 ```
 
 ## Rollback Procedures
 
 ### **Schema Rollback**
+
 ```bash
 # Apply previous migration
 pnpm db:migrate --to=previous_migration_name
@@ -379,6 +400,7 @@ psql $DATABASE_URL < backup_file.sql
 ```
 
 ### **Emergency Rollback**
+
 ```bash
 # Quick restore from backup
 pg_restore --clean --if-exists -d $DATABASE_URL backup_file.dump
@@ -387,20 +409,22 @@ pg_restore --clean --if-exists -d $DATABASE_URL backup_file.dump
 ## Performance Monitoring
 
 ### **Query Performance**
+
 ```sql
 -- Slow query monitoring
-SELECT query, mean_time, calls 
-FROM pg_stat_statements 
-WHERE query LIKE '%player_data%' 
+SELECT query, mean_time, calls
+FROM pg_stat_statements
+WHERE query LIKE '%player_data%'
 ORDER BY mean_time DESC;
 ```
 
 ### **Index Usage**
+
 ```sql
 -- Index effectiveness
-SELECT schemaname, tablename, indexname, 
+SELECT schemaname, tablename, indexname,
        idx_scan, idx_tup_read, idx_tup_fetch
-FROM pg_stat_user_indexes 
+FROM pg_stat_user_indexes
 WHERE schemaname = 'public'
 ORDER BY idx_scan DESC;
 ```
@@ -413,4 +437,4 @@ ORDER BY idx_scan DESC;
 
 ---
 
-*Last updated: 2024-07-02 - Added performance optimizations and constraint documentation* 
+_Last updated: 2024-07-02 - Added performance optimizations and constraint documentation_

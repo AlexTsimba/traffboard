@@ -13,6 +13,7 @@ Backup strategy for TraffBoard deployed on DigitalOcean App Platform.
 ## Backup Components
 
 TraffBoard backup covers:
+
 - **Application Code**: Git repository
 - **Database**: PostgreSQL data (when implemented)
 - **Static Assets**: Images, files
@@ -21,11 +22,13 @@ TraffBoard backup covers:
 ## Automated Backups
 
 ### Git Repository
+
 - **Primary**: GitHub repository
 - **Frequency**: Real-time on push
 - **Retention**: Unlimited
 
 ### Database (Future)
+
 ```bash
 # Daily backup
 pg_dump $DATABASE_URL > backup_$(date +%Y%m%d).sql
@@ -37,6 +40,7 @@ pg_dump $DATABASE_URL | gzip > "backup_$DATE.sql.gz"
 ```
 
 ### DigitalOcean App Platform
+
 - **Automatic**: Platform-level backups
 - **Frequency**: Daily snapshots
 - **Retention**: 7 days
@@ -45,6 +49,7 @@ pg_dump $DATABASE_URL | gzip > "backup_$DATE.sql.gz"
 ## Manual Backup Procedures
 
 ### Quick Backup
+
 ```bash
 # Clone repository
 git clone https://github.com/AlexTsimba/traffboard.git backup_repo
@@ -55,6 +60,7 @@ doctl apps get <app-id> --format json > app_config.json
 ```
 
 ### Full Environment Backup
+
 ```bash
 # Create backup directory
 mkdir traffboard_backup_$(date +%Y%m%d)
@@ -70,29 +76,32 @@ doctl apps get <app-id> > app_config.yaml
 ## Disaster Recovery
 
 ### Scenario 1: App Platform Failure
+
 1. **Create new DigitalOcean app**
 2. **Deploy from GitHub**: Connect repository
 3. **Restore environment variables**: From backup
 4. **Verify deployment**: Run health checks
 
 ### Scenario 2: Repository Loss
+
 1. **Use backup repository clone**
 2. **Create new GitHub repository**
 3. **Push backup code**
 4. **Reconnect DigitalOcean app**
 
 ### Scenario 3: Data Loss (Future)
+
 1. **Restore database**: From latest backup
 2. **Verify data integrity**: Run checks
 3. **Update app configuration**: If needed
 
 ## Recovery Time Objectives
 
-| Component | RTO | RPO | Method |
-|-----------|-----|-----|---------|
-| **Application** | 15 min | 0 | Git deploy |
-| **Database** | 30 min | 24 hrs | pg_restore |
-| **Configuration** | 5 min | Manual | doctl |
+| Component         | RTO    | RPO    | Method     |
+| ----------------- | ------ | ------ | ---------- |
+| **Application**   | 15 min | 0      | Git deploy |
+| **Database**      | 30 min | 24 hrs | pg_restore |
+| **Configuration** | 5 min  | Manual | doctl      |
 
 ## Backup Schedule
 
@@ -105,6 +114,7 @@ Monthly:  Complete environment documentation
 ## Monitoring
 
 ### Health Checks
+
 ```bash
 # App status
 curl https://your-app.ondigitalocean.app/api/health
@@ -114,6 +124,7 @@ pg_isready -d $DATABASE_URL
 ```
 
 ### Backup Verification
+
 ```bash
 # Verify Git backup
 git clone backup_repo test_restore
@@ -136,6 +147,7 @@ pg_restore --list backup.sql
 ## 🔐 Security & Encryption
 
 ### Backup Encryption
+
 ```bash
 # Encrypt sensitive backups before upload
 gpg --symmetric --cipher-algo AES256 --output backup.sql.gpg backup.sql
@@ -146,6 +158,7 @@ gpg --decrypt backup.sql.gpg > backup.sql
 ```
 
 ### Access Control
+
 - **DigitalOcean Spaces**: IAM policies for backup access only
 - **Encryption Keys**: Stored in DigitalOcean App Platform secrets
 - **GitHub Repository**: Protected branches + required reviews
@@ -154,12 +167,13 @@ gpg --decrypt backup.sql.gpg > backup.sql
 ## 📊 Monitoring & Alerting
 
 ### Backup Monitoring Workflow
+
 ```yaml
 # .github/workflows/backup-monitor.yml
 name: 🔍 Backup Monitoring
 on:
   schedule:
-    - cron: '0 6 * * *'  # Daily at 6 AM UTC
+    - cron: "0 6 * * *" # Daily at 6 AM UTC
 
 jobs:
   check-backups:
@@ -174,6 +188,7 @@ jobs:
 ```
 
 ### Health Checks
+
 - **Application**: `/api/health` endpoint with backup status
 - **Database**: Connection and backup completion status
 - **Files**: Sync status and manifest verification
@@ -182,6 +197,7 @@ jobs:
 ## 🧪 Testing & Validation
 
 ### Monthly Backup Testing
+
 ```bash
 #!/bin/bash
 # scripts/test-backup-restore.sh
@@ -202,6 +218,7 @@ echo "Testing file backup restore..."
 ```
 
 ### Validation Checklist
+
 - [ ] Backup files are created successfully
 - [ ] Encrypted backups can be decrypted
 - [ ] Recovery procedures work end-to-end
@@ -214,10 +231,11 @@ echo "Testing file backup restore..."
 ### Initial Configuration
 
 1. **Set up DigitalOcean Spaces**
+
    ```bash
    # Configure s3cmd
    s3cmd --configure
-   
+
    # Create backup bucket
    s3cmd mb s3://traffboard-backups
    ```
@@ -228,10 +246,11 @@ echo "Testing file backup restore..."
    - `SPACES_SECRET_KEY`: DigitalOcean Spaces secret key
 
 3. **Install backup scripts**
+
    ```bash
    # Make scripts executable
    chmod +x scripts/backup-*.sh
-   
+
    # Test backup scripts
    ./scripts/test-backup-restore.sh
    ```
@@ -258,4 +277,4 @@ Run the setup script to configure all backup components:
 
 ---
 
-**Navigation:** [← Operations Hub](../README.md) | [How-To Home](../../README.md) | [Deployment Guide →](./deployment.md) 
+**Navigation:** [← Operations Hub](../README.md) | [How-To Home](../../README.md) | [Deployment Guide →](./deployment.md)

@@ -4,9 +4,9 @@
 
 We provide security updates for the following versions of TraffBoard:
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 1.x.x   | ✅ Active support  |
+| Version | Supported              |
+| ------- | ---------------------- |
+| 1.x.x   | ✅ Active support      |
 | 0.x.x   | ⚠️ Critical fixes only |
 | < 0.1   | ❌ No longer supported |
 
@@ -78,6 +78,7 @@ We appreciate security researchers who help keep TraffBoard secure. Responsible 
 ## 📋 Security Best Practices for Contributors
 
 ### Code Security
+
 - Follow secure coding practices
 - Use parameterized queries to prevent SQL injection
 - Validate and sanitize all user inputs
@@ -85,18 +86,21 @@ We appreciate security researchers who help keep TraffBoard secure. Responsible 
 - Use HTTPS for all external communications
 
 ### Dependency Management
+
 - Keep dependencies up to date
 - Review new dependencies for security issues
 - Use `pnpm audit` to check for vulnerabilities
 - Pin dependencies to specific versions in production
 
 ### Secret Management
+
 - Never commit secrets, API keys, or passwords
 - Use environment variables for sensitive configuration
 - Rotate secrets regularly
 - Use GitHub Secrets for CI/CD credentials
 
 ### Git Security
+
 - Sign commits with GPG keys when possible
 - Use branch protection rules
 - Require code reviews for security-related changes
@@ -112,6 +116,7 @@ We appreciate security researchers who help keep TraffBoard secure. Responsible 
 ## 📞 Contact
 
 For any security-related questions or concerns:
+
 - **Email**: [security@traffboard.com](mailto:security@traffboard.com)
 - **GitHub**: [@traffboard/security-team](https://github.com/orgs/traffboard/teams/security-team)
 

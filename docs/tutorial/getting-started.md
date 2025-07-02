@@ -19,6 +19,7 @@ Complete beginner's guide to setting up and running TraffBoard locally.
 - **Git** for version control
 
 ### Quick Check
+
 ```bash
 node --version    # Should be 18+
 pnpm --version    # Should be 8+
@@ -27,17 +28,20 @@ pnpm --version    # Should be 8+
 ## Installation
 
 ### 1. Clone Repository
+
 ```bash
 git clone <repository-url>
 cd traffboard
 ```
 
 ### 2. Install Dependencies
+
 ```bash
 pnpm install
 ```
 
 ### 3. Start Development Server
+
 ```bash
 pnpm dev
 ```
@@ -83,6 +87,7 @@ pnpm lint         # Code linting
 ## Environment Setup
 
 Create `.env.local`:
+
 ```bash
 NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=your-secret-key
@@ -91,17 +96,19 @@ NEXTAUTH_SECRET=your-secret-key
 ## Next Steps
 
 - **[Development Setup](../how-to/development/)** - Advanced configuration
-- **[Component Library](../reference/components/)** - Available UI components  
+- **[Component Library](../reference/components/)** - Available UI components
 - **[API Reference](../reference/api/)** - Backend endpoints
 
 ## Troubleshooting
 
 **Port already in use?**
+
 ```bash
 pnpm dev --port 3001
 ```
 
 **Dependencies issues?**
+
 ```bash
 rm -rf node_modules pnpm-lock.yaml
 pnpm install
@@ -116,16 +123,19 @@ pnpm install
 Now that you have TraffBoard running locally, here's what to explore next:
 
 ### Immediate Next Steps
+
 - **[Architecture Overview](../explanation/architecture/README.md)** - Understand the system design
 - **[Development Workflow](../how-to/development/README.md)** - Learn the development process
 - **[Component Library](../reference/components/README.md)** - Explore available components
 
 ### Advanced Topics
+
 - **[Taskmaster Setup](../how-to/ai-integration/taskmaster-setup.md)** - AI-assisted development
 - **[Deployment Guide](../how-to/operations/deployment.md)** - Deploy to production
 - **[Testing Strategy](../how-to/development/testing.md)** - Comprehensive testing
 
 ### Development Features
+
 - **[AI Integration](../how-to/ai-integration/README.md)** - AI-powered development tools
 - **[Customization Guide](../how-to/customization/README.md)** - Customize themes and components
 
@@ -136,6 +146,7 @@ Now that you have TraffBoard running locally, here's what to explore next:
 ### Common Issues
 
 #### Development Server Won't Start
+
 ```bash
 # Clear cache and reinstall
 rm -rf .next node_modules
@@ -144,12 +155,14 @@ pnpm dev
 ```
 
 #### Port Already in Use
+
 ```bash
 # Use different port
 pnpm dev --port 3001
 ```
 
 #### Build Errors
+
 ```bash
 # Check for type errors
 pnpm type-check
@@ -159,6 +172,7 @@ pnpm lint --fix
 ```
 
 #### Environment Issues
+
 - Verify `.env.local` exists and has correct format
 - Check Node.js version is 18+
 - Ensure pnpm is installed globally
@@ -186,4 +200,4 @@ pnpm lint --fix
 
 ---
 
-**Navigation:** [← Tutorial Home](./README.md) | [Architecture Overview →](../explanation/architecture/README.md) | [Development Workflow →](../how-to/development/README.md) 
+**Navigation:** [← Tutorial Home](./README.md) | [Architecture Overview →](../explanation/architecture/README.md) | [Development Workflow →](../how-to/development/README.md)

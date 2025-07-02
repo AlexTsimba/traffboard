@@ -1,1 +1,306 @@
-{\n  \"rulesets\": [\n    {\n      \"name\": \"🔒 Production Protection (Main/Master)\",\n      \"description\": \"Maximum protection for production branches with comprehensive security and quality gates.\",\n      \"target\": \"branch\",\n      \"enforcement\": \"active\",\n      \"conditions\": {\n        \"ref_name\": {\n          \"include\": [\"main\", \"master\"],\n          \"exclude\": []\n        }\n      },\n      \"rules\": [\n        {\n          \"type\": \"deletion\",\n          \"parameters\": {}\n        },\n        {\n          \"type\": \"non_fast_forward\",\n          \"parameters\": {}\n        },\n        {\n          \"type\": \"required_linear_history\",\n          \"parameters\": {}\n        },\n        {\n          \"type\": \"required_signatures\",\n          \"parameters\": {}\n        },\n        {\n          \"type\": \"pull_request\",\n          \"parameters\": {\n            \"required_approving_review_count\": 2,\n            \"dismiss_stale_reviews_on_push\": true,\n            \"require_code_owner_review\": true,\n            \"require_last_push_approval\": true,\n            \"required_review_thread_resolution\": true\n          }\n        },\n        {\n          \"type\": \"required_status_checks\",\n          \"parameters\": {\n            \"strict_required_status_checks_policy\": true,\n            \"required_status_checks\": [\n              {\n                \"context\": \"🧪 CI/CD Pipeline / install\",\n                \"integration_id\": null\n              },\n              {\n                \"context\": \"🧪 CI/CD Pipeline / security-quality-audit\",\n                \"integration_id\": null\n              },\n              {\n                \"context\": \"🧪 CI/CD Pipeline / test\",\n                \"integration_id\": null\n              },\n              {\n                \"context\": \"🧪 CI/CD Pipeline / build\",\n                \"integration_id\": null\n              },\n              {\n                \"context\": \"🧪 CI/CD Pipeline / ci-success\",\n                \"integration_id\": null\n              },\n              {\n                \"context\": \"🔐 Security Analysis / codeql-analysis (javascript)\",\n                \"integration_id\": null\n              },\n              {\n                \"context\": \"🔐 Security Analysis / codeql-analysis (typescript)\",\n                \"integration_id\": null\n              },\n              {\n                \"context\": \"🔐 Security Analysis / secret-scanning\",\n                \"integration_id\": null\n              },\n              {\n                \"context\": \"🔐 Security Analysis / advanced-security\",\n                \"integration_id\": null\n              }\n            ]\n          }\n        }\n      ],\n      \"bypass_actors\": []\n    },\n    {\n      \"name\": \"🔐 Integration Protection (Develop/Staging)\",\n      \"description\": \"High protection for integration branches with required testing and quality checks.\",\n      \"target\": \"branch\",\n      \"enforcement\": \"active\",\n      \"conditions\": {\n        \"ref_name\": {\n          \"include\": [\"develop\", \"staging\", \"integration\"],\n          \"exclude\": []\n        }\n      },\n      \"rules\": [\n        {\n          \"type\": \"deletion\",\n          \"parameters\": {}\n        },\n        {\n          \"type\": \"non_fast_forward\",\n          \"parameters\": {}\n        },\n        {\n          \"type\": \"pull_request\",\n          \"parameters\": {\n            \"required_approving_review_count\": 1,\n            \"dismiss_stale_reviews_on_push\": true,\n            \"require_code_owner_review\": false,\n            \"require_last_push_approval\": false,\n            \"required_review_thread_resolution\": true\n          }\n        },\n        {\n          \"type\": \"required_status_checks\",\n          \"parameters\": {\n            \"strict_required_status_checks_policy\": true,\n            \"required_status_checks\": [\n              {\n                \"context\": \"🧪 CI/CD Pipeline / install\",\n                \"integration_id\": null\n              },\n              {\n                \"context\": \"🧪 CI/CD Pipeline / security-quality-audit\",\n                \"integration_id\": null\n              },\n              {\n                \"context\": \"🧪 CI/CD Pipeline / test\",\n                \"integration_id\": null\n              },\n              {\n                \"context\": \"🧪 CI/CD Pipeline / build\",\n                \"integration_id\": null\n              },\n              {\n                \"context\": \"🔐 Security Analysis / codeql-analysis (javascript)\",\n                \"integration_id\": null\n              },\n              {\n                \"context\": \"🔐 Security Analysis / secret-scanning\",\n                \"integration_id\": null\n              }\n            ]\n          }\n        }\n      ],\n      \"bypass_actors\": [\n        {\n          \"actor_type\": \"RepositoryRole\",\n          \"actor_id\": \"admin\",\n          \"bypass_mode\": \"always\"\n        }\n      ]\n    },\n    {\n      \"name\": \"🔓 Feature Branch Protection\",\n      \"description\": \"Standard protection for feature branches with CI/CD validation.\",\n      \"target\": \"branch\",\n      \"enforcement\": \"active\",\n      \"conditions\": {\n        \"ref_name\": {\n          \"include\": [\"feature/*\", \"refactor/*\", \"hotfix/*\", \"bugfix/*\", \"chore/*\"],\n          \"exclude\": []\n        }\n      },\n      \"rules\": [\n        {\n          \"type\": \"required_status_checks\",\n          \"parameters\": {\n            \"strict_required_status_checks_policy\": false,\n            \"required_status_checks\": [\n              {\n                \"context\": \"🧪 CI/CD Pipeline / install\",\n                \"integration_id\": null\n              },\n              {\n                \"context\": \"🧪 CI/CD Pipeline / security-quality-audit\",\n                \"integration_id\": null\n              },\n              {\n                \"context\": \"🧪 CI/CD Pipeline / test\",\n                \"integration_id\": null\n              }\n            ]\n          }\n        }\n      ],\n      \"bypass_actors\": [\n        {\n          \"actor_type\": \"RepositoryRole\",\n          \"actor_id\": \"admin\",\n          \"bypass_mode\": \"always\"\n        },\n        {\n          \"actor_type\": \"RepositoryRole\",\n          \"actor_id\": \"maintain\",\n          \"bypass_mode\": \"pull_request\"\n        }\n      ]\n    },\n    {\n      \"name\": \"🚨 Release Protection\",\n      \"description\": \"Enhanced protection for release branches with full validation.\",\n      \"target\": \"branch\",\n      \"enforcement\": \"active\",\n      \"conditions\": {\n        \"ref_name\": {\n          \"include\": [\"release/*\", \"release-*\", \"v*\"],\n          \"exclude\": []\n        }\n      },\n      \"rules\": [\n        {\n          \"type\": \"deletion\",\n          \"parameters\": {}\n        },\n        {\n          \"type\": \"non_fast_forward\",\n          \"parameters\": {}\n        },\n        {\n          \"type\": \"required_signatures\",\n          \"parameters\": {}\n        },\n        {\n          \"type\": \"pull_request\",\n          \"parameters\": {\n            \"required_approving_review_count\": 2,\n            \"dismiss_stale_reviews_on_push\": true,\n            \"require_code_owner_review\": true,\n            \"require_last_push_approval\": true,\n            \"required_review_thread_resolution\": true\n          }\n        },\n        {\n          \"type\": \"required_status_checks\",\n          \"parameters\": {\n            \"strict_required_status_checks_policy\": true,\n            \"required_status_checks\": [\n              {\n                \"context\": \"🧪 CI/CD Pipeline / install\",\n                \"integration_id\": null\n              },\n              {\n                \"context\": \"🧪 CI/CD Pipeline / security-quality-audit\",\n                \"integration_id\": null\n              },\n              {\n                \"context\": \"🧪 CI/CD Pipeline / test\",\n                \"integration_id\": null\n              },\n              {\n                \"context\": \"🧪 CI/CD Pipeline / build\",\n                \"integration_id\": null\n              },\n              {\n                \"context\": \"🔐 Security Analysis / codeql-analysis (javascript)\",\n                \"integration_id\": null\n              },\n              {\n                \"context\": \"🔐 Security Analysis / codeql-analysis (typescript)\",\n                \"integration_id\": null\n              },\n              {\n                \"context\": \"🔐 Security Analysis / security-summary\",\n                \"integration_id\": null\n              }\n            ]\n          }\n        }\n      ],\n      \"bypass_actors\": [\n        {\n          \"actor_type\": \"RepositoryRole\",\n          \"actor_id\": \"admin\",\n          \"bypass_mode\": \"always\"\n        }\n      ]\n    }\n  ],\n  \"repository_settings\": {\n    \"allow_merge_commits\": true,\n    \"allow_squash_merging\": true,\n    \"allow_rebase_merging\": false,\n    \"allow_auto_merge\": true,\n    \"delete_branch_on_merge\": true,\n    \"allow_update_branch\": true,\n    \"use_squash_pr_title_as_default\": true,\n    \"squash_merge_commit_title\": \"PR_TITLE\",\n    \"squash_merge_commit_message\": \"PR_BODY\",\n    \"merge_commit_title\": \"PR_TITLE\",\n    \"merge_commit_message\": \"PR_BODY\"\n  },\n  \"security_settings\": {\n    \"enable_vulnerability_alerts\": true,\n    \"enable_automated_security_fixes\": true,\n    \"enable_secret_scanning\": true,\n    \"enable_push_protection\": true,\n    \"enable_dependency_graph\": true,\n    \"private_vulnerability_reporting_enabled\": true\n  }\n}
+{
+  "rulesets": [
+    {
+      "name": "🔒 Production Protection (Main/Master)",
+      "description": "Maximum protection for production branches with comprehensive security and quality gates.",
+      "target": "branch",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "include": ["main", "master"],
+          "exclude": []
+        }
+      },
+      "rules": [
+        {
+          "type": "deletion",
+          "parameters": {}
+        },
+        {
+          "type": "non_fast_forward",
+          "parameters": {}
+        },
+        {
+          "type": "required_linear_history",
+          "parameters": {}
+        },
+        {
+          "type": "required_signatures",
+          "parameters": {}
+        },
+        {
+          "type": "pull_request",
+          "parameters": {
+            "required_approving_review_count": 2,
+            "dismiss_stale_reviews_on_push": true,
+            "require_code_owner_review": true,
+            "require_last_push_approval": true,
+            "required_review_thread_resolution": true
+          }
+        },
+        {
+          "type": "required_status_checks",
+          "parameters": {
+            "strict_required_status_checks_policy": true,
+            "required_status_checks": [
+              {
+                "context": "🧪 CI/CD Pipeline / install",
+                "integration_id": null
+              },
+              {
+                "context": "🧪 CI/CD Pipeline / security-quality-audit",
+                "integration_id": null
+              },
+              {
+                "context": "🧪 CI/CD Pipeline / test",
+                "integration_id": null
+              },
+              {
+                "context": "🧪 CI/CD Pipeline / build",
+                "integration_id": null
+              },
+              {
+                "context": "🧪 CI/CD Pipeline / ci-success",
+                "integration_id": null
+              },
+              {
+                "context": "🔐 Security Analysis / codeql-analysis (javascript)",
+                "integration_id": null
+              },
+              {
+                "context": "🔐 Security Analysis / codeql-analysis (typescript)",
+                "integration_id": null
+              },
+              {
+                "context": "🔐 Security Analysis / secret-scanning",
+                "integration_id": null
+              },
+              {
+                "context": "🔐 Security Analysis / advanced-security",
+                "integration_id": null
+              }
+            ]
+          }
+        }
+      ],
+      "bypass_actors": []
+    },
+    {
+      "name": "🔐 Integration Protection (Develop/Staging)",
+      "description": "High protection for integration branches with required testing and quality checks.",
+      "target": "branch",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "include": ["develop", "staging", "integration"],
+          "exclude": []
+        }
+      },
+      "rules": [
+        {
+          "type": "deletion",
+          "parameters": {}
+        },
+        {
+          "type": "non_fast_forward",
+          "parameters": {}
+        },
+        {
+          "type": "pull_request",
+          "parameters": {
+            "required_approving_review_count": 1,
+            "dismiss_stale_reviews_on_push": true,
+            "require_code_owner_review": false,
+            "require_last_push_approval": false,
+            "required_review_thread_resolution": true
+          }
+        },
+        {
+          "type": "required_status_checks",
+          "parameters": {
+            "strict_required_status_checks_policy": true,
+            "required_status_checks": [
+              {
+                "context": "🧪 CI/CD Pipeline / install",
+                "integration_id": null
+              },
+              {
+                "context": "🧪 CI/CD Pipeline / security-quality-audit",
+                "integration_id": null
+              },
+              {
+                "context": "🧪 CI/CD Pipeline / test",
+                "integration_id": null
+              },
+              {
+                "context": "🧪 CI/CD Pipeline / build",
+                "integration_id": null
+              },
+              {
+                "context": "🔐 Security Analysis / codeql-analysis (javascript)",
+                "integration_id": null
+              },
+              {
+                "context": "🔐 Security Analysis / secret-scanning",
+                "integration_id": null
+              }
+            ]
+          }
+        }
+      ],
+      "bypass_actors": [
+        {
+          "actor_type": "RepositoryRole",
+          "actor_id": "admin",
+          "bypass_mode": "always"
+        }
+      ]
+    },
+    {
+      "name": "🔓 Feature Branch Protection",
+      "description": "Standard protection for feature branches with CI/CD validation.",
+      "target": "branch",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "include": ["feature/*", "refactor/*", "hotfix/*", "bugfix/*", "chore/*"],
+          "exclude": []
+        }
+      },
+      "rules": [
+        {
+          "type": "required_status_checks",
+          "parameters": {
+            "strict_required_status_checks_policy": false,
+            "required_status_checks": [
+              {
+                "context": "🧪 CI/CD Pipeline / install",
+                "integration_id": null
+              },
+              {
+                "context": "🧪 CI/CD Pipeline / security-quality-audit",
+                "integration_id": null
+              },
+              {
+                "context": "🧪 CI/CD Pipeline / test",
+                "integration_id": null
+              }
+            ]
+          }
+        }
+      ],
+      "bypass_actors": [
+        {
+          "actor_type": "RepositoryRole",
+          "actor_id": "admin",
+          "bypass_mode": "always"
+        },
+        {
+          "actor_type": "RepositoryRole",
+          "actor_id": "maintain",
+          "bypass_mode": "pull_request"
+        }
+      ]
+    },
+    {
+      "name": "🚨 Release Protection",
+      "description": "Enhanced protection for release branches with full validation.",
+      "target": "branch",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "include": ["release/*", "release-*", "v*"],
+          "exclude": []
+        }
+      },
+      "rules": [
+        {
+          "type": "deletion",
+          "parameters": {}
+        },
+        {
+          "type": "non_fast_forward",
+          "parameters": {}
+        },
+        {
+          "type": "required_signatures",
+          "parameters": {}
+        },
+        {
+          "type": "pull_request",
+          "parameters": {
+            "required_approving_review_count": 2,
+            "dismiss_stale_reviews_on_push": true,
+            "require_code_owner_review": true,
+            "require_last_push_approval": true,
+            "required_review_thread_resolution": true
+          }
+        },
+        {
+          "type": "required_status_checks",
+          "parameters": {
+            "strict_required_status_checks_policy": true,
+            "required_status_checks": [
+              {
+                "context": "🧪 CI/CD Pipeline / install",
+                "integration_id": null
+              },
+              {
+                "context": "🧪 CI/CD Pipeline / security-quality-audit",
+                "integration_id": null
+              },
+              {
+                "context": "🧪 CI/CD Pipeline / test",
+                "integration_id": null
+              },
+              {
+                "context": "🧪 CI/CD Pipeline / build",
+                "integration_id": null
+              },
+              {
+                "context": "🔐 Security Analysis / codeql-analysis (javascript)",
+                "integration_id": null
+              },
+              {
+                "context": "🔐 Security Analysis / codeql-analysis (typescript)",
+                "integration_id": null
+              },
+              {
+                "context": "🔐 Security Analysis / security-summary",
+                "integration_id": null
+              }
+            ]
+          }
+        }
+      ],
+      "bypass_actors": [
+        {
+          "actor_type": "RepositoryRole",
+          "actor_id": "admin",
+          "bypass_mode": "always"
+        }
+      ]
+    }
+  ],
+  "repository_settings": {
+    "allow_merge_commits": true,
+    "allow_squash_merging": true,
+    "allow_rebase_merging": false,
+    "allow_auto_merge": true,
+    "delete_branch_on_merge": true,
+    "allow_update_branch": true,
+    "use_squash_pr_title_as_default": true,
+    "squash_merge_commit_title": "PR_TITLE",
+    "squash_merge_commit_message": "PR_BODY",
+    "merge_commit_title": "PR_TITLE",
+    "merge_commit_message": "PR_BODY"
+  },
+  "security_settings": {
+    "enable_vulnerability_alerts": true,
+    "enable_automated_security_fixes": true,
+    "enable_secret_scanning": true,
+    "enable_push_protection": true,
+    "enable_dependency_graph": true,
+    "private_vulnerability_reporting_enabled": true
+  }
+}

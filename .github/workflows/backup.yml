@@ -8,21 +8,21 @@ on:
   workflow_dispatch:
     inputs:
       backup_type:
-        description: 'Type of backup to perform'
+        description: "Type of backup to perform"
         required: true
-        default: 'full'
+        default: "full"
         type: choice
         options:
-        - full
-        - config-only
-        - code-only
+          - full
+          - config-only
+          - code-only
 
 permissions:
   contents: read
   actions: read
 
 env:
-  BACKUP_BRANCH: 'backup/automated'
+  BACKUP_BRANCH: "backup/automated"
 
 jobs:
   backup-repository:
@@ -34,14 +34,14 @@ jobs:
       - name: 📥 Checkout Repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Full history for complete backup
+          fetch-depth: 0 # Full history for complete backup
 
       - name: 🔧 Setup Backup Environment
         run: |
           # Configure git for backup operations
           git config user.name "GitHub Actions Backup"
           git config user.email "actions@github.com"
-          
+
           # Create backup directory
           mkdir -p .backup
 
@@ -49,24 +49,24 @@ jobs:
         if: ${{ github.event.inputs.backup_type == 'full' || github.event.inputs.backup_type == 'config-only' }}
         run: |
           echo "Creating configuration backup..."
-          
+
           # Backup environment template
           if [ -f .env.example ]; then
             cp .env.example .backup/env-template.backup
           fi
-          
+
           # Backup package.json and dependencies info
           cp package.json .backup/package.backup
           if [ -f pnpm-lock.yaml ]; then
             cp pnpm-lock.yaml .backup/pnpm-lock.backup
           fi
-          
+
           # Backup TypeScript and build configs
           cp tsconfig.json .backup/tsconfig.backup
           if [ -f next.config.mjs ]; then
             cp next.config.mjs .backup/next-config.backup
           fi
-          
+
           # Backup linting and formatting configs
           if [ -f eslint.config.mjs ]; then
             cp eslint.config.mjs .backup/eslint.backup
@@ -74,7 +74,7 @@ jobs:
           if [ -f commitlint.config.js ]; then
             cp commitlint.config.js .backup/commitlint.backup
           fi
-          
+
           # Create backup manifest
           echo "# Configuration Backup Manifest" > .backup/CONFIG_MANIFEST.md
           echo "Created: $(date -u)" >> .backup/CONFIG_MANIFEST.md
@@ -88,7 +88,7 @@ jobs:
         if: ${{ github.event.inputs.backup_type == 'full' || github.event.inputs.backup_type == 'code-only' }}
         run: |
           echo "Creating source code backup..."
-          
+
           # Create compressed archive of source code
           tar -czf .backup/source-code-$(date +%Y%m%d_%H%M%S).tar.gz \
             --exclude='.backup' \
@@ -107,14 +107,14 @@ jobs:
           echo "Commit: ${{ github.sha }}" >> .backup/BACKUP_REPORT.md
           echo "Triggered by: ${{ github.actor }}" >> .backup/BACKUP_REPORT.md
           echo "" >> .backup/BACKUP_REPORT.md
-          
+
           echo "## Repository Statistics:" >> .backup/BACKUP_REPORT.md
           echo "- Total files: $(find . -type f | wc -l)" >> .backup/BACKUP_REPORT.md
           echo "- Source files: $(find src -name '*.ts' -o -name '*.tsx' -o -name '*.js' -o -name '*.jsx' 2>/dev/null | wc -l)" >> .backup/BACKUP_REPORT.md
           echo "- Test files: $(find . -name '*.test.*' -o -name '*.spec.*' 2>/dev/null | wc -l)" >> .backup/BACKUP_REPORT.md
           echo "- Config files: $(find . -maxdepth 1 -name '*.json' -o -name '*.js' -o -name '*.mjs' -o -name '*.ts' | wc -l)" >> .backup/BACKUP_REPORT.md
           echo "" >> .backup/BACKUP_REPORT.md
-          
+
           echo "## Backup Contents:" >> .backup/BACKUP_REPORT.md
           if [ -d .backup ]; then
             ls -lah .backup/ >> .backup/BACKUP_REPORT.md
@@ -159,4 +159,4 @@ jobs:
   #     - name: Upload to Spaces
   #       run: |
   #         # Configure s3cmd for DigitalOcean Spaces
-  #         # Upload backup artifacts to secure storage 
+  #         # Upload backup artifacts to secure storage

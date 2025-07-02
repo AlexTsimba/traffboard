@@ -9,7 +9,7 @@ const databaseConfigSchema = z.object({
     .url("DATABASE_URL must be a valid URL")
     .refine(
       (url) => url.startsWith("postgresql://") || url.startsWith("postgres://"),
-      "DATABASE_URL must be a PostgreSQL connection string"
+      "DATABASE_URL must be a PostgreSQL connection string",
     ),
   poolMax: z.number().min(1).max(50).default(10),
   poolIdleTimeout: z.number().min(10).max(600).default(60),
