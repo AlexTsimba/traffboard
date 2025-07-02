@@ -3,6 +3,29 @@ import { pgTable, varchar, timestamp, serial, integer, numeric, jsonb } from "dr
 
 import { users } from "./users";
 
+// Enums for upload status and file types
+export const UPLOAD_STATUS = {
+  PENDING: "pending",
+  PROCESSING: "processing",
+  COMPLETED: "completed",
+  FAILED: "failed",
+} as const;
+
+export const FILE_TYPES = {
+  PLAYER_DATA: "player_data",
+  TRAFFIC_REPORT: "traffic_report",
+} as const;
+
+export const DEVICE_TYPES = {
+  PHONE: "Phone",
+  DESKTOP: "Desktop",
+  TABLET: "Tablet",
+} as const;
+
+export type UploadStatus = (typeof UPLOAD_STATUS)[keyof typeof UPLOAD_STATUS];
+export type FileType = (typeof FILE_TYPES)[keyof typeof FILE_TYPES];
+export type DeviceType = (typeof DEVICE_TYPES)[keyof typeof DEVICE_TYPES];
+
 // CSV upload tracking table
 export const conversionUploads = pgTable("conversion_uploads", {
   id: serial("id").primaryKey(),
@@ -15,131 +38,124 @@ export const conversionUploads = pgTable("conversion_uploads", {
   originalName: varchar("original_name", { length: 255 }).notNull(),
   fileSize: integer("file_size").notNull(),
   mimeType: varchar("mime_type", { length: 100 }).notNull(),
+  fileType: varchar("file_type", { length: 50 }).notNull(), // player_data, traffic_report
 
   // Processing Status
-  status: varchar("status", { length: 50 }).default("pending").notNull(),
-  totalRows: integer("total_rows").default(0).notNull(),
-  processedRows: integer("processed_rows").default(0).notNull(),
-  errorRows: integer("error_rows").default(0).notNull(),
-
-  // Error Tracking
-  errors: jsonb("errors").default([]), // Array of processing errors
-  processingLog: jsonb("processing_log").default([]), // Processing steps log
+  status: varchar("status", { length: 20 }).notNull().default(UPLOAD_STATUS.PENDING),
+  totalRows: integer("total_rows").default(0),
+  processedRows: integer("processed_rows").default(0),
+  errorRows: integer("error_rows").default(0),
+  errors: jsonb("errors").$type<string[]>().default([]),
 
   // Timestamps
   uploadedAt: timestamp("uploaded_at", { withTimezone: true })
-    .default(sql`CURRENT_TIMESTAMP`)
-    .notNull(),
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP`),
   processedAt: timestamp("processed_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true })
-    .default(sql`CURRENT_TIMESTAMP`)
-    .notNull(),
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP`),
   updatedAt: timestamp("updated_at", { withTimezone: true })
-    .default(sql`CURRENT_TIMESTAMP`)
-    .notNull(),
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP`),
 });
 
-// Main conversions table - NO PII, NO computed fields
-export const conversions = pgTable("conversions", {
+// Player Data Table - EXACTLY matching overall_players_demo.csv structure (34 fields, removed Partners email PII)
+export const playerData = pgTable("player_data", {
   id: serial("id").primaryKey(),
   uploadId: integer("upload_id")
     .notNull()
     .references(() => conversionUploads.id, { onDelete: "cascade" }),
 
-  // Business Identifiers (anonymized)
-  partnerId: varchar("partner_id", { length: 100 }),
-  campaignId: varchar("campaign_id", { length: 100 }),
-  adGroupId: varchar("ad_group_id", { length: 100 }),
-  keywordId: varchar("keyword_id", { length: 100 }),
-
-  // Traffic Source Information
-  trafficSource: varchar("traffic_source", { length: 100 }),
-  medium: varchar("medium", { length: 100 }),
-  campaign: varchar("campaign", { length: 255 }),
-  adGroup: varchar("ad_group", { length: 255 }),
-  keyword: varchar("keyword", { length: 255 }),
-
-  // Geo/Device Information (anonymized)
-  country: varchar("country", { length: 10 }), // ISO country codes
-  region: varchar("region", { length: 100 }),
-  city: varchar("city", { length: 100 }),
-  deviceType: varchar("device_type", { length: 50 }),
-  deviceCategory: varchar("device_category", { length: 50 }),
-
-  // Date Information
-  trafficDate: timestamp("traffic_date", { withTimezone: true }).notNull(),
-
-  // Raw Metrics (NO computed fields - calculated on demand)
-  clicks: integer("clicks").default(0).notNull(),
-  impressions: integer("impressions").default(0).notNull(),
-  conversions: integer("conversions").default(0).notNull(),
-
-  // Financial Data (in cents for precision)
-  cost: numeric("cost", { precision: 15, scale: 2 }).default("0").notNull(),
-  revenue: numeric("revenue", { precision: 15, scale: 2 }).default("0").notNull(),
-
-  // Gaming-specific metrics (from demo data)
-  registrations: integer("registrations").default(0),
-  firstTimeDeposits: integer("first_time_deposits").default(0),
-  depositCount: integer("deposit_count").default(0),
-  depositAmount: numeric("deposit_amount", { precision: 15, scale: 2 }).default("0"),
-  withdrawalCount: integer("withdrawal_count").default(0),
-  withdrawalAmount: numeric("withdrawal_amount", { precision: 15, scale: 2 }).default("0"),
-
-  // Casino-specific metrics
-  casinoBets: integer("casino_bets").default(0),
-  casinoBetAmount: numeric("casino_bet_amount", { precision: 15, scale: 2 }).default("0"),
-  casinoWinAmount: numeric("casino_win_amount", { precision: 15, scale: 2 }).default("0"),
-
-  // Additional tracking
-  rawData: jsonb("raw_data"), // Store original CSV row for debugging
+  // EXACT CSV FIELDS (34 fields, Partners email removed as PII)
+  playerId: varchar("player_id", { length: 50 }).notNull(),
+  originalPlayerId: varchar("original_player_id", { length: 50 }),
+  signUpDate: timestamp("sign_up_date", { withTimezone: true }),
+  firstDepositDate: timestamp("first_deposit_date", { withTimezone: true }),
+  partnerId: varchar("partner_id", { length: 50 }),
+  companyName: varchar("company_name", { length: 255 }),
+  // Partners email REMOVED - PII
+  partnerTags: varchar("partner_tags", { length: 500 }),
+  campaignId: varchar("campaign_id", { length: 50 }),
+  campaignName: varchar("campaign_name", { length: 255 }),
+  promoId: varchar("promo_id", { length: 50 }),
+  promoCode: varchar("promo_code", { length: 100 }),
+  playerCountry: varchar("player_country", { length: 10 }),
+  tagClickid: varchar("tag_clickid", { length: 255 }),
+  tagOs: varchar("tag_os", { length: 100 }),
+  tagSource: varchar("tag_source", { length: 100 }),
+  tagSub2: varchar("tag_sub2", { length: 100 }),
+  tagWebId: varchar("tag_web_id", { length: 100 }),
+  date: timestamp("date", { withTimezone: true }),
+  prequalified: integer("prequalified").default(0),
+  duplicate: integer("duplicate").default(0),
+  selfExcluded: integer("self_excluded").default(0),
+  disabled: integer("disabled").default(0),
+  currency: varchar("currency", { length: 10 }),
+  ftdCount: integer("ftd_count").default(0),
+  ftdSum: numeric("ftd_sum", { precision: 15, scale: 2 }).default("0"),
+  depositsCount: integer("deposits_count").default(0),
+  depositsSum: numeric("deposits_sum", { precision: 15, scale: 2 }).default("0"),
+  cashoutsCount: integer("cashouts_count").default(0),
+  cashoutsSum: numeric("cashouts_sum", { precision: 15, scale: 2 }).default("0"),
+  casinoBetsCount: integer("casino_bets_count").default(0),
+  casinoRealNgr: numeric("casino_real_ngr", { precision: 15, scale: 2 }).default("0"),
+  fixedPerPlayer: numeric("fixed_per_player", { precision: 15, scale: 2 }).default("0"),
+  casinoBetsSum: numeric("casino_bets_sum", { precision: 15, scale: 2 }).default("0"),
+  casinoWinsSum: numeric("casino_wins_sum", { precision: 15, scale: 2 }).default("0"),
 
   // Timestamps
   createdAt: timestamp("created_at", { withTimezone: true })
-    .default(sql`CURRENT_TIMESTAMP`)
-    .notNull(),
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP`),
   updatedAt: timestamp("updated_at", { withTimezone: true })
-    .default(sql`CURRENT_TIMESTAMP`)
-    .notNull(),
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP`),
 });
 
-// TypeScript types for schema inference
+// Traffic Report Table - EXACTLY matching traffic_report_demo.csv structure (19 fields)
+export const trafficReports = pgTable("traffic_reports", {
+  id: serial("id").primaryKey(),
+  uploadId: integer("upload_id")
+    .notNull()
+    .references(() => conversionUploads.id, { onDelete: "cascade" }),
+
+  // EXACT CSV FIELDS (19 fields)
+  date: timestamp("date", { withTimezone: true }).notNull(),
+  foreignBrandId: varchar("foreign_brand_id", { length: 50 }),
+  foreignPartnerId: varchar("foreign_partner_id", { length: 50 }),
+  foreignCampaignId: varchar("foreign_campaign_id", { length: 50 }),
+  foreignLandingId: varchar("foreign_landing_id", { length: 50 }),
+  trafficSource: varchar("traffic_source", { length: 100 }),
+  deviceType: varchar("device_type", { length: 50 }),
+  userAgentFamily: varchar("user_agent_family", { length: 255 }),
+  osFamily: varchar("os_family", { length: 100 }),
+  country: varchar("country", { length: 10 }),
+  allClicks: integer("all_clicks").default(0),
+  uniqueClicks: integer("unique_clicks").default(0),
+  registrationsCount: integer("registrations_count").default(0),
+  ftdCount: integer("ftd_count").default(0),
+  depositsCount: integer("deposits_count").default(0),
+  cr: numeric("cr", { precision: 10, scale: 2 }).default("0"),
+  cftd: numeric("cftd", { precision: 10, scale: 2 }).default("0"),
+  cd: numeric("cd", { precision: 10, scale: 2 }).default("0"),
+  rftd: numeric("rftd", { precision: 10, scale: 2 }).default("0"),
+
+  // Timestamps
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP`),
+});
+
+// Types for better TypeScript integration
 export type ConversionUpload = typeof conversionUploads.$inferSelect;
 export type NewConversionUpload = typeof conversionUploads.$inferInsert;
 
-export type Conversion = typeof conversions.$inferSelect;
-export type NewConversion = typeof conversions.$inferInsert;
+export type PlayerData = typeof playerData.$inferSelect;
+export type NewPlayerData = typeof playerData.$inferInsert;
 
-// Upload status enum
-export const UPLOAD_STATUS = {
-  PENDING: "pending",
-  PROCESSING: "processing",
-  COMPLETED: "completed",
-  FAILED: "failed",
-  CANCELLED: "cancelled",
-} as const;
-
-export type UploadStatus = (typeof UPLOAD_STATUS)[keyof typeof UPLOAD_STATUS];
-
-// Device type enum
-export const DEVICE_TYPES = {
-  DESKTOP: "desktop",
-  MOBILE: "mobile",
-  TABLET: "tablet",
-  UNKNOWN: "unknown",
-} as const;
-
-export type DeviceType = (typeof DEVICE_TYPES)[keyof typeof DEVICE_TYPES];
-
-// Traffic source enum
-export const TRAFFIC_SOURCES = {
-  ORGANIC: "organic",
-  PAID: "paid",
-  DIRECT: "direct",
-  REFERRAL: "referral",
-  SOCIAL: "social",
-  EMAIL: "email",
-  UNKNOWN: "unknown",
-} as const;
-
-export type TrafficSource = (typeof TRAFFIC_SOURCES)[keyof typeof TRAFFIC_SOURCES];
+export type TrafficReport = typeof trafficReports.$inferSelect;
+export type NewTrafficReport = typeof trafficReports.$inferInsert;

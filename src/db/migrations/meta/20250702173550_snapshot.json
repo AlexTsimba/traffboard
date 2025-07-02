@@ -1,5 +1,5 @@
 {
-  "id": "33d969ca-50c8-42bd-946a-2cae7e91f973",
+  "id": "c3dcdce4-57ea-41fa-a89a-f7995129bc06",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -44,9 +44,15 @@
           "primaryKey": false,
           "notNull": true
         },
+        "file_type": {
+          "name": "file_type",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true
+        },
         "status": {
           "name": "status",
-          "type": "varchar(50)",
+          "type": "varchar(20)",
           "primaryKey": false,
           "notNull": true,
           "default": "'pending'"
@@ -55,32 +61,25 @@
           "name": "total_rows",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "default": 0
         },
         "processed_rows": {
           "name": "processed_rows",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "default": 0
         },
         "error_rows": {
           "name": "error_rows",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "default": 0
         },
         "errors": {
           "name": "errors",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'[]'::jsonb"
-        },
-        "processing_log": {
-          "name": "processing_log",
           "type": "jsonb",
           "primaryKey": false,
           "notNull": false,
@@ -136,8 +135,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.conversions": {
-      "name": "conversions",
+    "public.player_data": {
+      "name": "player_data",
       "schema": "",
       "columns": {
         "id": {
@@ -152,199 +151,224 @@
           "primaryKey": false,
           "notNull": true
         },
+        "player_id": {
+          "name": "player_id",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "original_player_id": {
+          "name": "original_player_id",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sign_up_date": {
+          "name": "sign_up_date",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "first_deposit_date": {
+          "name": "first_deposit_date",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
         "partner_id": {
           "name": "partner_id",
-          "type": "varchar(100)",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "company_name": {
+          "name": "company_name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "partner_tags": {
+          "name": "partner_tags",
+          "type": "varchar(500)",
           "primaryKey": false,
           "notNull": false
         },
         "campaign_id": {
           "name": "campaign_id",
-          "type": "varchar(100)",
+          "type": "varchar(50)",
           "primaryKey": false,
           "notNull": false
         },
-        "ad_group_id": {
-          "name": "ad_group_id",
-          "type": "varchar(100)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "keyword_id": {
-          "name": "keyword_id",
-          "type": "varchar(100)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "traffic_source": {
-          "name": "traffic_source",
-          "type": "varchar(100)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "medium": {
-          "name": "medium",
-          "type": "varchar(100)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "campaign": {
-          "name": "campaign",
+        "campaign_name": {
+          "name": "campaign_name",
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": false
         },
-        "ad_group": {
-          "name": "ad_group",
-          "type": "varchar(255)",
+        "promo_id": {
+          "name": "promo_id",
+          "type": "varchar(50)",
           "primaryKey": false,
           "notNull": false
         },
-        "keyword": {
-          "name": "keyword",
-          "type": "varchar(255)",
+        "promo_code": {
+          "name": "promo_code",
+          "type": "varchar(100)",
           "primaryKey": false,
           "notNull": false
         },
-        "country": {
-          "name": "country",
+        "player_country": {
+          "name": "player_country",
           "type": "varchar(10)",
           "primaryKey": false,
           "notNull": false
         },
-        "region": {
-          "name": "region",
+        "tag_clickid": {
+          "name": "tag_clickid",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tag_os": {
+          "name": "tag_os",
           "type": "varchar(100)",
           "primaryKey": false,
           "notNull": false
         },
-        "city": {
-          "name": "city",
+        "tag_source": {
+          "name": "tag_source",
           "type": "varchar(100)",
           "primaryKey": false,
           "notNull": false
         },
-        "device_type": {
-          "name": "device_type",
-          "type": "varchar(50)",
+        "tag_sub2": {
+          "name": "tag_sub2",
+          "type": "varchar(100)",
           "primaryKey": false,
           "notNull": false
         },
-        "device_category": {
-          "name": "device_category",
-          "type": "varchar(50)",
+        "tag_web_id": {
+          "name": "tag_web_id",
+          "type": "varchar(100)",
           "primaryKey": false,
           "notNull": false
         },
-        "traffic_date": {
-          "name": "traffic_date",
+        "date": {
+          "name": "date",
           "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
-        "clicks": {
-          "name": "clicks",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "impressions": {
-          "name": "impressions",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "conversions": {
-          "name": "conversions",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "cost": {
-          "name": "cost",
-          "type": "numeric(15, 2)",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'0'"
-        },
-        "revenue": {
-          "name": "revenue",
-          "type": "numeric(15, 2)",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'0'"
-        },
-        "registrations": {
-          "name": "registrations",
+        "prequalified": {
+          "name": "prequalified",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "default": 0
         },
-        "first_time_deposits": {
-          "name": "first_time_deposits",
+        "duplicate": {
+          "name": "duplicate",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "default": 0
         },
-        "deposit_count": {
-          "name": "deposit_count",
+        "self_excluded": {
+          "name": "self_excluded",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "default": 0
         },
-        "deposit_amount": {
-          "name": "deposit_amount",
-          "type": "numeric(15, 2)",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'0'"
-        },
-        "withdrawal_count": {
-          "name": "withdrawal_count",
+        "disabled": {
+          "name": "disabled",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "default": 0
         },
-        "withdrawal_amount": {
-          "name": "withdrawal_amount",
-          "type": "numeric(15, 2)",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'0'"
-        },
-        "casino_bets": {
-          "name": "casino_bets",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "default": 0
-        },
-        "casino_bet_amount": {
-          "name": "casino_bet_amount",
-          "type": "numeric(15, 2)",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'0'"
-        },
-        "casino_win_amount": {
-          "name": "casino_win_amount",
-          "type": "numeric(15, 2)",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'0'"
-        },
-        "raw_data": {
-          "name": "raw_data",
-          "type": "jsonb",
+        "currency": {
+          "name": "currency",
+          "type": "varchar(10)",
           "primaryKey": false,
           "notNull": false
+        },
+        "ftd_count": {
+          "name": "ftd_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "ftd_sum": {
+          "name": "ftd_sum",
+          "type": "numeric(15, 2)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'0'"
+        },
+        "deposits_count": {
+          "name": "deposits_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "deposits_sum": {
+          "name": "deposits_sum",
+          "type": "numeric(15, 2)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'0'"
+        },
+        "cashouts_count": {
+          "name": "cashouts_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "cashouts_sum": {
+          "name": "cashouts_sum",
+          "type": "numeric(15, 2)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'0'"
+        },
+        "casino_bets_count": {
+          "name": "casino_bets_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "casino_real_ngr": {
+          "name": "casino_real_ngr",
+          "type": "numeric(15, 2)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'0'"
+        },
+        "fixed_per_player": {
+          "name": "fixed_per_player",
+          "type": "numeric(15, 2)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'0'"
+        },
+        "casino_bets_sum": {
+          "name": "casino_bets_sum",
+          "type": "numeric(15, 2)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'0'"
+        },
+        "casino_wins_sum": {
+          "name": "casino_wins_sum",
+          "type": "numeric(15, 2)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'0'"
         },
         "created_at": {
           "name": "created_at",
@@ -363,9 +387,9 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "conversions_upload_id_conversion_uploads_id_fk": {
-          "name": "conversions_upload_id_conversion_uploads_id_fk",
-          "tableFrom": "conversions",
+        "player_data_upload_id_conversion_uploads_id_fk": {
+          "name": "player_data_upload_id_conversion_uploads_id_fk",
+          "tableFrom": "player_data",
           "tableTo": "conversion_uploads",
           "columnsFrom": [
             "upload_id"
@@ -379,6 +403,268 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.traffic_reports": {
+      "name": "traffic_reports",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "upload_id": {
+          "name": "upload_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "date": {
+          "name": "date",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "foreign_brand_id": {
+          "name": "foreign_brand_id",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "foreign_partner_id": {
+          "name": "foreign_partner_id",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "foreign_campaign_id": {
+          "name": "foreign_campaign_id",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "foreign_landing_id": {
+          "name": "foreign_landing_id",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "traffic_source": {
+          "name": "traffic_source",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "device_type": {
+          "name": "device_type",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "user_agent_family": {
+          "name": "user_agent_family",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "os_family": {
+          "name": "os_family",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "country": {
+          "name": "country",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "all_clicks": {
+          "name": "all_clicks",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "unique_clicks": {
+          "name": "unique_clicks",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "registrations_count": {
+          "name": "registrations_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "ftd_count": {
+          "name": "ftd_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "deposits_count": {
+          "name": "deposits_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "cr": {
+          "name": "cr",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'0'"
+        },
+        "cftd": {
+          "name": "cftd",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'0'"
+        },
+        "cd": {
+          "name": "cd",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'0'"
+        },
+        "rftd": {
+          "name": "rftd",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'0'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "traffic_reports_upload_id_conversion_uploads_id_fk": {
+          "name": "traffic_reports_upload_id_conversion_uploads_id_fk",
+          "tableFrom": "traffic_reports",
+          "tableTo": "conversion_uploads",
+          "columnsFrom": [
+            "upload_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.users": {
+      "name": "users",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "password_hash": {
+          "name": "password_hash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "role": {
+          "name": "role",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'user'"
+        },
+        "two_factor_enabled": {
+          "name": "two_factor_enabled",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "two_factor_secret": {
+          "name": "two_factor_secret",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "recovery_codes": {
+          "name": "recovery_codes",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notification_preferences": {
+          "name": "notification_preferences",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{\"email\":true,\"loginAlerts\":true,\"securityAlerts\":true,\"systemUpdates\":false}'::jsonb"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "users_email_unique": {
+          "name": "users_email_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -679,92 +965,6 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.users": {
-      "name": "users",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "email": {
-          "name": "email",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "password_hash": {
-          "name": "password_hash",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "role": {
-          "name": "role",
-          "type": "varchar(50)",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'user'"
-        },
-        "two_factor_enabled": {
-          "name": "two_factor_enabled",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        },
-        "two_factor_secret": {
-          "name": "two_factor_secret",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "recovery_codes": {
-          "name": "recovery_codes",
-          "type": "text[]",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "notification_preferences": {
-          "name": "notification_preferences",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'{\"email\":true,\"loginAlerts\":true,\"securityAlerts\":true,\"systemUpdates\":false}'::jsonb"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "CURRENT_TIMESTAMP"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "CURRENT_TIMESTAMP"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "users_email_unique": {
-          "name": "users_email_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
-        }
-      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
