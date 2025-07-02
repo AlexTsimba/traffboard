@@ -288,7 +288,7 @@
     ],
     "metadata": {
       "created": "2025-07-01T22:28:10.873Z",
-      "updated": "2025-07-02T00:52:09.227Z",
+      "updated": "2025-07-02T01:00:29.125Z",
       "description": "Infrastructure refactoring: ESLint flat config, TypeScript, testing, CI/CD, Docker, deployment - 2025 best practices"
     }
   }
