@@ -25,6 +25,7 @@ function DragHandle({ id }: { readonly id: number }) {
 
 export const dragColumn: ColumnDef<{ id: number }> = {
   id: "drag",
+  // eslint-disable-next-line unicorn/no-null
   header: () => null,
   cell: ({ row }) => <DragHandle id={row.original.id} />,
   enableSorting: false,

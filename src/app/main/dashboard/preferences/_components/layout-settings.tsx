@@ -111,7 +111,7 @@ export function LayoutSettings() {
               type="single"
               value={collapsible}
               variant="outline"
-              onValueChange={(value) => handleValueChange("sidebar_collapsible", value)}
+              onValueChange={(value) => void handleValueChange("sidebar_collapsible", value)}
             >
               <ToggleGroupItem aria-label="Icon collapse" className="h-8" value="icon">
                 <div className="text-center">
@@ -147,7 +147,7 @@ export function LayoutSettings() {
               type="single"
               value={variant}
               variant="outline"
-              onValueChange={(value) => handleValueChange("sidebar_variant", value)}
+              onValueChange={(value) => void handleValueChange("sidebar_variant", value)}
             >
               <ToggleGroupItem aria-label="Inset sidebar" className="h-8" value="inset">
                 <div className="text-center">
@@ -186,7 +186,7 @@ export function LayoutSettings() {
               type="single"
               value={contentLayout}
               variant="outline"
-              onValueChange={(value) => handleValueChange("content_layout", value)}
+              onValueChange={(value) => void handleValueChange("content_layout", value)}
             >
               <ToggleGroupItem aria-label="Centered layout" className="h-8" value="centered">
                 <div className="text-center">

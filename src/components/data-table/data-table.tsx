@@ -19,12 +19,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { DraggableRow } from "./draggable-row";
 
 interface DataTableProps<TData, TValue> {
-  table: TanStackTable<TData>;
-  columns: ColumnDef<TData, TValue>[];
-  dndEnabled?: boolean;
-  onReorder?: (newData: TData[]) => void;
+  readonly table: TanStackTable<TData>;
+  readonly columns: ColumnDef<TData, TValue>[];
+  readonly dndEnabled?: boolean;
+  readonly onReorder?: (newData: TData[]) => void;
 }
 
+// eslint-disable-next-line sonarjs/function-return-type
 function renderTableBody<TData, TValue>({
   table,
   columns,
@@ -35,7 +36,7 @@ function renderTableBody<TData, TValue>({
   columns: ColumnDef<TData, TValue>[];
   dndEnabled: boolean;
   dataIds: UniqueIdentifier[];
-}) {
+}): React.ReactNode {
   if (table.getRowModel().rows.length === 0) {
     return (
       <TableRow>
@@ -54,13 +55,17 @@ function renderTableBody<TData, TValue>({
       </SortableContext>
     );
   }
-  return table.getRowModel().rows.map((row) => (
-    <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-      {row.getVisibleCells().map((cell) => (
-        <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+  return (
+    <>
+      {table.getRowModel().rows.map((row) => (
+        <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+          {row.getVisibleCells().map((cell) => (
+            <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+          ))}
+        </TableRow>
       ))}
-    </TableRow>
-  ));
+    </>
+  );
 }
 
 export function DataTable<TData, TValue>({

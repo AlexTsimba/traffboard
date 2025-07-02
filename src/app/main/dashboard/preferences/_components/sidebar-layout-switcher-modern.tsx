@@ -11,18 +11,27 @@ const SIDEBAR_VARIANTS = [
 ];
 
 function setCookie(name: string, value: string) {
-  document.cookie = `${name}=${value}; path=/; SameSite=Lax`;
+  if (typeof document !== "undefined") {
+    // eslint-disable-next-line unicorn/no-document-cookie
+    document.cookie = `${name}=${value}; path=/; SameSite=Lax`;
+  }
+}
+
+function getCookie(name: string): string | undefined {
+  if (typeof document !== "undefined") {
+    return document.cookie
+      .split("; ")
+      .find((row) => row.startsWith(`${name}=`))
+      ?.split("=")[1];
+  }
+  return undefined;
 }
 
 export function SidebarLayoutSwitcherModern() {
   const [selected, setSelected] = useState("sidebar");
 
   useEffect(() => {
-    const value =
-      document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("sidebar_variant="))
-        ?.split("=")[1] ?? "sidebar";
+    const value = getCookie("sidebar_variant") ?? "sidebar";
     setSelected(value);
   }, []);
 

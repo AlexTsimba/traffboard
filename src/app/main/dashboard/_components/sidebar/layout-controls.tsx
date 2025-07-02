@@ -20,20 +20,16 @@ const handleValueChange = async (key: string, value: string) => {
   await setValueToCookie(key, value);
 };
 
+// Move wrapper functions to outer scope
+const handleSidebarVariantChange = (value: string) => {
+  void handleValueChange("sidebar_variant", value);
+};
+
+const handleSidebarCollapsibleChange = (value: string) => {
+  void handleValueChange("sidebar_collapsible", value);
+};
+
 export function LayoutControls({ variant, collapsible, contentLayout }: LayoutControlsProps) {
-  // Create wrapper functions for event handlers
-  const handleSidebarVariantChange = (value: string) => {
-    void handleValueChange("sidebar_variant", value);
-  };
-
-  const handleSidebarCollapsibleChange = (value: string) => {
-    void handleValueChange("sidebar_collapsible", value);
-  };
-
-  const handleContentLayoutChange = (value: string) => {
-    void handleValueChange("content_layout", value);
-  };
-
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -98,7 +94,7 @@ export function LayoutControls({ variant, collapsible, contentLayout }: LayoutCo
                 type="single"
                 value={contentLayout}
                 variant="outline"
-                onValueChange={(value) => handleValueChange("content_layout", value)}
+                onValueChange={(value) => void handleValueChange("content_layout", value)}
               >
                 <ToggleGroupItem aria-label="Toggle centered" className="text-xs" value="centered">
                   Centered

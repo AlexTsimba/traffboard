@@ -140,31 +140,34 @@ export const dashboardColumns: ColumnDef<z.infer<typeof sectionSchema>>[] = [
   {
     accessorKey: "reviewer",
     header: ({ column }) => <DataTableColumnHeader column={column} title="Reviewer" />,
-    cell: ({ row }) => {
+    // eslint-disable-next-line sonarjs/function-return-type
+    cell: ({ row }): React.ReactNode => {
       const isAssigned = row.original.reviewer !== "Assign reviewer";
-
-      if (isAssigned) {
-        return row.original.reviewer;
-      }
 
       return (
         <>
-          <Label className="sr-only" htmlFor={`${row.original.id}-reviewer`}>
-            Reviewer
-          </Label>
-          <Select>
-            <SelectTrigger
-              className="w-38 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate"
-              id={`${row.original.id}-reviewer`}
-              size="sm"
-            >
-              <SelectValue placeholder="Assign reviewer" />
-            </SelectTrigger>
-            <SelectContent align="end">
-              <SelectItem value="Eddie Lake">Eddie Lake</SelectItem>
-              <SelectItem value="Jamik Tashpulatov">Jamik Tashpulatov</SelectItem>
-            </SelectContent>
-          </Select>
+          {isAssigned ? (
+            <span>{row.original.reviewer}</span>
+          ) : (
+            <>
+              <Label className="sr-only" htmlFor={`${row.original.id}-reviewer`}>
+                Reviewer
+              </Label>
+              <Select>
+                <SelectTrigger
+                  className="w-38 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate"
+                  id={`${row.original.id}-reviewer`}
+                  size="sm"
+                >
+                  <SelectValue placeholder="Assign reviewer" />
+                </SelectTrigger>
+                <SelectContent align="end">
+                  <SelectItem value="Eddie Lake">Eddie Lake</SelectItem>
+                  <SelectItem value="Jamik Tashpulatov">Jamik Tashpulatov</SelectItem>
+                </SelectContent>
+              </Select>
+            </>
+          )}
         </>
       );
     },
