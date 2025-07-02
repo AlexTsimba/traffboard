@@ -1,0 +1,162 @@
+name: 🔄 Repository Backup
+run-name: 🔄 Backup Repository by ${{ github.actor }}
+
+on:
+  schedule:
+    # Daily backup at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      backup_type:
+        description: 'Type of backup to perform'
+        required: true
+        default: 'full'
+        type: choice
+        options:
+        - full
+        - config-only
+        - code-only
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  BACKUP_BRANCH: 'backup/automated'
+
+jobs:
+  backup-repository:
+    name: 🔄 Create Repository Backup
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for complete backup
+
+      - name: 🔧 Setup Backup Environment
+        run: |
+          # Configure git for backup operations
+          git config user.name "GitHub Actions Backup"
+          git config user.email "actions@github.com"
+          
+          # Create backup directory
+          mkdir -p .backup
+
+      - name: 📦 Create Configuration Backup
+        if: ${{ github.event.inputs.backup_type == 'full' || github.event.inputs.backup_type == 'config-only' }}
+        run: |
+          echo "Creating configuration backup..."
+          
+          # Backup environment template
+          if [ -f .env.example ]; then
+            cp .env.example .backup/env-template.backup
+          fi
+          
+          # Backup package.json and dependencies info
+          cp package.json .backup/package.backup
+          if [ -f pnpm-lock.yaml ]; then
+            cp pnpm-lock.yaml .backup/pnpm-lock.backup
+          fi
+          
+          # Backup TypeScript and build configs
+          cp tsconfig.json .backup/tsconfig.backup
+          if [ -f next.config.mjs ]; then
+            cp next.config.mjs .backup/next-config.backup
+          fi
+          
+          # Backup linting and formatting configs
+          if [ -f eslint.config.mjs ]; then
+            cp eslint.config.mjs .backup/eslint.backup
+          fi
+          if [ -f commitlint.config.js ]; then
+            cp commitlint.config.js .backup/commitlint.backup
+          fi
+          
+          # Create backup manifest
+          echo "# Configuration Backup Manifest" > .backup/CONFIG_MANIFEST.md
+          echo "Created: $(date -u)" >> .backup/CONFIG_MANIFEST.md
+          echo "Backup Type: ${{ github.event.inputs.backup_type || 'scheduled' }}" >> .backup/CONFIG_MANIFEST.md
+          echo "Commit: ${{ github.sha }}" >> .backup/CONFIG_MANIFEST.md
+          echo "" >> .backup/CONFIG_MANIFEST.md
+          echo "## Files Included:" >> .backup/CONFIG_MANIFEST.md
+          ls -la .backup/ >> .backup/CONFIG_MANIFEST.md
+
+      - name: 📁 Create Source Code Backup
+        if: ${{ github.event.inputs.backup_type == 'full' || github.event.inputs.backup_type == 'code-only' }}
+        run: |
+          echo "Creating source code backup..."
+          
+          # Create compressed archive of source code
+          tar -czf .backup/source-code-$(date +%Y%m%d_%H%M%S).tar.gz \
+            --exclude='.backup' \
+            --exclude='node_modules' \
+            --exclude='.next' \
+            --exclude='coverage' \
+            --exclude='.git' \
+            .
+
+      - name: 📊 Generate Backup Report
+        run: |
+          echo "# Backup Report" > .backup/BACKUP_REPORT.md
+          echo "Generated: $(date -u)" >> .backup/BACKUP_REPORT.md
+          echo "Repository: ${{ github.repository }}" >> .backup/BACKUP_REPORT.md
+          echo "Branch: ${{ github.ref_name }}" >> .backup/BACKUP_REPORT.md
+          echo "Commit: ${{ github.sha }}" >> .backup/BACKUP_REPORT.md
+          echo "Triggered by: ${{ github.actor }}" >> .backup/BACKUP_REPORT.md
+          echo "" >> .backup/BACKUP_REPORT.md
+          
+          echo "## Repository Statistics:" >> .backup/BACKUP_REPORT.md
+          echo "- Total files: $(find . -type f | wc -l)" >> .backup/BACKUP_REPORT.md
+          echo "- Source files: $(find src -name '*.ts' -o -name '*.tsx' -o -name '*.js' -o -name '*.jsx' 2>/dev/null | wc -l)" >> .backup/BACKUP_REPORT.md
+          echo "- Test files: $(find . -name '*.test.*' -o -name '*.spec.*' 2>/dev/null | wc -l)" >> .backup/BACKUP_REPORT.md
+          echo "- Config files: $(find . -maxdepth 1 -name '*.json' -o -name '*.js' -o -name '*.mjs' -o -name '*.ts' | wc -l)" >> .backup/BACKUP_REPORT.md
+          echo "" >> .backup/BACKUP_REPORT.md
+          
+          echo "## Backup Contents:" >> .backup/BACKUP_REPORT.md
+          if [ -d .backup ]; then
+            ls -lah .backup/ >> .backup/BACKUP_REPORT.md
+          fi
+
+      - name: 💾 Store Backup Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: repository-backup-${{ github.run_number }}
+          path: .backup/
+          retention-days: 90
+          compression-level: 9
+
+      - name: 📢 Backup Summary
+        run: |
+          echo "## 🔄 Backup Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Repository:** ${{ github.repository }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Type:** ${{ github.event.inputs.backup_type || 'scheduled' }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Created:** $(date -u)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📦 Backup Artifacts Created:" >> $GITHUB_STEP_SUMMARY
+          if [ -d .backup ]; then
+            echo "- Configuration files backup" >> $GITHUB_STEP_SUMMARY
+            if [ -f .backup/source-code-*.tar.gz ]; then
+              echo "- Source code archive" >> $GITHUB_STEP_SUMMARY
+            fi
+            echo "- Backup manifest and report" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Backup completed successfully!**" >> $GITHUB_STEP_SUMMARY
+
+  # Future: Add backup to DigitalOcean Spaces when implemented
+  # backup-to-spaces:
+  #   name: 🌊 Upload to DigitalOcean Spaces
+  #   runs-on: ubuntu-latest
+  #   needs: backup-repository
+  #   if: success()
+  #   steps:
+  #     - name: Upload to Spaces
+  #       run: |
+  #         # Configure s3cmd for DigitalOcean Spaces
+  #         # Upload backup artifacts to secure storage 

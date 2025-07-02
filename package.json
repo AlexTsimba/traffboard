@@ -18,6 +18,8 @@
     "typecheck": "tsc --noEmit",
     "commitlint": "commitlint --edit",
     "commitlint:last": "commitlint --from HEAD~1 --to HEAD --verbose",
+    "backup": "scripts/backup-local.sh",
+    "backup:clean": "ls -t backups/*.tar.gz 2>/dev/null | tail -n +6 | xargs rm -f || echo 'No old backups to clean'",
     "setup:branch-protection": "node .github/branch-protection/setup-branch-protection.js",
     "setup:branch-protection:dry-run": "node .github/branch-protection/setup-branch-protection.js --dry-run",
     "setup:branch-protection:force": "node .github/branch-protection/setup-branch-protection.js --force"
