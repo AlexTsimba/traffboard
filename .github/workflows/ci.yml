@@ -1,71 +1,46 @@
-name: 🧪 CI/CD Pipeline
-run-name: 🚀 ${{ github.actor }} testing CI/CD Pipeline
+name: 🚀 CI/CD Pipeline
+run-name: 🚀 ${{ github.actor }} - ${{ github.ref_name }}
 
 on:
   push:
     branches: 
       - main
-      - master
       - develop
-      - staging
       - refactor/*
       - feature/*
       - fix/*
-      - hotfix/*
   pull_request:
     branches: 
       - main
-      - master
       - develop
   workflow_dispatch:
 
-# Global permissions for security
 permissions:
   contents: read
   actions: read
   checks: write
   pull-requests: write
-  issues: write
   security-events: write
-  id-token: write  # OIDC support
 
-# Performance and resource management
 env:
   PNPM_VERSION: '9'
   CI: true
   FORCE_COLOR: 3
-  NPM_CONFIG_PROGRESS: false
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-# Concurrency management
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  test:
-    name: 🧪 Test (Node ${{ matrix.node }} on ${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 30
+  # Main CI job - Ubuntu + Node 20.x (primary development environment)
+  ci:
+    name: 🧪 CI (Ubuntu + Node 20.x)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
     
-    strategy:
-      fail-fast: false
-      matrix:
-        node: ['20.x']
-        os: ['ubuntu-latest']
-
     steps:
-      - name: 🔒 Harden GitHub Actions Runner
-        run: |
-          set -euo pipefail
-          echo "🔒 Hardening runner environment..."
-          sudo apt-get update -qq && sudo apt-get install -y curl unzip
-          
-      - name: 📥 Checkout repository
+      - name: 📥 Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          persist-credentials: false
 
       - name: 📦 Setup pnpm
         uses: pnpm/action-setup@v4
@@ -73,20 +48,126 @@ jobs:
           version: ${{ env.PNPM_VERSION }}
           run_install: false
 
-      - name: 🚀 Setup Node.js ${{ matrix.node }}
+      - name: 🚀 Setup Node.js 20.x
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node }}
+          node-version: '20.x'
           cache: 'pnpm'
 
       - name: 🔨 Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: 📋 Lint check
+        run: pnpm lint
+
+      - name: 🔍 Type check
+        run: pnpm typecheck
+
       - name: 🧪 Run tests
         run: pnpm test:run
-        
-      - name: 📋 Run ESLint
-        run: pnpm lint
-        
-      - name: 🔍 TypeScript check
-        run: pnpm typecheck 
+
+      - name: 🏗️ Build check
+        run: pnpm build
+
+  # Cross-platform compatibility check (only for main/develop branches)
+  compatibility:
+    name: 🔄 Compatibility (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest]
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false
+
+      - name: 🚀 Setup Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'pnpm'
+
+      - name: 🔨 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🧪 Quick test
+        run: pnpm test:run
+
+      - name: 🏗️ Build check
+        run: pnpm build
+
+  # Security scan (runs in parallel)
+  security:
+    name: 🔒 Security Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false
+
+      - name: 🚀 Setup Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'pnpm'
+
+      - name: 🔨 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔍 Dependency audit
+        run: pnpm audit --audit-level moderate
+        continue-on-error: true
+
+  # Pre-deployment check (only for main branch - ready for DO deployment)
+  pre-deploy:
+    name: 🚀 Pre-deployment Check
+    runs-on: ubuntu-latest
+    needs: [ci, security]
+    if: github.ref == 'refs/heads/main'
+    timeout-minutes: 10
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false
+
+      - name: 🚀 Setup Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'pnpm'
+
+      - name: 🔨 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🏗️ Production build
+        run: pnpm build
+        env:
+          NODE_ENV: production
+
+      - name: ✅ Ready for DigitalOcean deployment
+        run: |
+          echo "🎉 Build successful! Ready for DigitalOcean deployment."
+          echo "Build artifacts are ready for production deployment." 
