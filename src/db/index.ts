@@ -6,7 +6,24 @@
  */
 
 // Database connection and instance
-export { db, pool, checkDatabaseHealth, closeDatabaseConnection, getDatabaseInfo } from "./connection";
+export { 
+  db, 
+  pool, 
+  checkDatabaseHealth, 
+  closeDatabaseConnection, 
+  getDatabaseInfo,
+  executeWithRetry,
+  getConnectionMetrics,
+} from "./connection";
+
+// Database monitoring utilities
+export { 
+  monitorDatabase, 
+  startDatabaseMonitoring, 
+  formatMonitoringResult, 
+  troubleshootConnection,
+  type DatabaseMonitoringResult,
+} from "./utils/monitoring";
 
 // Database configuration
 export {

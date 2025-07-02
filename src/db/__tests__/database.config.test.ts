@@ -97,7 +97,113 @@ describe("Database Configuration", () => {
         timeout: 5000,
         retries: 3,
         retryDelay: 1000,
+        checkInterval: 30000,
       });
+    });
+  });
+});
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+
+describe("Enhanced Database Configuration", () => {
+  let originalEnv: NodeJS.ProcessEnv;
+
+  beforeEach(() => {
+    originalEnv = { ...process.env };
+    // Clear all module caches to test re-imports
+    vi.resetModules();
+  });
+
+  afterEach(() => {
+    process.env = originalEnv;
+    vi.restoreAllMocks();
+  });
+
+  describe("Enhanced URL validation", () => {
+    it("should accept valid PostgreSQL URLs", async () => {
+      process.env.DATABASE_URL = "postgresql://user:pass@localhost:5432/testdb";
+      
+      await expect(async () => {
+        await import("@/config/database");
+      }).not.toThrow();
+    });
+
+    it("should accept postgres:// protocol", async () => {
+      process.env.DATABASE_URL = "postgres://user:pass@localhost:5432/testdb";
+      
+      await expect(async () => {
+        await import("@/config/database");
+      }).not.toThrow();
+    });
+
+    it("should reject MySQL URLs", async () => {
+      process.env.DATABASE_URL = "mysql://user:pass@localhost:3306/testdb";
+      
+      await expect(async () => {
+        await import("@/config/database");
+      }).rejects.toThrow();
+    });
+
+    it("should reject invalid URLs", async () => {
+      process.env.DATABASE_URL = "not-a-valid-url";
+      
+      await expect(async () => {
+        await import("@/config/database");
+      }).rejects.toThrow();
+    });
+  });
+
+  describe("Enhanced pool configuration parsing", () => {
+    it("should handle invalid numeric values gracefully", async () => {
+      process.env.DATABASE_URL = "postgresql://user:pass@localhost:5432/testdb";
+      process.env.DB_POOL_MAX = "not-a-number";
+      process.env.DB_POOL_IDLE_TIMEOUT = "invalid";
+      process.env.DB_POOL_CONNECT_TIMEOUT = "NaN";
+
+      const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+      
+      const { databaseConfig } = await import("@/config/database");
+      
+      expect(databaseConfig.poolMax).toBe(10); // default
+      expect(databaseConfig.poolIdleTimeout).toBe(60); // default 
+      expect(databaseConfig.poolConnectTimeout).toBe(30); // default
+      expect(consoleSpy).toHaveBeenCalledWith("⚠️ Invalid pool configuration, using defaults");
+      
+      consoleSpy.mockRestore();
+    });
+
+    it("should use custom values when valid", async () => {
+      process.env.DATABASE_URL = "postgresql://user:pass@localhost:5432/testdb";
+      process.env.DB_POOL_MAX = "25";
+      process.env.DB_POOL_IDLE_TIMEOUT = "90";
+      process.env.DB_POOL_CONNECT_TIMEOUT = "20";
+      
+      const { databaseConfig } = await import("@/config/database");
+      
+      expect(databaseConfig.poolMax).toBe(25);
+      expect(databaseConfig.poolIdleTimeout).toBe(90);
+      expect(databaseConfig.poolConnectTimeout).toBe(20);
+    });
+  });
+
+  describe("Enhanced test configuration", () => {
+    it("should have optimized test settings", async () => {
+      const { testDatabaseConfig } = await import("@/config/database");
+      
+      expect(testDatabaseConfig.poolMax).toBe(5);
+      expect(testDatabaseConfig.poolIdleTimeout).toBe(30);
+      expect(testDatabaseConfig.poolConnectTimeout).toBe(15);
+      expect(testDatabaseConfig.url).toContain("traffboard_test");
+    });
+  });
+
+  describe("Enhanced health check configuration", () => {
+    it("should include periodic check interval", async () => {
+      const { healthCheckConfig } = await import("@/config/database");
+      
+      expect(healthCheckConfig.timeout).toBe(5000);
+      expect(healthCheckConfig.retries).toBe(3);
+      expect(healthCheckConfig.retryDelay).toBe(1000);
+      expect(healthCheckConfig.checkInterval).toBe(30000);
     });
   });
 });
