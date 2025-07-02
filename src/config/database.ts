@@ -26,7 +26,7 @@ function parsePoolConfig() {
     const poolConnectTimeout = Number.parseInt(process.env.DB_POOL_CONNECT_TIMEOUT ?? "30");
 
     // Check for NaN values and return defaults if invalid
-    if (isNaN(poolMax) || isNaN(poolIdleTimeout) || isNaN(poolConnectTimeout)) {
+    if (Number.isNaN(poolMax) || Number.isNaN(poolIdleTimeout) || Number.isNaN(poolConnectTimeout)) {
       console.warn("⚠️ Invalid pool configuration, using defaults");
       return {
         poolMax: 10,
@@ -40,7 +40,7 @@ function parsePoolConfig() {
       poolIdleTimeout,
       poolConnectTimeout,
     };
-  } catch (error) {
+  } catch {
     console.warn("⚠️ Invalid pool configuration, using defaults");
     return {
       poolMax: 10,
@@ -83,5 +83,5 @@ export const healthCheckConfig = {
   timeout: 5000, // 5 seconds
   retries: 3,
   retryDelay: 1000, // 1 second
-  checkInterval: 30000, // 30 seconds for periodic health checks
+  checkInterval: 30_000, // 30 seconds for periodic health checks
 };

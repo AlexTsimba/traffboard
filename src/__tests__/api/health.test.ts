@@ -25,7 +25,13 @@ describe("/api/health", () => {
     const { GET } = await import("@/app/api/health/route");
 
     const response = await GET();
-    const data = await response.json();
+    const data = (await response.json()) as {
+      status: string;
+      checks: {
+        database: { status: string; latency: number };
+        server: string;
+      };
+    };
 
     expect(response.status).toBe(200);
     expect(data.status).toBe("healthy");
@@ -45,7 +51,12 @@ describe("/api/health", () => {
     const { GET } = await import("@/app/api/health/route");
 
     const response = await GET();
-    const data = await response.json();
+    const data = (await response.json()) as {
+      status: string;
+      checks: {
+        database: { status: string; error: string };
+      };
+    };
 
     expect(response.status).toBe(503);
     expect(data.status).toBe("degraded");
@@ -61,7 +72,14 @@ describe("/api/health", () => {
     const { GET } = await import("@/app/api/health/route");
 
     const response = await GET();
-    const data = await response.json();
+    const data = (await response.json()) as {
+      status: string;
+      error: string;
+      checks: {
+        server: string;
+        database: string;
+      };
+    };
 
     expect(response.status).toBe(503);
     expect(data.status).toBe("unhealthy");
@@ -81,7 +99,15 @@ describe("/api/health", () => {
     const { GET } = await import("@/app/api/health/route");
 
     const response = await GET();
-    const data = await response.json();
+    const data = (await response.json()) as {
+      checks: {
+        memory: {
+          used: number;
+          total: number;
+          percentage: number;
+        };
+      };
+    };
 
     expect(data.checks.memory).toBeDefined();
     expect(data.checks.memory.used).toBeDefined();
@@ -101,7 +127,14 @@ describe("/api/health", () => {
     const { GET } = await import("@/app/api/health/route");
 
     const response = await GET();
-    const data = await response.json();
+    const data = (await response.json()) as {
+      status: string;
+      timestamp: string;
+      uptime: number;
+      environment: string;
+      version: string;
+      checks: Record<string, unknown>;
+    };
 
     expect(data).toHaveProperty("status");
     expect(data).toHaveProperty("timestamp");

@@ -23,7 +23,7 @@ vi.mock("@/db/connection", () => ({
     totalConnections: 10,
     activeConnections: 5,
   }),
-  executeWithRetry: vi.fn().mockImplementation((fn) => fn()),
+  executeWithRetry: vi.fn().mockImplementation((fn: () => unknown) => fn()),
 }));
 
 vi.mock("@/config/database", () => ({
@@ -31,7 +31,7 @@ vi.mock("@/config/database", () => ({
     timeout: 5000,
     retries: 3,
     retryDelay: 1000,
-    checkInterval: 30000,
+    checkInterval: 30_000,
   },
 }));
 
@@ -94,7 +94,7 @@ describe("Database Monitoring Utilities", () => {
           },
         },
         metrics: {
-          environment: "test",
+          environment: "test" as const,
           poolMax: 10,
           poolIdleTimeout: 60,
           poolConnectTimeout: 30,
@@ -174,21 +174,41 @@ describe("Database Monitoring Utilities", () => {
 
   describe("startDatabaseMonitoring", () => {
     it("should start periodic monitoring", async () => {
+      // Reset and setup mocks for this test
+      vi.clearAllMocks();
+
+      const { checkDatabaseHealth, getConnectionMetrics } = await import("@/db/connection");
+      vi.mocked(checkDatabaseHealth).mockResolvedValue({
+        status: "healthy",
+        latency: 50,
+        connectionInfo: {
+          poolSize: 10,
+          idleConnections: 5,
+          activeConnections: 5,
+        },
+      });
+
+      vi.mocked(getConnectionMetrics).mockReturnValue({
+        environment: "test",
+        poolMax: 10,
+        poolIdleTimeout: 60,
+        poolConnectTimeout: 30,
+        idleConnections: 5,
+        totalConnections: 10,
+        activeConnections: 5,
+      });
+
       const { startDatabaseMonitoring } = await import("@/db/utils/monitoring");
 
       const onResult = vi.fn();
       const cleanup = startDatabaseMonitoring(100, onResult); // Very short interval for testing
 
-      // Wait for the monitoring to execute at least once
-      await vi.waitFor(
-        () => {
-          expect(onResult).toHaveBeenCalled();
-        },
-        { timeout: 1000 },
-      );
+      // Advance timers to trigger the interval
+      await vi.advanceTimersByTimeAsync(200); // Advance past the 100ms interval
 
+      expect(onResult).toHaveBeenCalled();
       cleanup();
-    }, 15000); // Extended timeout for this test
+    });
 
     it("should return cleanup function", async () => {
       const { startDatabaseMonitoring } = await import("@/db/utils/monitoring");
@@ -198,7 +218,9 @@ describe("Database Monitoring Utilities", () => {
       expect(typeof cleanup).toBe("function");
 
       // Should not throw when called
-      expect(() => cleanup()).not.toThrow();
+      expect(() => {
+        cleanup();
+      }).not.toThrow();
     });
   });
 });

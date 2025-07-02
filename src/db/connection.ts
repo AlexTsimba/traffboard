@@ -54,7 +54,7 @@ function createPool() {
 /**
  * Create Drizzle ORM instance with proper error handling
  */
-function createDatabase() {
+function _createDatabase() {
   try {
     const pool = createPool();
 
@@ -167,12 +167,8 @@ export async function closeDatabaseConnection(): Promise<void> {
 /**
  * Execute database operation with retry logic
  */
-export async function executeWithRetry<T>(
-  operation: () => Promise<T>,
-  maxRetries: number = 3,
-  baseDelay: number = 1000,
-): Promise<T> {
-  let lastError: Error;
+export async function executeWithRetry<T>(operation: () => Promise<T>, maxRetries = 3, baseDelay = 1000): Promise<T> {
+  let lastError: Error = new Error("Unknown error");
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
@@ -192,7 +188,7 @@ export async function executeWithRetry<T>(
     }
   }
 
-  throw lastError!;
+  throw lastError;
 }
 
 /**
