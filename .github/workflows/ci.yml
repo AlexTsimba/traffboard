@@ -1,4 +1,4 @@
-name: 🚀 CI/CD Pipeline
+name: Build & Test
 run-name: 🚀 ${{ github.actor }} - ${{ github.ref_name }}
 
 on:
