@@ -63,8 +63,8 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const { conclusion, workflow_name, branch, commit, actor, run_url } = 
-              ${{ toJson(steps.workflow-result.outputs) }};
+            const outputs = ${{ toJson(steps.workflow-result.outputs) }};
+            const { conclusion, workflow_name, branch, commit, actor, run_url } = outputs;
             
             const statusEmoji = "${{ steps.workflow-result.outputs.status_emoji }}";
             const statusMessage = "${{ steps.workflow-result.outputs.status_message }}";
@@ -116,8 +116,8 @@ jobs:
 
       # Slack notification (optional - requires SLACK_WEBHOOK_URL secret)
       - name: 📱 Slack Notification
-        if: env.SLACK_WEBHOOK_URL != ''
         uses: 8398a7/action-slack@v3
+        continue-on-error: true
         with:
           status: ${{ steps.workflow-result.outputs.conclusion }}
           channel: '#ci-cd'
@@ -137,8 +137,9 @@ jobs:
 
       # Email notification (optional - requires EMAIL setup)
       - name: 📧 Email Notification on Failure
-        if: steps.workflow-result.outputs.conclusion == 'failure' && env.SMTP_SERVER != ''
+        if: steps.workflow-result.outputs.conclusion == 'failure'
         uses: dawidd6/action-send-mail@v3
+        continue-on-error: true
         with:
           server_address: ${{ secrets.SMTP_SERVER }}
           server_port: ${{ secrets.SMTP_PORT }}

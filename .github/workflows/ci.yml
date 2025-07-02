@@ -34,7 +34,7 @@ concurrency:
 jobs:
   # Main CI job - Ubuntu + Node 20.x (primary development environment)
   ci:
-    name: 🧪 CI (Ubuntu + Node 20.x)
+    name: Build & Test
     runs-on: ubuntu-latest
     timeout-minutes: 15
     

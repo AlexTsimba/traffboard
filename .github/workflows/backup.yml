@@ -2,9 +2,9 @@ name: 🔄 Repository Backup
 run-name: 🔄 Backup Repository by ${{ github.actor }}
 
 on:
-  schedule:
-    # Daily backup at 2 AM UTC
-    - cron: '0 2 * * *'
+  # schedule:
+  #   # Daily backup at 2 AM UTC
+  #   - cron: '0 2 * * *'
   workflow_dispatch:
     inputs:
       backup_type:
