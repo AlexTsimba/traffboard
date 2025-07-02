@@ -1,0 +1,16 @@
+date,source,campaign,device,country,clicks,impressions,conversions,cost,revenue
+2024-01-15,Facebook,Winter Sale iOS,mobile,US,1250,4500,45,125.50,1125.75
+2024-01-15,Google,Search Brand,desktop,US,890,2340,32,89.25,896.80
+2024-01-15,TikTok,Gen Z Campaign,mobile,CA,2100,8900,67,210.30,1876.25
+2024-01-16,Facebook,Winter Sale Android,mobile,US,1340,4890,48,134.75,1248.90
+2024-01-16,Instagram,Stories Campaign,mobile,UK,1560,5670,52,156.80,1456.20
+2024-01-16,YouTube,Video Ads,desktop,DE,980,3200,35,98.45,945.30
+2024-01-17,LinkedIn,B2B Professional,desktop,CA,760,1890,28,76.20,812.40
+2024-01-17,Twitter,Promoted Tweets,mobile,AU,1120,3780,42,112.45,1089.60
+2024-01-17,Snapchat,AR Filter,mobile,FR,1450,5230,38,145.60,1034.75
+2024-01-18,Pinterest,Shopping Pins,desktop,NL,890,2670,29,89.75,823.50
+2024-01-18,Reddit,Community Ads,desktop,SE,1230,3890,34,123.80,956.80
+2024-01-18,Facebook,Retargeting,mobile,US,2340,7890,89,234.70,2456.80
+2024-01-19,Google,Display Network,mobile,UK,1680,5430,56,168.50,1567.90
+2024-01-19,TikTok,Spark Ads,mobile,DE,1890,6780,63,189.45,1789.25
+2024-01-19,Instagram,Reels Campaign,mobile,CA,2100,7210,71,210.80,2034.60

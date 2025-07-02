@@ -62,14 +62,69 @@
         "id": 2,
         "title": "Database Setup and Models Implementation",
         "description": "Set up the database connection and implement the data models using Drizzle ORM.",
-        "details": "1. Install and configure Drizzle ORM with PostgreSQL adapter\n2. Set up connection to PostgreSQL database\n3. Implement the following schemas using Drizzle:\n   - users table:\n     * id: serial primary key\n     * email: varchar(255) unique not null\n     * passwordHash: text not null\n     * role: varchar(50) default 'user' not null\n     * totpSecret: text\n     * createdAt: timestamp default now() not null\n   - conversions table:\n     * id: serial primary key\n     * date: date not null\n     * partnerId: varchar(100) not null\n     * campaignId: varchar(100) not null\n     * clicks: integer default 0 not null\n     * registrations: integer default 0 not null\n     * revenue: decimal(10,2) default 0 not null\n     * createdAt: timestamp default now() not null\n4. Set up migrations using drizzle-kit\n5. Create seed data for testing purposes\n6. Implement database utility functions for common operations",
+        "details": "1. Install and configure Drizzle ORM with PostgreSQL adapter\n2. Set up connection to PostgreSQL database\n3. Implement the following schemas using Drizzle:\n   - users table:\n     * id: serial primary key\n     * email: varchar(255) unique not null\n     * passwordHash: text not null\n     * role: varchar(50) default 'user' not null\n     * totpSecret: text\n     * createdAt: timestamp default now() not null\n   - conversions table:\n     * id: serial primary key\n     * date: date not null\n     * partnerId: varchar(100) not null\n     * campaignId: varchar(100) not null\n     * clicks: integer default 0 not null\n     * registrations: integer default 0 not null\n     * revenue: decimal(10,2) default 0 not null\n     * createdAt: timestamp default now() not null\n4. Set up migrations using drizzle-kit\n5. Create seed data for testing purposes\n6. Implement database utility functions for common operations\n<info added on 2025-07-02T15:44:00.714Z>\n## CRITICAL REQUIREMENTS\n\n**Testing & Quality Gates:**\n- Every subtask must be tested locally before completion\n- Every subtask must pass GitHub Actions workflow (build, lint, tests)  \n- NO subtask marked \"done\" without successful local + CI tests\n\n**Commit Strategy:**\n- ONE commit per subtask (not per task)\n- Commit naming: \"feat(database): implement subtask description - refs task 2.X\"\n- Each commit must be atomic and pass all quality checks\n\n**Workflow per Subtask:**\n1. Implement subtask\n2. Run `pnpm build` locally (must pass)\n3. Run `pnpm test` locally (must pass)  \n4. Run `pnpm lint` locally (must pass)\n5. Commit with correct naming convention\n6. Push to feature branch\n7. Verify GitHub Actions passes\n8. Only then mark subtask as \"done\"\n\n**Updated Schema Requirements:**\n- Add user_sessions table:\n  * id: serial primary key\n  * userId: integer references users(id)\n  * deviceInfo: text not null\n  * lastActive: timestamp default now() not null\n  * isRevoked: boolean default false not null\n  * createdAt: timestamp default now() not null\n\n- Add conversion_uploads table:\n  * id: serial primary key\n  * filename: varchar(255) not null\n  * uploadedBy: integer references users(id)\n  * recordCount: integer not null\n  * status: varchar(50) default 'pending' not null\n  * processedAt: timestamp\n  * createdAt: timestamp default now() not null\n\n- PII data exclusion: Ensure no emails or personal identifiable information in database\n- Computed fields excluded (cr/cftd/cd/rftd calculated on demand)\n\n**Environment Configuration:**\n- Development: Local PostgreSQL\n- Testing: SQLite in-memory for unit tests\n- Production: DigitalOcean PostgreSQL\n</info added on 2025-07-02T15:44:00.714Z>",
         "testStrategy": "1. Verify database connection\n2. Run and test migrations\n3. Validate schema creation\n4. Test seed data insertion\n5. Write unit tests for database utility functions\n6. Ensure proper error handling for database operations",
         "priority": "high",
         "dependencies": [
           1
         ],
-        "status": "pending",
-        "subtasks": []
+        "status": "in-progress",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Setup Drizzle ORM Configuration",
+            "description": "Configure Drizzle ORM with PostgreSQL and create basic project structure",
+            "details": "- Create drizzle.config.ts with PostgreSQL connection\n- Set up database configuration in src/config/database.ts\n- Create basic folder structure: src/db/schema/, src/db/migrations/\n- Configure environment variables for database connection\n- Test basic connection to PostgreSQL\n\nCOMMIT: \"feat(database): setup drizzle orm configuration - refs task 2.1\"\n<info added on 2025-07-02T15:50:11.999Z>\n**Implementation Details:**\n\n- Created directory structure with `/src/db/`, `/src/db/schema/`, and `/src/db/migrations/`\n- Implemented configuration files:\n  - `drizzle.config.ts` with PostgreSQL dialect\n  - `src/config/database.ts` with environment-based config and Zod validation\n  - `src/db/connection.ts` using singleton pattern with connection pooling\n  - `src/db/index.ts` for database module exports\n- Set up environment configuration:\n  - `.env.example` template with required variables\n  - `.env.local` for local development\n- Enhanced health check system:\n  - Updated `src/app/api/health/route.ts` with database connectivity checks\n  - Added latency monitoring and error reporting\n- Implemented key features:\n  - Connection pooling with configurable pool size\n  - Singleton pattern to prevent multiple connections during hot reload\n  - Environment validation using Zod schema\n  - Health monitoring with latency tracking\n  - Multi-environment support (development, test, production)\n- Ready for quality gate testing (requires PostgreSQL instance)\n</info added on 2025-07-02T15:50:11.999Z>\n<info added on 2025-07-02T16:00:41.604Z>\n**Test Implementation Details:**\n\n- Created comprehensive test suite with 27 unit and integration tests\n- Implemented test files:\n  - `src/db/__tests__/database.config.test.ts` - Configuration validation (9 tests)\n  - `src/db/__tests__/connection.test.ts` - Connection and health checks (8 tests)\n  - `src/db/__tests__/index.test.ts` - Module exports validation (5 tests)\n  - `src/__tests__/api/health.test.ts` - Health API integration tests (5 tests)\n- Followed TDD methodology:\n  1. Created failing tests first\n  2. Implemented code to pass tests\n  3. Refactored for improved reliability\n- Test coverage includes:\n  - Database configuration parsing and validation\n  - Environment detection and pool settings\n  - Health check functionality and API responses\n  - Error handling scenarios with mocks\n  - Environment variable validation and URL masking\n- Quality verification completed:\n  - All tests passing\n  - Build successful\n  - Linting clean\n- Updated documentation with TDD requirements\n- Established testing pattern for future database-related subtasks\n</info added on 2025-07-02T16:00:41.604Z>",
+            "status": "in-progress",
+            "dependencies": [],
+            "parentTaskId": 2
+          },
+          {
+            "id": 2,
+            "title": "Create Database Schema Definitions",
+            "description": "Define all database tables using Drizzle schema",
+            "details": "- Create src/db/schema/users.ts with users table\n- Create src/db/schema/sessions.ts with sessions and user_sessions tables\n- Create src/db/schema/conversions.ts with conversions and conversion_uploads tables\n- Create src/db/schema/index.ts to export all schemas\n- Include proper TypeScript types and relationships\n- Ensure PII exclusion and no computed fields in schema\n\nCOMMIT: \"feat(database): create drizzle schema definitions - refs task 2.2\"",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 2
+          },
+          {
+            "id": 3,
+            "title": "Setup Migration System",
+            "description": "Configure and test database migration system with drizzle-kit",
+            "details": "- Configure drizzle-kit for migrations generation\n- Create initial migration from schema\n- Test migration system with development database\n- Update package.json scripts (db:generate, db:migrate, db:push, db:studio)\n- Validate migration rollback capability\n- Document migration process\n\nCOMMIT: \"feat(database): setup migration system with drizzle-kit - refs task 2.3\"",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 2
+          },
+          {
+            "id": 4,
+            "title": "Create Database Utility Functions",
+            "description": "Implement database connection and utility functions",
+            "details": "- Create src/db/connection.ts with database connection logic\n- Implement connection pooling and error handling\n- Create src/db/utils.ts with common database operations\n- Add database health check function\n- Implement proper connection cleanup\n- Add TypeScript types for database operations\n\nCOMMIT: \"feat(database): create database utility functions - refs task 2.4\"",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 2
+          },
+          {
+            "id": 5,
+            "title": "Create Seed Data System",
+            "description": "Implement database seeding with demo data for testing",
+            "details": "- Create src/db/seed.ts with seeding logic\n- Load demo data from src/data/demo/ CSV files\n- Parse and clean CSV data (exclude PII, computed fields)\n- Create seed users with different roles\n- Create sample conversions and uploads data\n- Add npm script: db:seed\n- Ensure idempotent seeding (can run multiple times)\n\nCOMMIT: \"feat(database): create seed data system with demo data - refs task 2.5\"",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 2
+          },
+          {
+            "id": 6,
+            "title": "Create Database Tests",
+            "description": "Implement comprehensive database testing suite",
+            "details": "- Create src/__tests__/db/ directory for database tests\n- Implement unit tests for schema validation\n- Create integration tests for database operations\n- Set up in-memory SQLite for fast unit tests\n- Test seed data loading and validation\n- Test migration up/down scenarios\n- Add database connection health checks tests\n- Ensure all tests pass before marking task complete\n\nCOMMIT: \"feat(database): create comprehensive database test suite - refs task 2.6\"",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 2
+          }
+        ]
       },
       {
         "id": 3,
@@ -165,7 +220,7 @@
     ],
     "metadata": {
       "created": "2025-07-01T22:28:10.873Z",
-      "updated": "2025-07-02T08:31:38.095Z",
+      "updated": "2025-07-02T15:46:29.943Z",
       "description": "Tasks for master context"
     }
   }

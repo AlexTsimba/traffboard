@@ -1,16 +1,26 @@
 import { NextResponse } from "next/server";
 
-export function GET() {
+import { checkDatabaseHealth } from "@/db";
+
+export async function GET() {
   try {
+    // Database health check
+    const dbHealth = await checkDatabaseHealth();
+
     // Basic health checks
     const health = {
-      status: "healthy",
+      status: dbHealth.status === "healthy" ? "healthy" : "degraded",
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
       environment: process.env.NODE_ENV,
       version: process.env.npm_package_version ?? "1.0.0",
       checks: {
         server: "ok",
+        database: {
+          status: dbHealth.status,
+          latency: dbHealth.latency,
+          ...(dbHealth.error && { error: dbHealth.error }),
+        },
         memory: {
           used: process.memoryUsage().heapUsed,
           total: process.memoryUsage().heapTotal,
@@ -19,7 +29,10 @@ export function GET() {
       },
     };
 
-    return NextResponse.json(health, { status: 200 });
+    // Return 503 if database is unhealthy
+    const statusCode = dbHealth.status === "healthy" ? 200 : 503;
+
+    return NextResponse.json(health, { status: statusCode });
   } catch (error) {
     console.error("Health check failed:", error);
 
@@ -28,6 +41,10 @@ export function GET() {
         status: "unhealthy",
         timestamp: new Date().toISOString(),
         error: error instanceof Error ? error.message : "Unknown error",
+        checks: {
+          server: "error",
+          database: "error",
+        },
       },
       { status: 503 },
     );
