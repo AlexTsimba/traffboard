@@ -1,5 +1,5 @@
 {
-  "id": "c3dcdce4-57ea-41fa-a89a-f7995129bc06",
+  "id": "e76493ec-0f0e-4702-9569-3cb26a984264",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -113,7 +113,110 @@
           "default": "CURRENT_TIMESTAMP"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_conversion_uploads_user_id": {
+          "name": "idx_conversion_uploads_user_id",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_conversion_uploads_status": {
+          "name": "idx_conversion_uploads_status",
+          "columns": [
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_conversion_uploads_file_type": {
+          "name": "idx_conversion_uploads_file_type",
+          "columns": [
+            {
+              "expression": "file_type",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_conversion_uploads_uploaded_at": {
+          "name": "idx_conversion_uploads_uploaded_at",
+          "columns": [
+            {
+              "expression": "uploaded_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_conversion_uploads_user_status": {
+          "name": "idx_conversion_uploads_user_status",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_conversion_uploads_user_type": {
+          "name": "idx_conversion_uploads_user_type",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "file_type",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "conversion_uploads_user_id_users_id_fk": {
           "name": "conversion_uploads_user_id_users_id_fk",
@@ -132,7 +235,28 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
-      "checkConstraints": {},
+      "checkConstraints": {
+        "chk_conversion_uploads_valid_status": {
+          "name": "chk_conversion_uploads_valid_status",
+          "value": "\n        \"conversion_uploads\".\"status\" IN ('pending', 'processing', 'completed', 'failed')\n      "
+        },
+        "chk_conversion_uploads_valid_file_type": {
+          "name": "chk_conversion_uploads_valid_file_type",
+          "value": "\n        \"conversion_uploads\".\"file_type\" IN ('player_data', 'traffic_report')\n      "
+        },
+        "chk_conversion_uploads_positive_file_size": {
+          "name": "chk_conversion_uploads_positive_file_size",
+          "value": "\n        \"conversion_uploads\".\"file_size\" > 0\n      "
+        },
+        "chk_conversion_uploads_positive_rows": {
+          "name": "chk_conversion_uploads_positive_rows",
+          "value": "\n        \"conversion_uploads\".\"total_rows\" >= 0 AND \n        \"conversion_uploads\".\"processed_rows\" >= 0 AND \n        \"conversion_uploads\".\"error_rows\" >= 0\n      "
+        },
+        "chk_conversion_uploads_row_logic": {
+          "name": "chk_conversion_uploads_row_logic",
+          "value": "\n        \"conversion_uploads\".\"processed_rows\" + \"conversion_uploads\".\"error_rows\" <= \"conversion_uploads\".\"total_rows\"\n      "
+        }
+      },
       "isRLSEnabled": false
     },
     "public.player_data": {
@@ -385,7 +509,131 @@
           "default": "CURRENT_TIMESTAMP"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_player_data_upload_id": {
+          "name": "idx_player_data_upload_id",
+          "columns": [
+            {
+              "expression": "upload_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_player_data_date": {
+          "name": "idx_player_data_date",
+          "columns": [
+            {
+              "expression": "date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_player_data_partner_campaign": {
+          "name": "idx_player_data_partner_campaign",
+          "columns": [
+            {
+              "expression": "partner_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "campaign_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_player_data_date_partner": {
+          "name": "idx_player_data_date_partner",
+          "columns": [
+            {
+              "expression": "date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "partner_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_player_data_player_id": {
+          "name": "idx_player_data_player_id",
+          "columns": [
+            {
+              "expression": "player_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_player_data_country": {
+          "name": "idx_player_data_country",
+          "columns": [
+            {
+              "expression": "player_country",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "unique_player_per_upload": {
+          "name": "unique_player_per_upload",
+          "columns": [
+            {
+              "expression": "upload_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "player_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "player_data_upload_id_conversion_uploads_id_fk": {
           "name": "player_data_upload_id_conversion_uploads_id_fk",
@@ -404,7 +652,20 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
-      "checkConstraints": {},
+      "checkConstraints": {
+        "chk_player_data_positive_amounts": {
+          "name": "chk_player_data_positive_amounts",
+          "value": "\n        \"player_data\".\"ftd_sum\" >= 0 AND \n        \"player_data\".\"deposits_sum\" >= 0 AND \n        \"player_data\".\"cashouts_sum\" >= 0 AND \n        \"player_data\".\"casino_bets_sum\" >= 0 AND \n        \"player_data\".\"casino_wins_sum\" >= 0 AND\n        \"player_data\".\"casino_real_ngr\" >= 0 AND\n        \"player_data\".\"fixed_per_player\" >= 0\n      "
+        },
+        "chk_player_data_positive_counts": {
+          "name": "chk_player_data_positive_counts",
+          "value": "\n        \"player_data\".\"ftd_count\" >= 0 AND \n        \"player_data\".\"deposits_count\" >= 0 AND \n        \"player_data\".\"cashouts_count\" >= 0 AND \n        \"player_data\".\"casino_bets_count\" >= 0\n      "
+        },
+        "chk_player_data_boolean_flags": {
+          "name": "chk_player_data_boolean_flags",
+          "value": "\n        \"player_data\".\"prequalified\" IN (0, 1) AND \n        \"player_data\".\"duplicate\" IN (0, 1) AND \n        \"player_data\".\"self_excluded\" IN (0, 1) AND \n        \"player_data\".\"disabled\" IN (0, 1)\n      "
+        }
+      },
       "isRLSEnabled": false
     },
     "public.traffic_reports": {
@@ -561,7 +822,149 @@
           "default": "CURRENT_TIMESTAMP"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_traffic_reports_upload_id": {
+          "name": "idx_traffic_reports_upload_id",
+          "columns": [
+            {
+              "expression": "upload_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_traffic_reports_date": {
+          "name": "idx_traffic_reports_date",
+          "columns": [
+            {
+              "expression": "date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_traffic_reports_date_partner": {
+          "name": "idx_traffic_reports_date_partner",
+          "columns": [
+            {
+              "expression": "date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "foreign_partner_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_traffic_reports_date_campaign": {
+          "name": "idx_traffic_reports_date_campaign",
+          "columns": [
+            {
+              "expression": "date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "foreign_campaign_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_traffic_reports_source_device": {
+          "name": "idx_traffic_reports_source_device",
+          "columns": [
+            {
+              "expression": "traffic_source",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "device_type",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_traffic_reports_country": {
+          "name": "idx_traffic_reports_country",
+          "columns": [
+            {
+              "expression": "country",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_traffic_reports_analytics": {
+          "name": "idx_traffic_reports_analytics",
+          "columns": [
+            {
+              "expression": "date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "foreign_partner_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "foreign_campaign_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "device_type",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "traffic_reports_upload_id_conversion_uploads_id_fk": {
           "name": "traffic_reports_upload_id_conversion_uploads_id_fk",
@@ -580,7 +983,24 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
-      "checkConstraints": {},
+      "checkConstraints": {
+        "chk_traffic_reports_positive_counts": {
+          "name": "chk_traffic_reports_positive_counts",
+          "value": "\n        \"traffic_reports\".\"all_clicks\" >= 0 AND \n        \"traffic_reports\".\"unique_clicks\" >= 0 AND \n        \"traffic_reports\".\"registrations_count\" >= 0 AND \n        \"traffic_reports\".\"ftd_count\" >= 0 AND \n        \"traffic_reports\".\"deposits_count\" >= 0\n      "
+        },
+        "chk_traffic_reports_positive_rates": {
+          "name": "chk_traffic_reports_positive_rates",
+          "value": "\n        \"traffic_reports\".\"cr\" >= 0 AND \n        \"traffic_reports\".\"cftd\" >= 0 AND \n        \"traffic_reports\".\"cd\" >= 0 AND \n        \"traffic_reports\".\"rftd\" >= 0\n      "
+        },
+        "chk_traffic_reports_device_type": {
+          "name": "chk_traffic_reports_device_type",
+          "value": "\n        \"traffic_reports\".\"device_type\" IS NULL OR \"traffic_reports\".\"device_type\" IN ('Phone', 'Desktop', 'Tablet')\n      "
+        },
+        "chk_traffic_reports_clicks_logic": {
+          "name": "chk_traffic_reports_clicks_logic",
+          "value": "\n        \"traffic_reports\".\"unique_clicks\" <= \"traffic_reports\".\"all_clicks\"\n      "
+        }
+      },
       "isRLSEnabled": false
     },
     "public.users": {

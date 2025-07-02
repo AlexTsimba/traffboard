@@ -262,4 +262,155 @@ These operations require extra caution:
 - [Drizzle ORM Documentation](https://orm.drizzle.team/)
 - [Drizzle Kit Migrations](https://orm.drizzle.team/kit-docs/overview)
 - [PostgreSQL Documentation](https://www.postgresql.org/docs/)
-- [Database Migration Best Practices](https://docs.github.com/en/repositories/working-with-files/managing-files/viewing-a-file#viewing-the-file-history) 
+- [Database Migration Best Practices](https://docs.github.com/en/repositories/working-with-files/managing-files/viewing-a-file#viewing-the-file-history)
+
+## Performance Optimizations
+
+TraffBoard's database schema includes comprehensive performance optimizations:
+
+#### **Indexes for Analytics Performance**
+
+```sql
+-- Player Data Analytics
+CREATE INDEX "idx_player_data_date_partner" ON "player_data" ("date","partner_id");
+CREATE INDEX "idx_player_data_partner_campaign" ON "player_data" ("partner_id","campaign_id");
+CREATE UNIQUE INDEX "unique_player_per_upload" ON "player_data" ("upload_id","player_id");
+
+-- Traffic Reports Analytics  
+CREATE INDEX "idx_traffic_reports_analytics" ON "traffic_reports" 
+  ("date","foreign_partner_id","foreign_campaign_id","device_type");
+CREATE INDEX "idx_traffic_reports_source_device" ON "traffic_reports" 
+  ("traffic_source","device_type");
+
+-- Upload Management
+CREATE INDEX "idx_conversion_uploads_user_status" ON "conversion_uploads" ("user_id","status");
+CREATE INDEX "idx_conversion_uploads_user_type" ON "conversion_uploads" ("user_id","file_type");
+```
+
+#### **Database-Level Constraints**
+
+```sql
+-- Data Integrity Constraints
+ALTER TABLE "player_data" ADD CONSTRAINT "chk_player_data_positive_amounts" 
+  CHECK ("ftd_sum" >= 0 AND "deposits_sum" >= 0 AND "casino_wins_sum" >= 0);
+
+ALTER TABLE "traffic_reports" ADD CONSTRAINT "chk_traffic_reports_clicks_logic" 
+  CHECK ("unique_clicks" <= "all_clicks");
+
+-- File Upload Validation
+ALTER TABLE "conversion_uploads" ADD CONSTRAINT "chk_conversion_uploads_valid_status" 
+  CHECK ("status" IN ('pending', 'processing', 'completed', 'failed'));
+```
+
+#### **Scale-Ready Design Features**
+
+- **Partitioning Ready**: Date-based indexes support future partitioning by month/year
+- **Efficient Queries**: Composite indexes for common dashboard queries
+- **Data Validation**: CHECK constraints prevent invalid data at database level
+- **Cascade Deletes**: Proper cleanup when users or uploads are deleted
+- **No PII Storage**: Analytics tables contain no personally identifiable information
+
+## Migration Files Structure
+
+```
+src/db/migrations/
+├── 20250702180052_opposite_turbo.sql     # Forward migration
+└── meta/
+    ├── _journal.json                     # Migration history
+    └── 0000_snapshot.json               # Schema snapshot
+```
+
+### Migration File Contents
+
+Each migration includes:
+- **Table Definitions**: Complete table structures
+- **Indexes**: Performance optimization indexes
+- **Constraints**: Data validation rules
+- **Foreign Keys**: Relationship definitions
+
+## Environment Configuration
+
+### Development
+- **Auto-apply**: Migrations applied automatically
+- **Schema Sync**: Direct schema push available
+- **Test Data**: Seeding with demo data
+
+### Production  
+- **Manual Control**: Explicit migration commands required
+- **Backup Required**: Always backup before migrations
+- **Monitoring**: Track migration performance and rollback plans
+
+## Common Issues & Solutions
+
+### **Migration Generation Fails**
+```bash
+# Clear migration cache
+rm -rf src/db/migrations/meta
+pnpm db:generate
+```
+
+### **Database Out of Sync**
+```bash
+# Reset to match schema
+pnpm db:drop
+pnpm db:push  # Direct schema application
+```
+
+### **Performance Issues After Migration**
+```bash
+# Analyze query plans
+EXPLAIN ANALYZE SELECT * FROM player_data WHERE date >= '2024-01-01';
+
+# Check index usage
+SELECT schemaname, tablename, indexname, idx_scan 
+FROM pg_stat_user_indexes 
+WHERE schemaname = 'public';
+```
+
+## Rollback Procedures
+
+### **Schema Rollback**
+```bash
+# Apply previous migration
+pnpm db:migrate --to=previous_migration_name
+
+# Or restore from backup
+psql $DATABASE_URL < backup_file.sql
+```
+
+### **Emergency Rollback**
+```bash
+# Quick restore from backup
+pg_restore --clean --if-exists -d $DATABASE_URL backup_file.dump
+```
+
+## Performance Monitoring
+
+### **Query Performance**
+```sql
+-- Slow query monitoring
+SELECT query, mean_time, calls 
+FROM pg_stat_statements 
+WHERE query LIKE '%player_data%' 
+ORDER BY mean_time DESC;
+```
+
+### **Index Usage**
+```sql
+-- Index effectiveness
+SELECT schemaname, tablename, indexname, 
+       idx_scan, idx_tup_read, idx_tup_fetch
+FROM pg_stat_user_indexes 
+WHERE schemaname = 'public'
+ORDER BY idx_scan DESC;
+```
+
+## Next Steps
+
+- Review [Database Configuration](../reference/configuration/database.md) for connection settings
+- See [Development Workflow](dev_workflow.md) for integration with coding tasks
+- Check [Performance Guide](../how-to/optimization/database-performance.md) for query optimization
+
+---
+
+*Last updated: 2024-07-02 - Added performance optimizations and constraint documentation* 
