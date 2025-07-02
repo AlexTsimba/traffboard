@@ -3,8 +3,9 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 // Mock postgres before importing connection
 vi.mock("postgres", () => ({
   default: vi.fn(() => {
-    const queryFn = vi.fn().mockResolvedValue([{ health_check: 1 }]);
-    queryFn.end = vi.fn().mockResolvedValue(null);
+    const queryFn = Object.assign(vi.fn().mockResolvedValue([{ health_check: 1 }]), {
+      end: vi.fn().mockResolvedValue(null),
+    });
     return queryFn;
   }),
 }));
