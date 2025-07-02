@@ -1,0 +1,66 @@
+name: 🔍 TypeScript Debug
+run-name: 🔍 TypeScript Debug by ${{ github.actor }}
+
+on:
+  push:
+    branches: 
+      - refactor/*
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PNPM_VERSION: '9'
+  CI: true
+
+jobs:
+  typescript-debug:
+    name: 🔍 TypeScript Debug (Node 20.x)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false
+
+      - name: 🚀 Setup Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'pnpm'
+
+      - name: 🔨 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔍 Environment Debug
+        run: |
+          echo "=== Node.js version ==="
+          node --version
+          echo "=== TypeScript version ==="
+          npx tsc --version
+          echo "=== TSConfig check ==="
+          cat tsconfig.json
+          echo "=== Working directory ==="
+          pwd
+          ls -la
+
+      - name: 🔍 TypeScript verbose check
+        run: |
+          echo "=== Running TypeScript with verbose output ==="
+          npx tsc --noEmit --listFiles 2>&1 | tail -20
+          echo "=== TypeScript dry run ==="
+          npx tsc --noEmit --pretty false --skipLibCheck 2>&1 || {
+            echo "=== TypeScript failed, checking specific errors ==="
+            npx tsc --noEmit --pretty false 2>&1 | head -50
+            exit 1
+          }
+
+      - name: ✅ TypeScript success
+        run: echo "🎉 TypeScript check passed!" 
