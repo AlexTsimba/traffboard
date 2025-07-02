@@ -1,155 +1,213 @@
-<div align="center">
-  <strong>Next.js Admin Template built with TypeScript & Shadcn UI</strong><br />
-  A modern admin dashboard template using Next.js 15, Tailwind CSS v4, App Router, TypeScript, and Shadcn UI.
-</div>
+# 🚀 TraffBoard
 
-<br />
+> **Modern Admin Dashboard** built with Next.js 15, TypeScript, and Shadcn UI
 
 <div align="center">
-  <a href="https://next-shadcn-admin-dashboard.vercel.app">View Demo</a>
+  <p>A powerful, extensible admin dashboard template for modern web applications with built-in AI integration and comprehensive tooling.</p>
+  
+  [![TypeScript](https://img.shields.io/badge/TypeScript-5.8+-blue?logo=typescript)](https://www.typescriptlang.org/)
+  [![Next.js](https://img.shields.io/badge/Next.js-15.3+-black?logo=next.js)](https://nextjs.org/)
+  [![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.1+-38bdf8?logo=tailwind-css)](https://tailwindcss.com/)
+  [![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-green?logo=github-actions)](https://github.com/features/actions)
 </div>
 
-<br />
+## ✨ **What is TraffBoard?**
 
-<p align="center">
-  <a href="https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Farhamkhnz%2Fnext-shadcn-admin-dashboard">
-    <img src="https://vercel.com/button" alt="Deploy with Vercel" />
-  </a>
-</p>
+TraffBoard is a **production-ready admin dashboard template** designed for modern web applications. It combines the latest frontend technologies with AI-powered development tools to create a seamless development experience.
 
-<br />
+### 🎯 **Key Features**
+- **🏗️ Modern Stack**: Next.js 15 (App Router), TypeScript, Tailwind CSS v4
+- **🎨 Beautiful UI**: Shadcn UI components with Radix UI primitives  
+- **🤖 AI Integration**: Built-in support for AI agents and task automation
+- **📱 Responsive Design**: Mobile-first approach with dark/light themes
+- **🔒 Enterprise Ready**: Security-focused with comprehensive testing
+- **⚡ Performance**: Optimized for speed and scalability
+- **🛠️ Developer Experience**: Advanced tooling and automation
 
-<div align="center">
-  <img src="https://github.com/arhamkhnz/next-shadcn-admin-dashboard/blob/main/media/dashboard.png?version=5" alt="Dashboard Screenshot" width="75%">
-</div>
+## 🚀 **Quick Start**
 
-## Project Vision
+### **Prerequisites**
+- Node.js 18+ 
+- pnpm (recommended) or npm
+- Git
 
-The goal is to create an open-source admin template that includes multiple example screens, prebuilt sections, and thoughtfully designed UI patterns, all supported by a clean architecture and proper project setup.
-
-It aims to serve as a strong starting point for SaaS platforms, internal dashboards, and admin panels, with built-in support for multi-tenancy, RBAC, and feature-based scaling.
-
-## Overview
-
-This project uses `Next.js 15 (App Router)`, `TypeScript`, `Tailwind CSS v4`, and `Shadcn UI` as the main stack.  
-It also includes `Zod` for validation, `ESLint` and `Prettier` for linting and formatting, and `Husky` for pre-commit hooks.  
-
-This will support `React Hook Form`, `Zustand`, `TanStack Table`, and other related utilities, and will be added with upcoming screens. RBAC (Role-Based Access Control) with config-driven UI and multi-tenant UI support are also planned as part of the feature roadmap.
-
-The current version uses the [Tweakcn Tangerine](https://tweakcn.com/) theme for UI.
-
-> Looking for a **Next 14 + Tailwind CSS v3** version instead?  
-> Check out the [`archive/next14-tailwindv3`](https://github.com/arhamkhnz/next-shadcn-admin-dashboard/tree/archive/next14-tailwindv3) branch.  
-> This branch uses a different color theme and is not actively maintained, though I'm trying to keep it updated with the latest changes and screens.
-
-## Screens
-
-✅ Available  
-🚧 Coming Soon
-
-### Dashboards
-- ✅ Default
-- 🚧 CRM
-- 🚧 Analytics
-- 🚧 eCommerce
-- 🚧 Academy
-- 🚧 Logistics
-
-### Pages
-- 🚧 Email
-- 🚧 Chat
-- 🚧 Calendar
-- 🚧 Kanban
-- 🚧 Invoice
-- 🚧 Users
-- 🚧 Roles
-- ✅ Authentication
-
-## Colocation File System Architecture
-
-The project follows a colocation-first file structure using the App Router. Feature-specific pages live alongside their components to maintain separation of concerns and reduce cross-import complexity.
-
-```txt
-src/
-├── app/                      # Next.js App Router entry
-│   ├── (external)/           # Public pages (e.g., marketing, feedback)
-│
-│   ├── (main)/               # Main application layout
-│   │   ├── dashboard/
-│   │   │   ├── layout.tsx    # Shared layout for dashboard routes
-│   │   │   ├── default/      # Default overview dashboard
-│   │   │   │   ├── components/
-│   │   │   │   └── page.tsx
-│   │   │   ├── ecommerce/
-│   │   │   │   ├── components/
-│   │   │   │   └── page.tsx
-│   │   │   ├── email/
-│   │   │   │   ├── components/
-│   │   │   │   └── page.tsx
-│   │   │   ├── users/
-│   │   │   │   ├── components/
-│   │   │   │   └── page.tsx
-│   │   │   ├── profile/
-│   │   │   │   ├── components/
-│   │   │   │   └── page.tsx
-│   ├── auth/                  # Auth section
-│   │   ├── layout.tsx  
-│   │   ├── login/
-│   │   │   ├── components/
-│   │   │   └── page.tsx
-│   │   ├── register/
-│   │   │   ├── components/
-│   │   │   └── page.tsx
-│   │   ├── components/        # Shared auth components (e.g., buttons)
-│
-├── components/
-│   ├── ui/                    # Reusable UI primitives (button, input, etc.)
-│   ├── common/                # Shared layout/global components used across multiple areas
-│
-├── middleware.ts              # Middleware for handling auth/redirects
-├── navigation/                # Navigation config for sidebar
-├── hooks/                     # Custom React hooks
-├── utils/                     # Utility/helper functions
-├── server/                    # Server-only functions and server actions
-├── config/                    # Project-wide configuration (e.g. theme, layout)
-├── constants/                 # Static values like roles, app-level enums, routes, dummy data
+### **1. Clone and Install**
+```bash
+git clone https://github.com/AlexTsimba/traffboard.git
+cd traffboard
+pnpm install
 ```
 
-If you want to dive deeper into this architecture pattern, check out [this repo](https://github.com/arhamkhnz/next-colocation-template).
+### **2. Start Development**
+```bash
+pnpm dev
+```
 
-## Getting Started
+Your dashboard will be available at **http://localhost:3000**
 
-To set up and run this admin dashboard locally, follow these steps:
+### **3. Build for Production**
+```bash
+pnpm build
+pnpm start
+```
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/arhamkhnz/next-shadcn-admin-dashboard.git
-   ```
-   
-2. **Install dependencies**
-   ```bash
-    npm install
-   ```
-   > While installing, you may be prompted to use the `--force` or `--legacy-peer-deps` flag.  
-   > This is expected and safe — it’s due to a dependency from the Shadcn registry that references a breaking library version.
+## 📁 **Project Structure**
 
-3. **Start the development server**
-   ```bash
-   npm run dev
-   ```
+TraffBoard follows a **colocation-first architecture** for better organization:
 
-Once running, the app will be available at [http://localhost:3000](http://localhost:3000)
+```
+src/
+├── app/                      # Next.js App Router
+│   ├── main/                 # Main application (protected)
+│   │   └── dashboard/        # Dashboard pages
+│   ├── external/             # Public pages
+│   └── api/                  # API routes
+├── components/
+│   ├── ui/                   # Reusable UI primitives
+│   └── common/               # Shared components
+├── hooks/                    # Custom React hooks
+├── utils/                    # Utility functions
+└── config/                   # Configuration files
+```
 
+> **Learn more**: Read our [Architecture Guide](docs/explanation/architecture/overview.md) for detailed explanations.
+
+## 🛠️ **Tech Stack**
+
+### **Core Technologies**
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| [Next.js](https://nextjs.org/) | 15.3+ | React framework with App Router |
+| [TypeScript](https://www.typescriptlang.org/) | 5.8+ | Type safety and developer experience |
+| [Tailwind CSS](https://tailwindcss.com/) | 4.1+ | Utility-first CSS framework |
+| [Shadcn UI](https://ui.shadcn.com/) | Latest | High-quality component library |
+
+### **Development Tools**
+| Tool | Purpose |
+|------|---------|
+| [Vitest](https://vitest.dev/) | Unit testing framework |
+| [ESLint](https://eslint.org/) | Code linting and quality |
+| [Prettier](https://prettier.io/) | Code formatting |
+| [Husky](https://typicode.github.io/husky/) | Git hooks and workflow automation |
+| [Taskmaster AI](docs/reference/tools/taskmaster/) | AI-powered project management |
+
+### **UI Components**
+- **🎨 Radix UI**: Accessible, unstyled component primitives
+- **📊 Recharts**: Composable charting library  
+- **🎭 Lucide Icons**: Beautiful & consistent icon set
+- **🎨 Next Themes**: Dark/light theme switching
+
+## 📚 **Documentation**
+
+Our documentation follows the [Diátaxis framework](https://diataxis.fr/) for optimal organization:
+
+### **🎓 [Getting Started](docs/tutorial/)**
+- [Complete Setup Guide](docs/tutorial/getting-started.md)
+- [Build Your First Dashboard](docs/tutorial/first-dashboard.md)
+- [Deploy to Production](docs/tutorial/deployment.md)
+
+### **🛠️ [How-To Guides](docs/how-to/)**
+- [Development Workflow](docs/how-to/development/)
+- [Customization](docs/how-to/customization/)
+- [AI Integration](docs/how-to/ai-integration/)
+
+### **📖 [Reference](docs/reference/)**
+- [API Documentation](docs/reference/api/)
+- [Component Library](docs/reference/components/)
+- [Configuration](docs/reference/configuration/)
+
+### **🧠 [Architecture & Concepts](docs/explanation/)**
+- [Project Architecture](docs/explanation/architecture/)
+- [Design Patterns](docs/explanation/patterns/)
+- [Core Concepts](docs/explanation/concepts/)
+
+## 🤖 **AI-Powered Development**
+
+TraffBoard includes **AI integration** for enhanced productivity:
+
+### **Taskmaster AI**
+- **📋 Task Management**: AI-generated tasks from PRDs
+- **🔄 Workflow Automation**: Automated development workflows  
+- **📊 Complexity Analysis**: Smart task breakdown
+- **🔍 Research Integration**: Up-to-date best practices
+
+### **AI Agents**
+- **📝 Documentation**: Auto-generated documentation
+- **🧪 Testing**: Intelligent test generation
+- **🔧 Code Quality**: Automated refactoring suggestions
+
+> **Learn more**: [AI Integration Guide](docs/how-to/ai-integration/agents-setup.md)
+
+## 🚦 **Available Scripts**
+
+```bash
+# Development
+pnpm dev              # Start development server
+pnpm build            # Build for production
+pnpm start            # Start production server
+
+# Quality Assurance  
+pnpm lint             # Run ESLint
+pnpm format           # Format code with Prettier
+pnpm typecheck        # Type checking with TypeScript
+
+# Testing
+pnpm test             # Run tests
+pnpm test:watch       # Run tests in watch mode
+pnpm test:coverage    # Generate coverage report
+
+# Project Management
+pnpm backup           # Create project backup
+pnpm setup:branch-protection  # Setup GitHub branch protection
+```
+
+## 🔒 **Security & Quality**
+
+- **🛡️ Security Scanning**: Automated CodeQL analysis
+- **🧪 Comprehensive Testing**: Unit tests with Vitest
+- **📋 Code Quality**: ESLint + Prettier + SonarJS
+- **🔍 Type Safety**: Full TypeScript coverage
+- **🚨 Commit Hooks**: Pre-commit validation
+
+## 📈 **Performance**
+
+- **⚡ Next.js 15**: Latest performance optimizations
+- **🎯 Tree Shaking**: Minimal bundle size
+- **📱 Mobile First**: Responsive and optimized
+- **🖼️ Image Optimization**: Automatic Next.js optimization
+- **🔄 Streaming**: Server-side rendering with streaming
+
+## 🤝 **Contributing**
+
+We welcome contributions! Please read our:
+
+1. **[Contributing Guide](docs/how-to/development/contributing.md)**
+2. **[Commit Conventions](docs/how-to/development/commit-conventions.md)**
+3. **[Development Setup](docs/how-to/development/setup-dev-env.md)**
+
+### **Development Workflow**
+1. Fork the repository
+2. Create your feature branch: `git checkout -b feature/amazing-feature`
+3. Follow our [commit conventions](docs/how-to/development/commit-conventions.md)
+4. Push to the branch: `git push origin feature/amazing-feature`
+5. Open a Pull Request
+
+## 📄 **License**
+
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+## 🙋 **Support & Community**
+
+- **📚 Documentation**: [Full documentation](docs/)
+- **🐛 Bug Reports**: [GitHub Issues](https://github.com/AlexTsimba/traffboard/issues)
+- **💡 Feature Requests**: [GitHub Discussions](https://github.com/AlexTsimba/traffboard/discussions)
+- **💬 Community**: [Join our discussions](https://github.com/AlexTsimba/traffboard/discussions)
 
 ---
 
-> [!IMPORTANT]  
-> This project is frequently updated. If you’re working from a fork or previously cloned copy, check for the latest changes before syncing. Some updates may include breaking changes.
-
----
-
-Feel free to open issues, feature requests, or start a discussion if you'd like to contribute or suggest improvements.
-
-**Happy building!**
+<div align="center">
+  <p><strong>Built with ❤️ using modern web technologies</strong></p>
+  <p>Star ⭐ this repository if it helped you!</p>
+</div>
 
 

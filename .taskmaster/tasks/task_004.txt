@@ -1,0 +1,27 @@
+# Task ID: 4
+# Title: Develop Basic Layout and Navigation
+# Status: pending
+# Dependencies: 1, 3
+# Priority: medium
+# Description: Create the basic layout and navigation structure for the TraffBoardLite MVP.
+# Details:
+1. Update the sidebar navigation component from the starter template
+2. Create the following pages using Next.js 15 App Router:
+   - Dashboard (/dashboard)
+   - Upload (/upload) - visible only to superusers
+   - Users (/users) - visible only to superusers
+3. Implement role-based menu visibility using RBAC from Task 20
+4. Design and implement a responsive layout using shadcn/ui components
+5. Create a header component with user information and logout functionality
+6. Implement a breadcrumb component for easy navigation
+7. Design and implement a 404 Not Found page
+8. Ensure proper SEO meta tags for all pages
+
+# Test Strategy:
+1. Test responsive design across various screen sizes
+2. Verify correct page routing
+3. Ensure role-based menu items are displayed correctly
+4. Test navigation between pages
+5. Validate SEO meta tags
+6. Perform accessibility audit using tools like Lighthouse
+7. Test 404 page functionality
