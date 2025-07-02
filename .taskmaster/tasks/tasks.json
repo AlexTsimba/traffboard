@@ -3,26 +3,6 @@
     "tasks": [
       {
         "id": 1,
-        "title": "Анализ текущей инфраструктуры и планирование архитектуры проекта",
-        "description": "Выполнить комплексный анализ текущего состояния инфраструктуры проекта TraffBoard и разработать поэтапный план её модернизации с учётом современных практик Next.js 15, TypeScript 5.8, Vitest, ESLint 9 flat config и других инструментов.",
-        "details": "1. Провести аудит следующих компонентов: ESLint flat config (eslint.config.mjs), конфигурация TypeScript (tsconfig.json), Prettier и форматирование кода, pre-commit и pre-push хуки, CI/CD инфраструктура (наличие/отсутствие), система тестирования, переменные окружения, Docker и контейнеризация, возможности деплоя на DigitalOcean.\n2. Для каждого компонента подготовить отчёт о текущем состоянии: выявить устаревшие или отсутствующие элементы, соответствие современным стандартам (Next.js 15, TypeScript 5.8, Vitest, ESLint 9 flat config, best practices 2025 года[1][2][3]).\n3. На основе анализа составить поэтапный план модернизации: определить последовательность внедрения изменений, указать необходимые шаги для каждого компонента.\n4. Сформировать список рекомендуемых технологий и инструментов для каждого этапа (например, Vitest для тестирования, ESLint 9 flat config, Prettier, Husky для git-хуков, Docker Compose, DigitalOcean App Platform и др.).\n5. Разработать архитектурные решения для CI/CD: выбрать подходящие инструменты (например, GitHub Actions, GitLab CI), описать pipeline, интеграцию с тестированием и деплоем.\n6. Определить стратегию тестирования: виды тестов (юнит, интеграционные, e2e), инструменты (Vitest, Playwright), интеграцию с CI/CD.\n7. Оформить результаты в виде структурированного отчёта с выводами и рекомендациями.",
-        "testStrategy": "1. Проверить наличие подробного отчёта по каждому компоненту инфраструктуры с анализом текущего состояния.\n2. Убедиться, что план модернизации содержит этапы, последовательность действий и обоснование выбора технологий.\n3. Проверить, что список технологий и инструментов соответствует современным best practices и требованиям проекта.\n4. Оценить полноту архитектурных решений для CI/CD и стратегии тестирования.\n5. Провести внутреннее ревью отчёта с командой и получить подтверждение, что рекомендации понятны и реализуемы.",
-        "status": "pending",
-        "dependencies": [],
-        "priority": "high",
-        "subtasks": []
-      }
-    ],
-    "metadata": {
-      "created": "2025-07-01T22:25:22.680Z",
-      "updated": "2025-07-01T22:27:03.557Z",
-      "description": "Infrastructure refactoring tasks: modern 2025 best practices for ESLint, TypeScript, Prettier, CI/CD, testing, deployment"
-    }
-  },
-  "infrastructure-refactor": {
-    "tasks": [
-      {
-        "id": 1,
         "title": "Анализ и планирование модернизации инфраструктуры TraffBoard",
         "description": "Выполнить комплексный аудит текущей инфраструктуры TraffBoard и разработать детальный поэтапный план модернизации с учетом лучших практик 2025 года.",
         "details": "1. Провести исследование паттернов инфраструктуры Next.js 2025 года, используя данные из памяти neo4j и современные источники (Context7, web research).\n2. Проанализировать текущие конфигурационные файлы проекта: package.json, eslint.config.mjs, tsconfig.json, .prettierrc, .husky/.\n3. Оценить наличие и качество компонентов: тестирование, CI/CD, Docker, управление переменными окружения.\n4. Зафиксировать выявленные паттерны и несоответствия для дальнейших задач.\n5. Разработать архитектурный план модернизации, включающий рекомендации по внедрению современных инструментов и практик.\n6. Провести локальное тестирование текущей конфигурации для выявления технических ограничений.\n7. Сформировать подробный отчёт с поэтапным планом модернизации и рекомендациями по внедрению.\n<info added on 2025-07-01T22:41:47.177Z>\n## ✅ ЗАВЕРШЁН КОМПЛЕКСНЫЙ АНАЛИЗ ИНФРАСТРУКТУРЫ TRAFFBOARD\n\n### 📊 ТЕКУЩЕЕ СОСТОЯНИЕ (после research + анализа файлов + качественных тестов)\n\n#### ✅ ЧТО РАБОТАЕТ ОТЛИЧНО:\n1. **ESLint Flat Config** - современная конфигурация ESLint 9.29.0\n   - Хорошие плагины: security, sonarjs, unicorn, import, typescript-eslint\n   - Правила для Next.js, TypeScript, React настроены\n   - ⚠️ Проблема: Next.js plugin warning (FlatCompat вместо нативной поддержки)\n   \n2. **TypeScript 5.8.3** - актуальная версия\n   - Strict mode ✅, bundler module resolution ✅\n   - Правильная конфигурация для Next.js 15\n   \n3. **Next.js 15.3.4 + React 19.1.0** - самые новые версии\n   - **Quality Gates:** ✅ lint, ✅ type-check, ✅ build (все проходят успешно!)\n   - Сборка: 16 страниц, optimized, production ready\n   \n4. **Prettier + Husky** - работают корректно\n   - Tailwind plugin настроен ✅\n   - Pre-commit hook с lint-staged ✅\n\n#### ❌ КРИТИЧЕСКИЕ ПРОБЕЛЫ:\n\n1. **ОТСУТСТВУЕТ СИСТЕМА ТЕСТИРОВАНИЯ**\n   - ❌ Нет Jest/Vitest (npm test = Missing script)\n   - ❌ Нет React Testing Library\n   - ❌ Нет coverage reporting\n   \n2. **ОТСУТСТВУЕТ CI/CD ПОЛНОСТЬЮ**\n   - ❌ Нет .github/ директории\n   - ❌ Нет автоматизированного тестирования\n   - ❌ Нет deployment workflows\n   \n3. **ОТСУТСТВУЕТ КОНТЕЙНЕРИЗАЦИЯ**\n   - ❌ Нет Dockerfile/docker-compose.yml\n   - ❌ Нет .dockerignore\n   \n4. **НЕПОЛНОЕ ENV MANAGEMENT**\n   - ✅ Есть .env/.env.example\n   - ❌ Нет .env.development/.env.production\n   - ❌ Нет валидации с Zod\n\n5. **БАЗОВЫЕ GIT HOOKS**\n   - ❌ Нет pre-push hooks (только pre-commit)\n   - ❌ Нет commitlint/conventional commits\n\n### 🎯 АРХИТЕКТУРНЫЙ ПЛАН МОДЕРНИЗАЦИИ:\n\n#### ТЕХНОЛОГИЧЕСКАЯ СТРАТЕГИЯ 2025:\n- **Тестирование:** Vitest (ESM native, быстрее Jest) + React Testing Library + jsdom\n- **CI/CD:** GitHub Actions с matrix testing Node 18/20/22 + aggressive caching\n- **Docker:** Multi-stage Alpine build + оптимизированный .dockerignore\n- **Environment:** .env.local/.env.production + Zod runtime validation\n- **Git Workflow:** pre-push tests + commitlint conventional commits\n- **Deployment:** DigitalOcean App Platform с automated deployment\n\n#### ПОЭТАПНАЯ РЕАЛИЗАЦИЯ:\n1. **ESLint нативная поддержка Next.js** (убрать FlatCompat warnings)\n2. **Vitest + RTL** полная настройка тестирования\n3. **GitHub Actions CI/CD** с quality gates + deployment\n4. **Docker + env management** production готовность\n5. **Advanced git hooks** developer experience\n6. **DigitalOcean deployment** финальная интеграция\n\n### ✅ ГОТОВНОСТЬ:\n**Код высокого качества** - все текущие quality gates проходят успешно\n**Современная база** - Next.js 15 + TS 5.8 + React 19 ready для модернизации\n</info added on 2025-07-01T22:41:47.177Z>",
@@ -88,12 +68,80 @@
         "description": "Настроить React Testing Library для интеграции с Vitest и обеспечить современную инфраструктуру тестирования компонентов в проекте TraffBoard.",
         "details": "1. Установите необходимые зависимости: @testing-library/react, @testing-library/jest-dom, @testing-library/user-event и jsdom с помощью npm или yarn.\n2. Создайте файл setupTests.ts (или setup.ts) в директории src/test или src, где импортируйте '@testing-library/jest-dom' для расширения матчеров и настройте дополнительные глобальные параметры тестирования.\n3. В файле vitest.config.ts (или vite.config.ts) добавьте или обновите секцию test: укажите 'environment: \"jsdom\"', 'globals: true', 'setupFiles: \"./src/test/setup.ts\"' (или соответствующий путь), и при необходимости включите поддержку CSS и другие параметры.\n4. Проверьте, что tsconfig.json включает типы 'vitest/globals' и файл setupTests.ts в секции include.\n5. Убедитесь, что все тестовые файлы корректно используют расширенные матчеры и userEvent для имитации пользовательских действий.\n6. Документируйте структуру и паттерны подключения React Testing Library для будущих тестов.",
         "testStrategy": "- Проверьте, что тесты компонентов успешно выполняются с использованием React Testing Library и Vitest.\n- Убедитесь, что кастомные матчеры из @testing-library/jest-dom доступны во всех тестах.\n- Проверьте, что userEvent корректно работает для имитации пользовательских сценариев.\n- Запустите тесты с помощью 'npm run test' и убедитесь в отсутствии ошибок конфигурации.\n- Проверьте, что setup-файл корректно подключается и выполняется перед тестами.",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           2
         ],
         "priority": "medium",
-        "subtasks": []
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Install Testing Dependencies",
+            "description": "Set up all necessary testing libraries and dependencies for the project",
+            "dependencies": [],
+            "details": "Install vitest, @testing-library/react, @testing-library/jest-dom, jsdom, @vitejs/plugin-react, and other required packages. Update package.json with appropriate test scripts including 'test', 'test:watch', and 'test:coverage'. Ensure compatibility with Next.js 15.3.4 and React 19.1.0.",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Configure Vitest and Testing Environment",
+            "description": "Create and configure vitest.config.ts file with appropriate settings",
+            "dependencies": [
+              1
+            ],
+            "details": "Set up vitest.config.ts with proper configuration for React and Next.js testing. Configure test environment to use jsdom. Set up appropriate transformers for TypeScript and JSX. Configure coverage reporting. Add necessary plugins including @vitejs/plugin-react. Set up proper path aliases to match Next.js configuration.",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Set Up TypeScript Configuration for Tests",
+            "description": "Update TypeScript configuration to support testing",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Create or update tsconfig.json to include test files. Add appropriate types for testing libraries. Create a separate tsconfig.test.json if needed. Configure type definitions for vitest globals. Ensure proper resolution of path aliases in test files.",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Create Setup Files and Test Utilities",
+            "description": "Implement test setup files and utility functions",
+            "dependencies": [
+              1,
+              2,
+              3
+            ],
+            "details": "Create setup files for extending expect with custom matchers from @testing-library/jest-dom. Implement test utilities for rendering components with proper providers (ThemeProvider, etc.). Create mock implementations for Next.js features like useRouter, Image component, etc. Set up global beforeEach and afterEach hooks if needed.",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Implement Component Tests",
+            "description": "Create initial test files for key components",
+            "dependencies": [
+              4
+            ],
+            "details": "Implement tests for basic UI components first. Create test files with proper naming convention (*.test.tsx). Write tests covering component rendering, user interactions, and state changes. Implement snapshot tests where appropriate. Focus on testing component behavior rather than implementation details.",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "Implement Next.js-Specific Testing Patterns",
+            "description": "Create tests for Next.js specific features and patterns",
+            "dependencies": [
+              5
+            ],
+            "details": "Implement tests for Next.js Pages and Layouts. Create tests for Server Components vs Client Components. Test data fetching patterns including loading and error states. Test routing functionality and navigation. Implement tests for metadata and other Next.js specific APIs. Create integration tests for key user flows.\n<info added on 2025-07-02T00:28:53.322Z>\n# Next.js-Specific Testing Implementation\n\n## Completed Components:\n\n### Page Component Tests (`src/__tests__/pages/page.test.tsx`)\n- Implemented mocking for Next.js navigation hooks (useRouter, usePathname, useSearchParams)\n- Created tests for semantic page structure validation\n- Added verification for navigation elements and interactions\n\n### API Route Tests (`src/__tests__/api/conversions.test.ts`)\n- Integrated `node-mocks-http` for request/response mocking\n- Developed tests for multiple HTTP methods (GET, POST, DELETE)\n- Implemented status code and response validation\n- Added edge case and error handling tests\n\n### Navigation Component Tests (`src/__tests__/components/navigation.test.tsx`)\n- Created tests for Next.js Link components\n- Implemented router.push mocking for navigation testing\n- Added active state verification based on pathname\n- Included accessibility testing for ARIA attributes\n\n## Configuration Improvements:\n- Renamed `setup.ts` to `setup.tsx` to support JSX\n- Fixed mocks for Next.js Link and Image components\n- Enhanced Next.js navigation hooks mocking\n- Added React import for proper JSX support\n\n## Testing Results:\n- All 28 tests passing successfully\n- 5 test files completed\n- Coverage for core Next.js patterns established\n- API routes testing properly configured\n- Page component testing functioning correctly\n- Navigation with router mocking working as expected\n</info added on 2025-07-02T00:28:53.322Z>",
+            "status": "done",
+            "testStrategy": ""
+          }
+        ]
       },
       {
         "id": 4,
@@ -153,7 +201,7 @@
     ],
     "metadata": {
       "created": "2025-07-01T22:28:10.873Z",
-      "updated": "2025-07-01T23:04:13.648Z",
+      "updated": "2025-07-02T00:29:12.259Z",
       "description": "Infrastructure refactoring: ESLint flat config, TypeScript, testing, CI/CD, Docker, deployment - 2025 best practices"
     }
   }
