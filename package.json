@@ -14,10 +14,13 @@
     "test:watch": "vitest --watch",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
-    "test:run": "vitest run"
+    "test:run": "vitest run",
+    "setup:branch-protection": "node .github/branch-protection/setup-branch-protection.js",
+    "setup:branch-protection:dry-run": "node .github/branch-protection/setup-branch-protection.js --dry-run",
+    "setup:branch-protection:force": "node .github/branch-protection/setup-branch-protection.js --force"
   },
   "lint-staged": {
-    "*.{js,ts,jsx,tsx}": [
+    "{src,app,components,lib,utils,hooks,pages}/**/*.{js,ts,jsx,tsx}": [
       "eslint --fix"
     ]
   },

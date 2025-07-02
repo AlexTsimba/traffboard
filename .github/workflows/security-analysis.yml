@@ -1,0 +1,216 @@
+name: 🔐 Security Analysis
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master]
+  schedule:
+    # Run security scan daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+env:
+  NODE_ENV: production
+
+# Security-focused permissions
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  codeql-analysis:
+    name: 🕵️ CodeQL Security Analysis
+    runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.head_commit.message, '[skip security]') }}
+    
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ['javascript', 'typescript']
+    
+    steps:
+      - name: 🔧 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: 🚀 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+
+      - name: 🔨 Install dependencies
+        run: pnpm install --frozen-lockfile --prefer-offline
+        env:
+          NPM_CONFIG_PROGRESS: false
+
+      - name: 🔍 Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          config-file: ./.github/codeql-config.yml
+          queries: +security-and-quality
+
+      - name: 🏗️ Build for analysis
+        run: |
+          # Build the project for CodeQL analysis
+          pnpm build
+        env:
+          NODE_ENV: production
+          NODE_OPTIONS: "--max-old-space-size=4096"
+
+      - name: 🕵️ Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{ matrix.language }}"
+          upload: true
+          wait-for-processing: true
+
+  dependency-review:
+    name: 🔍 Dependency Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    permissions:
+      contents: read
+      pull-requests: write
+    
+    steps:
+      - name: 🔧 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: 🔍 Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: moderate
+          allow-licenses: MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC
+          deny-licenses: GPL-2.0, GPL-3.0, AGPL-1.0, AGPL-3.0
+          comment-summary-in-pr: true
+
+  secret-scanning:
+    name: 🔐 Secret Scanning
+    runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.head_commit.message, '[skip security]') }}
+    
+    permissions:
+      contents: read
+      security-events: write
+    
+    steps:
+      - name: 🔧 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: 🔍 Run TruffleHog OSS
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: main
+          head: HEAD
+          extra_args: --debug --only-verified
+
+  advanced-security:
+    name: 🛡️ Advanced Security Scan
+    runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.head_commit.message, '[skip security]') }}
+    
+    permissions:
+      contents: read
+      security-events: write
+    
+    steps:
+      - name: 🔧 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: 🚀 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: 🔨 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔍 Snyk Security Scan
+        uses: snyk/actions/node@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=medium --file=package.json
+
+      - name: 📊 Upload Snyk results to GitHub Code Scanning
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: snyk.sarif
+        continue-on-error: true
+
+      - name: 🧹 Semgrep Security Analysis
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: >- 
+            p/security-audit
+            p/secrets
+            p/ci
+            p/dockerfile
+            p/javascript
+            p/typescript
+            p/react
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+        continue-on-error: true
+
+  security-summary:
+    name: 📋 Security Summary
+    runs-on: ubuntu-latest
+    needs: [codeql-analysis, dependency-review, secret-scanning, advanced-security]
+    if: always()
+    
+    permissions:
+      contents: read
+      security-events: read
+    
+    steps:
+      - name: 📊 Security Analysis Summary
+        run: |
+          echo "## 🔐 Security Analysis Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Analysis Completed:" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ CodeQL Analysis: ${{ needs.codeql-analysis.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Secret Scanning: ${{ needs.secret-scanning.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Advanced Security: ${{ needs.advanced-security.result }}" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "- ✅ Dependency Review: ${{ needs.dependency-review.result }}" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🛡️ Security Status" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ needs.codeql-analysis.result }}" = "success" ] && [ "${{ needs.secret-scanning.result }}" = "success" ] && [ "${{ needs.advanced-security.result }}" = "success" ]; then
+            echo "🟢 All security checks passed!" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "🟡 Some security checks require attention. Check individual job results." >> $GITHUB_STEP_SUMMARY
+          fi

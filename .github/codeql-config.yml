@@ -1,0 +1,70 @@
+name: "TraffBoard CodeQL Configuration"
+
+# Disable default queries and use security-focused ones
+disable-default-queries: false
+
+# Use additional security-focused query suites
+queries:
+  - name: security-extended
+    uses: security-extended
+  - name: security-and-quality
+    uses: security-and-quality
+  - name: javascript-security
+    uses: ./queries/javascript-security
+
+# Paths to analyze
+paths:
+  - "src"
+  - "app"
+  - "pages"
+  - "components"
+  - "lib"
+  - "utils"
+  - "hooks"
+  - "context"
+  - "api"
+
+# Paths to ignore
+paths-ignore:
+  - "node_modules"
+  - "dist"
+  - ".next"
+  - "build"
+  - "coverage"
+  - "public"
+  - "**/*.test.ts"
+  - "**/*.test.tsx"
+  - "**/*.spec.ts"
+  - "**/*.spec.tsx"
+  - "**/__tests__/**"
+  - "**/tests/**"
+  - "**/*.d.ts"
+  - "**/.eslintrc.*"
+  - "**/vitest.config.*"
+  - "**/next.config.*"
+  - "**/tailwind.config.*"
+  - "**/postcss.config.*"
+
+# Pack configuration
+packs:
+  - javascript-security-pack
+  - javascript-quality-pack
+
+# External data sources for enhanced analysis
+external-data:
+  javascript:
+    # Include popular JavaScript/TypeScript libraries
+    libraries:
+      - react
+      - next
+      - typescript
+
+# Query filters to focus on security issues
+query-filters:
+  - include:
+      tags:
+        - security
+        - external/cwe
+  - exclude:
+      tags:
+        - experimental
