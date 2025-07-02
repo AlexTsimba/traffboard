@@ -9,8 +9,6 @@ queries:
     uses: security-extended
   - name: security-and-quality
     uses: security-and-quality
-  - name: javascript-security
-    uses: ./queries/javascript-security
 
 # Paths to analyze
 paths:
