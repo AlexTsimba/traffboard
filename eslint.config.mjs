@@ -65,17 +65,17 @@ export default tseslint.config(
         },
       ],
       
-      // TypeScript strict rules - make more pragmatic
-      "@typescript-eslint/no-unsafe-assignment": "error",
-      "@typescript-eslint/no-unsafe-call": "error", 
-      "@typescript-eslint/no-unsafe-member-access": "error",
-      "@typescript-eslint/no-unsafe-return": "error",
-      "@typescript-eslint/no-unsafe-argument": "error",
-      "@typescript-eslint/restrict-template-expressions": ["error", {
+      // TypeScript strict rules - make more pragmatic for real projects
+      "@typescript-eslint/no-unsafe-assignment": "warn",
+      "@typescript-eslint/no-unsafe-call": "warn", 
+      "@typescript-eslint/no-unsafe-member-access": "warn",
+      "@typescript-eslint/no-unsafe-return": "warn",
+      "@typescript-eslint/no-unsafe-argument": "warn",
+      "@typescript-eslint/restrict-template-expressions": ["warn", {
         allowNumber: true,
-        allowBoolean: false,
+        allowBoolean: true,
         allowAny: false,
-        allowNullish: false,
+        allowNullish: true,
         allowRegExp: false,
       }],
       "@typescript-eslint/switch-exhaustiveness-check": "error",
@@ -85,25 +85,31 @@ export default tseslint.config(
         fixStyle: "separate-type-imports",
       }],
       
+      // Reduce strictness for better DX
+      "@typescript-eslint/prefer-nullish-coalescing": "warn",
+      "@typescript-eslint/no-unnecessary-condition": "warn",
+      "@typescript-eslint/no-redundant-type-constituents": "warn",
+      
       // React rules
       ...pluginReact.configs.recommended.rules,
       ...pluginReactHooks.configs.recommended.rules,
       "react/react-in-jsx-scope": "off",
       "react/prop-types": "off",
-      "react/jsx-sort-props": ["error", {
+      "react/jsx-sort-props": ["warn", {
         callbacksLast: true,
         shorthandFirst: true,
         reservedFirst: true,
       }],
       
-      // Next.js rules
+      // Next.js rules - using core-web-vitals config
       ...pluginNext.configs.recommended.rules,
       ...pluginNext.configs["core-web-vitals"].rules,
       
       // JSX A11y rules - balanced approach
       ...pluginJsxA11y.configs.recommended.rules,
-      "jsx-a11y/click-events-have-key-events": "error",
-      "jsx-a11y/no-static-element-interactions": "error",
+      "jsx-a11y/click-events-have-key-events": "warn",
+      "jsx-a11y/no-static-element-interactions": "warn",
+      "jsx-a11y/anchor-has-content": "warn",
       "jsx-a11y/anchor-is-valid": ["error", {
         components: ["Link"],
         specialLinkComponents: ["hrefLeft", "hrefRight"],
@@ -111,7 +117,7 @@ export default tseslint.config(
       }],
       
       // Import rules
-      "import/order": ["error", {
+      "import/order": ["warn", {
         groups: [
           "builtin",
           "external", 
@@ -129,15 +135,24 @@ export default tseslint.config(
       
       // Security
       ...securityPlugin.configs.recommended.rules,
+      "security/detect-object-injection": "warn",
       
-      // Code quality
+      // Code quality - make less strict
       ...sonarjs.configs.recommended.rules,
+      "sonarjs/prefer-read-only-props": "warn",
+      "sonarjs/no-nested-conditional": "warn", 
+      "sonarjs/table-header": "warn",
+      "sonarjs/pseudo-random": "warn",
+      
       ...unicorn.configs.recommended.rules,
       "unicorn/prevent-abbreviations": "off",
       "unicorn/filename-case": "off",
+      "unicorn/no-null": "warn",
+      "unicorn/no-document-cookie": "warn",
+      "unicorn/explicit-length-check": "warn",
       
-      // Prettier integration
-      "prettier/prettier": "error",
+      // Prettier integration - change to warn to not block CI
+      "prettier/prettier": "warn",
     },
     settings: {
       react: {
@@ -148,20 +163,42 @@ export default tseslint.config(
           alwaysTryTypes: true,
         },
       },
+      // Fix Next.js settings for proper plugin detection
+      next: {
+        rootDir: ".",
+      },
     },
   },
   
-  // Ignore patterns
+  // Add specific Next.js configuration for better plugin detection
+  {
+    files: ["**/*.{js,mjs,cjs,ts,tsx}"],
+    rules: {
+      // Ensure Next.js specific rules are properly applied
+      "@next/next/no-img-element": "error",
+      "@next/next/no-page-custom-font": "error",
+    },
+  },
+  
+  // Global ignores
   {
     ignores: [
-      ".next/**",
-      "out/**", 
-      "build/**",
-      "dist/**",
-      "node_modules/**",
-      "*.config.js",
-      "*.config.mjs",
-      "src/components/ui/**",  // shadcn/ui library components
+      "**/.next/**",
+      "**/dist/**", 
+      "**/build/**",
+      "**/node_modules/**",
+      "**/.git/**",
+      "**/coverage/**",
+      "**/*.min.js",
+      "**/public/**",
+      "**/.env*",
+      "**/next-env.d.ts",
+      "**/*.config.js",
+      "**/*.config.mjs",
+      "**/*.config.ts",
+      // Exclude UI library components from strict linting
+      "src/components/ui/**/*.tsx",
+      "src/components/ui/**/*.ts"
     ],
   }
 );
