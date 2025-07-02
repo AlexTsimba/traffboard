@@ -5,11 +5,47 @@ category: "how-to"
 section: "landing"
 ---
 
-# 🛠️ How-To Guides
+# How-To Guides
 
-> **Problem-oriented guides** that help you solve specific issues and accomplish real-world tasks
+Problem-solving guides for common TraffBoard development tasks.
 
-These guides assume you have basic familiarity with TraffBoard. Each guide focuses on solving a particular problem or achieving a specific goal.
+## Development
+
+### Setup & Configuration
+- **[Commit Conventions](development/commit-conventions.md)** - Conventional commits standard
+
+### Coming Soon
+- **Environment Setup** - Configure development environment
+- **IDE Configuration** - VS Code and Cursor setup
+- **Testing Setup** - Testing frameworks and patterns
+
+## Operations
+
+### Deployment & Maintenance
+- **[Backup Strategy](operations/backup-strategy.md)** - Disaster recovery planning
+
+### Coming Soon
+- **Production Deployment** - Deploy to DigitalOcean
+- **Monitoring Setup** - Application and error monitoring
+- **Performance Optimization** - Speed up your application
+
+## Customization
+
+### Coming Soon
+- **Theme Customization** - Modify colors, fonts, and styles
+- **Component Modification** - Customize existing components
+- **Layout Changes** - Modify dashboard layout and navigation
+
+## AI Integration
+
+### Coming Soon
+- **Cursor Setup** - AI-powered IDE configuration
+- **Taskmaster Workflow** - Automated project management
+- **Agent Configuration** - Custom AI agent setup
+
+---
+
+**Popular**: [Commit Conventions](development/commit-conventions.md) | [Backup Strategy](operations/backup-strategy.md)
 
 ## 🎯 **When to Use These Guides**
 
@@ -24,7 +60,6 @@ These guides assume you have basic familiarity with TraffBoard. Each guide focus
 Essential guides for daily development tasks:
 
 - **[Setup Development Environment](development/setup-dev-env.md)** - Configure your local setup
-- **[Commit Conventions](development/commit-conventions.md)** - Follow proper Git practices
 - **[Testing Strategies](development/testing.md)** - Write and run effective tests
 - **[Code Quality](development/code-quality.md)** - Maintain high standards
 - **[Debugging](development/debugging.md)** - Troubleshoot common issues
@@ -34,10 +69,6 @@ Essential guides for daily development tasks:
 ### **⚙️ [Operations & Infrastructure](operations/)**
 Production and infrastructure management:
 
-- **[Backup Strategy](operations/backup-strategy.md)** - Protect your data and code
-- **[Monitoring Setup](operations/monitoring.md)** - Track application health
-- **[Performance Optimization](operations/performance.md)** - Speed up your app
-- **[Security Hardening](operations/security.md)** - Secure your deployment
 - **[Environment Management](operations/environments.md)** - Manage different stages
 
 ---
@@ -45,10 +76,6 @@ Production and infrastructure management:
 ### **🎨 [Customization](customization/)**
 Tailor TraffBoard to your needs:
 
-- **[Theme Customization](customization/themes.md)** - Modify colors and styling
-- **[Component Styling](customization/components.md)** - Create custom UI components
-- **[Layout Configuration](customization/layouts.md)** - Adjust page layouts
-- **[Navigation Setup](customization/navigation.md)** - Configure menus and routing
 - **[Responsive Design](customization/responsive.md)** - Mobile optimization
 
 ---
@@ -56,9 +83,6 @@ Tailor TraffBoard to your needs:
 ### **🤖 [AI Integration](ai-integration/)**
 Leverage AI tools for enhanced productivity:
 
-- **[Agents Setup](ai-integration/agents-setup.md)** - Configure AI development agents
-- **[Taskmaster Workflow](ai-integration/taskmaster-workflow.md)** - Automate project management
-- **[Code Generation](ai-integration/code-generation.md)** - AI-assisted development
 - **[Documentation Automation](ai-integration/docs-automation.md)** - Auto-generate docs
 
 ## 🔍 **Quick Problem Finder**

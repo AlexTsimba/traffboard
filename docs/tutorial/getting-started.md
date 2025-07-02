@@ -10,248 +10,104 @@ duration: "30 minutes"
 
 # Getting Started with TraffBoard
 
-Welcome to TraffBoard! This tutorial will guide you through setting up your development environment and running the application locally.
+Complete beginner's guide to setting up and running TraffBoard locally.
 
-## 📋 Prerequisites
+## Prerequisites
 
-Before starting, ensure you have:
-
-- **Node.js 18+** ([Download here](https://nodejs.org/))
-- **pnpm** package manager ([Install pnpm](https://pnpm.io/installation))
+- **Node.js 18+** ([Download](https://nodejs.org/))
+- **pnpm** ([Install](https://pnpm.io/installation))
 - **Git** for version control
-- **VS Code or Cursor** (recommended IDEs)
 
-### Quick Prerequisites Check
-
+### Quick Check
 ```bash
-# Check Node.js version (should be 18+)
-node --version
-
-# Check pnpm installation
-pnpm --version
-
-# Check Git installation
-git --version
+node --version    # Should be 18+
+pnpm --version    # Should be 8+
 ```
 
----
+## Installation
 
-## 🚀 Step 1: Clone the Repository
-
+### 1. Clone Repository
 ```bash
-# Clone the repository
-git clone https://github.com/AlexTsimba/traffboard.git
-
-# Navigate to project directory
+git clone <repository-url>
 cd traffboard
-
-# Check current branch
-git branch
 ```
 
-**Expected Output:**
-```
-* feature/docs-restructure  # or main
-```
-
----
-
-## 📦 Step 2: Install Dependencies
-
-TraffBoard uses **pnpm** for fast, efficient package management:
-
+### 2. Install Dependencies
 ```bash
-# Install all dependencies
 pnpm install
-
-# Verify installation
-pnpm list --depth=0
 ```
 
-**What gets installed:**
-- **Next.js 15** - React framework
-- **TypeScript** - Type safety
-- **Tailwind CSS v4** - Styling
-- **shadcn/ui** - Component library
-- **Testing libraries** - Vitest, Testing Library
-
----
-
-## ⚙️ Step 3: Environment Setup
-
-Create your local environment configuration:
-
+### 3. Start Development Server
 ```bash
-# Copy environment template
-cp .env.example .env.local
-
-# Edit environment variables
-code .env.local  # or nano .env.local
-```
-
-**Environment Variables:**
-```env
-# Basic configuration
-NODE_ENV=development
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-
-# Database (when implemented)
-# DATABASE_URL=postgresql://...
-
-# Authentication (when implemented)
-# NEXTAUTH_URL=http://localhost:3000
-# NEXTAUTH_SECRET=your-secret-here
-```
-
----
-
-## 🏃‍♂️ Step 4: Start Development Server
-
-Launch the development server:
-
-```bash
-# Start the development server
 pnpm dev
 ```
 
-**Expected Output:**
-```
-▲ Next.js 15.0.0
-- Local:        http://localhost:3000
-- Environments: .env.local
+Visit [http://localhost:3000](http://localhost:3000)
 
-✓ Starting...
-✓ Ready in 2.1s
-```
-
-**🎉 Success!** Open [http://localhost:3000](http://localhost:3000) in your browser.
-
----
-
-## 🧭 Step 5: Explore the Application
-
-### Main Areas
-
-1. **Dashboard** (`/main/dashboard`) - Main application interface
-2. **Authentication** (`/main/auth`) - Login/register pages
-3. **Preferences** (`/main/dashboard/preferences`) - User settings
-4. **Analytics** (`/main/dashboard/conversions`) - Data visualization
-
-### Navigation Structure
-
-```
-TraffBoard/
-├── Landing Page (/)           # Public landing
-├── External Page (/external)  # External traffic demo
-└── Main App (/main)          # Authenticated area
-    ├── Auth (/main/auth)
-    │   ├── Login
-    │   └── Register
-    └── Dashboard (/main/dashboard)
-        ├── Overview
-        ├── Conversions
-        ├── Administration
-        └── Preferences
-```
-
----
-
-## 🧪 Step 6: Run Quality Checks
-
-Verify everything is working correctly:
-
-```bash
-# Run all quality checks
-pnpm lint && pnpm type-check && pnpm test && pnpm build
-```
-
-**Individual Commands:**
-```bash
-# Code linting
-pnpm lint
-
-# TypeScript validation
-pnpm type-check
-
-# Test suite
-pnpm test
-
-# Production build
-pnpm build
-```
-
-**Expected Results:**
-- ✅ No linting errors
-- ✅ No TypeScript errors  
-- ✅ All tests pass
-- ✅ Build completes successfully
-
----
-
-## 🎨 Step 7: Explore the UI Components
-
-TraffBoard uses **shadcn/ui** components with **Tailwind CSS v4**:
-
-### Key Features
-- **Responsive Design** - Works on all devices
-- **Dark/Light Mode** - Toggle in preferences
-- **Modern Components** - Accessible, well-designed
-- **Customizable Themes** - Multiple color schemes
-
-### Test UI Features
-
-1. **Navigation** - Try the sidebar and mobile menu
-2. **Themes** - Switch between light/dark mode
-3. **Data Tables** - Explore the interactive tables
-4. **Forms** - Test the authentication forms
-5. **Charts** - View analytics visualizations
-
----
-
-## 📁 Step 8: Understand Project Structure
+## Project Structure
 
 ```
 src/
-├── app/                    # Next.js App Router
-│   ├── (main)/           # Main application
-│   │   ├── auth/         # Authentication pages
-│   │   └── dashboard/    # Dashboard pages
-│   ├── external/         # External landing
-│   ├── globals.css       # Global styles
-│   └── layout.tsx        # Root layout
-├── components/           # Reusable components
-│   ├── ui/              # shadcn/ui components
-│   └── data-table/      # Table components
-├── lib/                 # Utilities
-├── hooks/               # Custom React hooks
-└── __tests__/           # Test files
+├── app/                    # Next.js 15 App Router
+│   ├── main/dashboard/     # Dashboard pages
+│   └── api/               # API routes
+├── components/            # Reusable UI components
+│   └── ui/               # shadcn/ui components
+└── lib/                  # Utilities and configurations
 ```
 
----
+## Essential Scripts
 
-## 🔧 Step 9: Development Tools Setup
-
-### Recommended VS Code Extensions
-
-```json
-{
-  "recommendations": [
-    "bradlc.vscode-tailwindcss",
-    "esbenp.prettier-vscode",
-    "dbaeumer.vscode-eslint",
-    "ms-vscode.vscode-typescript-next"
-  ]
-}
+```bash
+pnpm dev          # Development server
+pnpm build        # Production build
+pnpm test         # Run tests
+pnpm lint         # Code linting
 ```
 
-### Cursor AI Setup (Recommended)
+## Development Workflow
 
-TraffBoard is optimized for [Cursor](https://cursor.sh/) with AI assistance:
+1. **Create feature branch**: `git checkout -b feature/your-feature`
+2. **Make changes** following [commit conventions](../how-to/development/commit-conventions.md)
+3. **Test**: `pnpm test && pnpm build`
+4. **Commit**: `git commit -m "feat: your feature"`
 
-1. **Install Cursor** from cursor.sh
-2. **Open Project** in Cursor
-3. **AI Features** - Use Cmd+K for AI assistance
-4. **Agent Integration** - Configured for autonomous development
+## Key Features Overview
+
+- **Dashboard**: Interactive analytics with charts
+- **Authentication**: NextAuth.js with Google OAuth
+- **UI Components**: shadcn/ui with Tailwind CSS
+- **Dark/Light Theme**: Automatic system detection
+- **Responsive**: Mobile-first design
+
+## Environment Setup
+
+Create `.env.local`:
+```bash
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=your-secret-key
+```
+
+## Next Steps
+
+- **[Development Setup](../how-to/development/)** - Advanced configuration
+- **[Component Library](../reference/components/)** - Available UI components  
+- **[API Reference](../reference/api/)** - Backend endpoints
+
+## Troubleshooting
+
+**Port already in use?**
+```bash
+pnpm dev --port 3001
+```
+
+**Dependencies issues?**
+```bash
+rm -rf node_modules pnpm-lock.yaml
+pnpm install
+```
+
+**Need help?** Check [GitHub Issues](https://github.com/AlexTsimba/traffboard/issues)
 
 ---
 

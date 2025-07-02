@@ -8,193 +8,130 @@ tags: ["backup", "disaster-recovery", "digitalocean", "operations"]
 
 # 🔄 Backup & Disaster Recovery Strategy
 
-Comprehensive backup and disaster recovery strategy for TraffBoard deployed on DigitalOcean App Platform.
+Backup strategy for TraffBoard deployed on DigitalOcean App Platform.
 
-## 📋 Overview
+## Backup Components
 
-TraffBoard backup strategy covers all critical data components to ensure business continuity and data protection:
-
-- **Application State**: Next.js application code and static assets
+TraffBoard backup covers:
+- **Application Code**: Git repository
 - **Database**: PostgreSQL data (when implemented)
-- **User Files**: Uploaded files and media (when implemented)
-- **Configuration**: Environment variables and app settings
-- **Infrastructure**: Deployment configurations and CI/CD setup
+- **Static Assets**: Images, files
+- **Configuration**: Environment variables
 
-## 🏗️ Architecture Components
+## Automated Backups
 
-### 1. **DigitalOcean App Platform (Primary)**
-- **Component**: Next.js application
-- **Backup Method**: Git-based deployment + Docker registry
-- **Frequency**: Continuous (on push to main)
-- **Storage**: GitHub repository + DigitalOcean Container Registry
+### Git Repository
+- **Primary**: GitHub repository
+- **Frequency**: Real-time on push
+- **Retention**: Unlimited
 
-### 2. **Database (Future Implementation)**
-- **Component**: PostgreSQL database
-- **Backup Method**: Automated dumps + Point-in-time recovery
-- **Frequency**: Daily full backup + continuous WAL
-- **Storage**: DigitalOcean Spaces + Cross-region replication
-
-### 3. **User Files (Future Implementation)**
-- **Component**: Uploaded files, media assets
-- **Backup Method**: DigitalOcean Spaces replication
-- **Frequency**: Real-time synchronization
-- **Storage**: Primary Space + Cross-region replica
-
-### 4. **Configuration Data**
-- **Component**: Environment variables, secrets
-- **Backup Method**: Encrypted configuration files
-- **Frequency**: On change + Weekly snapshots
-- **Storage**: Secure GitHub repository + DigitalOcean Spaces
-
-## 🔄 Implementation Phases
-
-### Phase 1: Application & Configuration (Current)
-
-#### Git Repository Backup
-```yaml
-# .github/workflows/backup.yml
-name: 🔄 Repository Backup
-on:
-  schedule:
-    - cron: '0 2 * * *'  # Daily at 2 AM UTC
-  workflow_dispatch:
-
-jobs:
-  backup:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Create GitHub Backup
-        run: |
-          # Mirror repository to backup location
-          git clone --mirror ${{ github.repository }}
-          # Upload to DigitalOcean Spaces
-```
-
-#### Configuration Backup
+### Database (Future)
 ```bash
+# Daily backup
+pg_dump $DATABASE_URL > backup_$(date +%Y%m%d).sql
+
+# Automated backup script
 #!/bin/bash
-# scripts/backup-config.sh
-
-# Backup environment template
-cp .env.example .backup/env-template.backup
-
-# Backup app configuration (excluding secrets)
-echo "# Backup created: $(date)" > .backup/app-config.backup
-echo "NODE_ENV=production" >> .backup/app-config.backup
-echo "NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL" >> .backup/app-config.backup
-
-# Encrypt and upload to DigitalOcean Spaces
+DATE=$(date +%Y%m%d_%H%M%S)
+pg_dump $DATABASE_URL | gzip > "backup_$DATE.sql.gz"
 ```
 
-### Phase 2: Database Backup (Future)
+### DigitalOcean App Platform
+- **Automatic**: Platform-level backups
+- **Frequency**: Daily snapshots
+- **Retention**: 7 days
+- **Access**: DigitalOcean dashboard
 
-#### PostgreSQL Automated Backup
-```bash
-#!/bin/bash
-# scripts/backup-database.sh
+## Manual Backup Procedures
 
-DB_NAME="traffboard_prod"
-BACKUP_DIR="/tmp/db-backups"
-TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-
-# Create backup directory
-mkdir -p $BACKUP_DIR
-
-# Full database dump
-pg_dump $DATABASE_URL > $BACKUP_DIR/db_full_$TIMESTAMP.sql
-
-# Compress backup
-gzip $BACKUP_DIR/db_full_$TIMESTAMP.sql
-
-# Upload to DigitalOcean Spaces
-s3cmd put $BACKUP_DIR/db_full_$TIMESTAMP.sql.gz s3://traffboard-backups/database/
-
-# Cleanup old local backups (keep last 3 days)
-find $BACKUP_DIR -name "*.sql.gz" -mtime +3 -delete
-```
-
-#### Point-in-Time Recovery Setup
-```sql
--- PostgreSQL configuration for PITR
--- In postgresql.conf:
-wal_level = replica
-archive_mode = on
-archive_command = 's3cmd put %p s3://traffboard-backups/wal/%f'
-max_wal_senders = 3
-checkpoint_completion_target = 0.9
-```
-
-### Phase 3: File System Backup (Future)
-
-#### User Files Synchronization
-```bash
-#!/bin/bash
-# scripts/backup-files.sh
-
-SOURCE_DIR="/app/uploads"
-BACKUP_SPACE="s3://traffboard-backups/files/"
-
-# Sync files to backup space
-s3cmd sync $SOURCE_DIR/ $BACKUP_SPACE \
-  --delete-removed \
-  --preserve \
-  --verbose
-
-# Create manifest
-echo "Backup completed: $(date)" > /tmp/backup-manifest.txt
-echo "Files backed up: $(find $SOURCE_DIR -type f | wc -l)" >> /tmp/backup-manifest.txt
-s3cmd put /tmp/backup-manifest.txt s3://traffboard-backups/manifests/files_$(date +%Y%m%d).txt
-```
-
-## 📅 Backup Schedule
-
-| Component | Frequency | Retention | Method |
-|-----------|-----------|-----------|---------|
-| **Code Repository** | On push + Daily | 90 days | Git mirror + Spaces |
-| **Configuration** | On change + Weekly | 30 days | Encrypted files |
-| **Database (Future)** | Daily full + Continuous WAL | 30 days full, 7 days WAL | pg_dump + WAL archiving |
-| **User Files (Future)** | Real-time sync | 90 days | DigitalOcean Spaces replication |
-| **App Platform Snapshots** | Weekly | 4 weeks | DO App Platform backups |
-
-## 🚨 Disaster Recovery Procedures
-
-### Complete Application Recovery
-
+### Quick Backup
 ```bash
 # Clone repository
-git clone https://github.com/AlexTsimba/traffboard.git
-cd traffboard
-git checkout main
+git clone https://github.com/AlexTsimba/traffboard.git backup_repo
 
-# Install dependencies and build
-pnpm install
-pnpm build
-
-# Deploy to new DigitalOcean App
-doctl apps create .do/app.yaml
+# Export environment variables
+doctl apps list
+doctl apps get <app-id> --format json > app_config.json
 ```
 
-### Database Recovery (Future)
-
+### Full Environment Backup
 ```bash
-# Full database restore
-createdb traffboard_restored
-gunzip -c db_full_20240101_120000.sql.gz | psql traffboard_restored
+# Create backup directory
+mkdir traffboard_backup_$(date +%Y%m%d)
+cd traffboard_backup_$(date +%Y%m%d)
 
-# Point-in-time recovery
-pg_basebackup -D /recovery -Ft -z -P
-# Apply WAL files up to specific timestamp
+# Repository backup
+git clone --mirror https://github.com/AlexTsimba/traffboard.git repo.git
+
+# Configuration backup
+doctl apps get <app-id> > app_config.yaml
 ```
 
-### Configuration Recovery
+## Disaster Recovery
 
+### Scenario 1: App Platform Failure
+1. **Create new DigitalOcean app**
+2. **Deploy from GitHub**: Connect repository
+3. **Restore environment variables**: From backup
+4. **Verify deployment**: Run health checks
+
+### Scenario 2: Repository Loss
+1. **Use backup repository clone**
+2. **Create new GitHub repository**
+3. **Push backup code**
+4. **Reconnect DigitalOcean app**
+
+### Scenario 3: Data Loss (Future)
+1. **Restore database**: From latest backup
+2. **Verify data integrity**: Run checks
+3. **Update app configuration**: If needed
+
+## Recovery Time Objectives
+
+| Component | RTO | RPO | Method |
+|-----------|-----|-----|---------|
+| **Application** | 15 min | 0 | Git deploy |
+| **Database** | 30 min | 24 hrs | pg_restore |
+| **Configuration** | 5 min | Manual | doctl |
+
+## Backup Schedule
+
+```
+Daily:    Database backup (when implemented)
+Weekly:   Full configuration export
+Monthly:  Complete environment documentation
+```
+
+## Monitoring
+
+### Health Checks
 ```bash
-# Restore configuration from backup
-s3cmd get s3://traffboard-backups/config/latest.env.backup .env
+# App status
+curl https://your-app.ondigitalocean.app/api/health
 
-# Update DO App Platform environment variables
-doctl apps update $APP_ID --spec .do/app.yaml
+# Database status (future)
+pg_isready -d $DATABASE_URL
 ```
+
+### Backup Verification
+```bash
+# Verify Git backup
+git clone backup_repo test_restore
+cd test_restore && pnpm install && pnpm build
+
+# Verify database backup (future)
+pg_restore --list backup.sql
+```
+
+## Emergency Contacts
+
+- **DigitalOcean Support**: Submit ticket
+- **GitHub Support**: support@github.com
+- **Team Lead**: [Contact info]
+
+---
+
+**Last Updated**: Check git log for recent changes
 
 ## 🔐 Security & Encryption
 

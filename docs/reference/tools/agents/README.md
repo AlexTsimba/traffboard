@@ -8,129 +8,114 @@ tags: ["agents", "automation", "taskmaster", "ai"]
 
 # Agent Tools & Configuration
 
-Comprehensive documentation for AI agents and automation tools used in TraffBoard development.
+AI agent setup and protocols for TraffBoard development automation.
 
-## 📋 Quick Reference
+## Agent Protocol Overview
 
-| Tool | Purpose | Documentation |
-|------|---------|---------------|
-| **Agent Protocol** | AI engineering guidelines | [Agent Protocol](#agent-protocol) |
-| **Taskmaster Integration** | Task management workflow | [../taskmaster/README.md](../taskmaster/README.md) |
-| **Development Workflow** | Automated development process | [Development Guidelines](#development-guidelines) |
+Standardized guidelines for AI-assisted development with autonomous execution and quality gates.
 
----
+### Core Principles
+- **Autonomous Execution**: Agents operate independently within defined rules
+- **Quality Gates**: Mandatory testing and validation at each step
+- **Research Integration**: Use up-to-date information beyond training data
+- **Iterative Development**: TDD cycle with continuous improvement
 
-## Agent Protocol
+## Agent Workflow
 
-### TraffBoard MVP Engineering Protocol
+### Standard Development Cycle
+1. **Task Analysis**: Understand requirements and acceptance criteria
+2. **Research Phase**: Gather current best practices and patterns
+3. **Implementation**: Write code following TDD principles
+4. **Testing**: Ensure all tests pass before proceeding
+5. **Documentation**: Update relevant documentation
+6. **Quality Check**: Run linting, type checking, and build validation
 
-You are an autonomous software engineering AI with Next.js expertise. Execute subtasks continuously without permission for standard development operations.
+### Quality Gates
+Each development step must pass these gates:
+- ✅ **Tests Pass**: All existing and new tests must pass
+- ✅ **Types Valid**: TypeScript compilation without errors
+- ✅ **Linting Clean**: ESLint passes without warnings
+- ✅ **Build Success**: Production build completes successfully
 
-#### 🚨 Critical: Autonomous Execution Rules
+## Agent Configuration
 
-**EXECUTE IMMEDIATELY without asking:**
-- Write/fix code, tests, documentation
-- Install dependencies, configure tools
-- Run quality gates, fix errors
-- Follow Next.js/shadcn/ui patterns
-- Complete entire subtasks end-to-end
+### Essential Tools
+- **Cursor IDE**: Primary development environment
+- **Taskmaster**: Project management and task tracking
+- **Context7**: Real-time library documentation
+- **Web Research**: Current best practices and updates
 
-**STOP AND ASK only for:**
-- Environment variables/API keys
-- Architectural changes
-- Deployment to production
-- Unclear requirements
+### Development Rules
+- **Test-Driven Development**: Write tests before implementation
+- **Incremental Progress**: Small, verifiable changes
+- **Documentation First**: Update docs with code changes
+- **Performance Aware**: Consider Core Web Vitals impact
 
-### 🛠️ Tech Stack (MVP)
+## Research-Backed Development
 
-```typescript
-// Full-Stack: Next.js 15 + Tanstack Router + TypeScript
-// UI: shadcn/ui + Tailwind + shadcn charts
-// State: TanStack Query + Zustand  
-// DB: Drizzle ORM + DO Managed PostgreSQL
-// Auth: NextAuth.js + TOTP
-// Deploy: DigitalOcean App Platform
-```
+### When to Research
+- ✅ New technologies or libraries being introduced
+- ✅ Security-related implementations
+- ✅ Performance optimization needs
+- ✅ Best practice verification for complex features
 
-### 🔍 Quality Gates (Mandatory)
-
+### Research Tools
 ```bash
-npm run lint && npm run type-check && npm run test && npm run build
+# Built-in research capabilities
+pnpm taskmaster research "Next.js 15 App Router patterns" --files=src/app/
+
+# Context7 for library docs
+# Automatic lookup for current library documentation
+
+# Web search for latest practices
+# Real-time information beyond training data
 ```
 
-### ⚡ Execution Pattern
+## Development Patterns
 
-1. Execute subtask autonomously
-2. Research first → websearch, context7 mcp server
-3. Run quality gates, fix issues
-4. Report completion
-5. Proceed to next subtask immediately
+### Component Development
+1. **Research**: Current component patterns and accessibility requirements
+2. **Design**: Plan component API and props interface
+3. **Test**: Write component tests with realistic use cases
+4. **Implement**: Build component following established patterns
+5. **Document**: Add component to documentation
 
-### 📊 Completion Format
+### Feature Implementation
+1. **Analysis**: Break down feature into testable units
+2. **Architecture**: Plan integration with existing systems
+3. **TDD Cycle**: Red → Green → Refactor for each unit
+4. **Integration**: Ensure feature works within larger system
+5. **Performance**: Validate Core Web Vitals impact
 
-```
-✅ Subtask [X.Y]: [Name] - COMPLETED
+## Autonomous Operation Guidelines
 
-🎯 Summary: [What was built]
-🧪 Tests: [X/X] passing, build ✅
-📝 Files: [list]
-🚀 Deploy Ready: [Yes/No]
+### What Agents Can Do Independently
+- ✅ Write and refactor code following established patterns
+- ✅ Create and update tests for new functionality
+- ✅ Research current best practices and implement them
+- ✅ Update documentation to reflect code changes
+- ✅ Fix linting and type errors
 
-Please verify, then I'll proceed to next subtask.
-```
+### What Requires Human Input
+- ❌ Major architectural decisions
+- ❌ Breaking changes to public APIs
+- ❌ Security-related configuration changes
+- ❌ Deployment and infrastructure modifications
 
-## Development Guidelines
+## Integration with TraffBoard
 
-### 🏗️ Architecture Patterns
+### Project-Specific Guidelines
+- **Component Library**: Use shadcn/ui components with consistent theming
+- **State Management**: Prefer React hooks and Context API over external libraries
+- **Styling**: Tailwind CSS utility classes with semantic naming
+- **Performance**: Optimize for Core Web Vitals, especially LCP and CLS
 
-#### Server Components for Data
-```typescript
-// Server Components for data
-export default async function Page() {
-  const data = await getAnalytics()
-  return <Chart data={data} />
-}
-```
-
-#### Client Components for Interactivity
-```typescript
-// Client Components for interactivity  
-'use client'
-export function Filters() {
-  const filters = useFilterStore()
-  // ...
-}
-```
-
-#### Server Actions for Mutations
-```typescript
-// Server Actions for mutations
-export async function uploadCSV(formData: FormData) {
-  'use server'
-  // ...
-}
-```
-
-### 🧪 TDD Cycle
-
-1. **Research** with Context7 MCP
-2. **Write failing tests**
-3. **Implement minimal code**
-4. **Refactor and optimize**
-5. **Validate quality gates**
-
-### 🚀 Getting Started
-
-Start by checking TaskMaster for current task and execute continuously.
+### Code Quality Standards
+- **TypeScript**: Strict type checking enabled
+- **Testing**: Vitest with comprehensive component and integration tests
+- **Accessibility**: WCAG 2.1 compliance for all interactive elements
+- **Performance**: Bundle size awareness and lazy loading where appropriate
 
 ---
 
-## Related Documentation
-
-- **[Taskmaster Workflow](../taskmaster/README.md)** - Task management and development workflow
-- **[Development Setup](../../how-to/development/)** - Local development environment
-- **[Deployment Guide](../../how-to/operations/)** - Production deployment processes
-
----
-
-**Navigation:** [← Tools Overview](../README.md) | [Reference Home](../../README.md) | [Taskmaster →](../taskmaster/README.md) 
+**Navigation**: [← Tools Overview](../README.md) | [Taskmaster](../taskmaster/) | [Reference Home](../../README.md) 

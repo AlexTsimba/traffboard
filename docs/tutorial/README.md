@@ -5,11 +5,41 @@ category: "tutorial"
 section: "landing"
 ---
 
-# 🎓 Tutorials
+# Tutorial - Learning TraffBoard
 
-> **Learning-oriented guides** to get you productive with TraffBoard from zero to deployment
+Step-by-step guides to learn TraffBoard development from basics to advanced topics.
 
-Welcome to TraffBoard tutorials! These hands-on guides will take you from installation to building and deploying your first admin dashboard.
+## Getting Started
+
+### Essential Tutorials
+- **[Getting Started](getting-started.md)** - Set up TraffBoard locally in 15 minutes
+
+### Coming Soon
+- **Development Workflow** - Daily development cycle with TraffBoard
+- **Customization Basics** - Modify themes, components, and layouts
+- **Deployment Tutorial** - Deploy to DigitalOcean App Platform
+- **AI Integration** - Set up Cursor and Taskmaster for AI-assisted development
+
+## Learning Path
+
+### 🌱 Beginner (New to TraffBoard)
+1. [Getting Started](getting-started.md) - Local setup and first run
+2. Development Workflow - Learn the dev cycle *(coming soon)*
+3. Customization Basics - Make it yours *(coming soon)*
+
+### 🚀 Intermediate (Building Features)
+1. AI Integration - Cursor and Taskmaster setup *(coming soon)*
+2. Component Development - Build new UI components *(coming soon)*
+3. API Integration - Connect external services *(coming soon)*
+
+### ⚡ Advanced (Production Ready)
+1. Deployment Tutorial - Production deployment *(coming soon)*
+2. Performance Optimization - Speed up your app *(coming soon)*
+3. Security Configuration - Protect your data *(coming soon)*
+
+---
+
+**Next Step**: [Start with Getting Started →](getting-started.md)
 
 ## 🎯 **What You'll Learn**
 
