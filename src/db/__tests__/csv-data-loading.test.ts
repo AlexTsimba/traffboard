@@ -1,7 +1,9 @@
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest";
-import { readFileSync } from "fs";
-import { join } from "path";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+
 import { sql } from "drizzle-orm";
+import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest";
+
 import { createDbConnection, TEST_DB_CONFIG } from "../config";
 import { trafficReports, playerData } from "../schema";
 
@@ -32,11 +34,11 @@ describe("CSV Data Loading Tests", () => {
       const csvContent = readFileSync(csvPath, "utf-8");
       const lines = csvContent.trim().split("\n");
       const headers = lines[0].split(",");
-      
+
       // Verify CSV structure matches our schema
       expect(headers).toEqual([
         "date",
-        "foreign_brand_id", 
+        "foreign_brand_id",
         "foreign_partner_id",
         "foreign_campaign_id",
         "foreign_landing_id",
@@ -46,14 +48,14 @@ describe("CSV Data Loading Tests", () => {
         "os_family",
         "country",
         "all_clicks",
-        "unique_clicks", 
+        "unique_clicks",
         "registrations_count",
         "ftd_count",
         "deposits_count",
         "cr",
         "cftd",
         "cd",
-        "rftd"
+        "rftd",
       ]);
 
       // Parse and load first 10 rows
@@ -62,16 +64,16 @@ describe("CSV Data Loading Tests", () => {
 
       for (const line of sampleRows) {
         const values = line.split(",");
-        
+
         // Handle empty strings and convert types
-        const parseIntOrNull = (val: string) => val === "" ? null : parseInt(val);
-        const parseFloatOrZero = (val: string) => val === "" ? 0 : parseFloat(val);
-        const parseStringOrNull = (val: string) => val === '""' || val === "" ? null : val.replace(/"/g, "");
+        const parseIntOrNull = (val: string) => (val === "" ? null : Number.parseInt(val));
+        const parseFloatOrZero = (val: string) => (val === "" ? 0 : Number.parseFloat(val));
+        const parseStringOrNull = (val: string) => (val === '""' || val === "" ? null : val.replaceAll('"', ""));
 
         const record = {
           date: new Date(values[0]),
           foreignBrandId: parseIntOrNull(values[1]),
-          foreignPartnerId: parseIntOrNull(values[2]), 
+          foreignPartnerId: parseIntOrNull(values[2]),
           foreignCampaignId: parseIntOrNull(values[3]),
           foreignLandingId: parseIntOrNull(values[4]),
           trafficSource: parseStringOrNull(values[5]),
@@ -95,7 +97,7 @@ describe("CSV Data Loading Tests", () => {
 
       // Insert all records at once
       const results = await db.insert(trafficReports).values(records).returning();
-      
+
       expect(results).toHaveLength(10);
       expect(results[0].date.toISOString().startsWith("2025-05-01")).toBe(true);
       expect(results[0].foreignBrandId).toBe(114);
@@ -109,19 +111,19 @@ describe("CSV Data Loading Tests", () => {
       const csvPath = join(process.cwd(), "src/data/demo/overall_rows (3).csv");
       const csvContent = readFileSync(csvPath, "utf-8");
       const lines = csvContent.trim().split("\n");
-      
+
       // Find the row with negative NGR (line 10 in the file has -2.81)
-      const negativeNgrLine = lines.find(line => line.includes("-2.81"));
+      const negativeNgrLine = lines.find((line) => line.includes("-2.81"));
       expect(negativeNgrLine).toBeDefined();
 
       // Parse the negative NGR row
       const values = negativeNgrLine!.split(",");
-      
+
       // Helper functions
-      const parseIntOrNull = (val: string) => val === "" ? null : parseInt(val);
-      const parseStringOrNull = (val: string) => val === '""' || val === "" ? null : val.replace(/"/g, "");
-      const parseFloatOrZero = (val: string) => val === "" ? "0.00" : val;
-      const parseDate = (val: string) => val === "" ? null : new Date(val);
+      const parseIntOrNull = (val: string) => (val === "" ? null : Number.parseInt(val));
+      const parseStringOrNull = (val: string) => (val === '""' || val === "" ? null : val.replaceAll('"', ""));
+      const parseFloatOrZero = (val: string) => (val === "" ? "0.00" : val);
+      const parseDate = (val: string) => (val === "" ? null : new Date(val));
 
       const record = {
         playerId: values[0],
@@ -163,11 +165,11 @@ describe("CSV Data Loading Tests", () => {
 
       // Insert the record with negative NGR
       const result = await db.insert(playerData).values(record).returning();
-      
+
       expect(result).toHaveLength(1);
       expect(result[0].casinoRealNgr).toBe("-2.81");
       expect(result[0].playerId).toBe("25291893");
-      expect(result[0].partnerId).toBe(153278);
+      expect(result[0].partnerId).toBe(153_278);
     });
 
     it("should load multiple player records for different dates", async () => {
@@ -175,18 +177,18 @@ describe("CSV Data Loading Tests", () => {
       const csvPath = join(process.cwd(), "src/data/demo/overall_rows (3).csv");
       const csvContent = readFileSync(csvPath, "utf-8");
       const lines = csvContent.trim().split("\n");
-      
+
       // Process first 5 data rows (skip header)
       const sampleRows = lines.slice(1, 6);
       const records = [];
 
       for (const line of sampleRows) {
         const values = line.split(",");
-        
-        const parseIntOrNull = (val: string) => val === "" ? null : parseInt(val);
-        const parseStringOrNull = (val: string) => val === '""' || val === "" ? null : val.replace(/"/g, "");
-        const parseFloatOrZero = (val: string) => val === "" ? "0.00" : val;
-        const parseDate = (val: string) => val === "" ? null : new Date(val);
+
+        const parseIntOrNull = (val: string) => (val === "" ? null : Number.parseInt(val));
+        const parseStringOrNull = (val: string) => (val === '""' || val === "" ? null : val.replaceAll('"', ""));
+        const parseFloatOrZero = (val: string) => (val === "" ? "0.00" : val);
+        const parseDate = (val: string) => (val === "" ? null : new Date(val));
 
         const record = {
           playerId: values[0],
@@ -230,14 +232,14 @@ describe("CSV Data Loading Tests", () => {
 
       // Insert all records
       const results = await db.insert(playerData).values(records).returning();
-      
+
       expect(results).toHaveLength(5);
-      
+
       // Verify we can have same player on multiple dates (time series)
-      const playerCounts = results.reduce((acc, record) => {
+      const playerCounts = results.reduce<Record<string, number>>((acc, record) => {
         acc[record.playerId] = (acc[record.playerId] || 0) + 1;
         return acc;
-      }, {} as Record<string, number>);
+      }, {});
 
       // Player 22027429 appears 3 times in the first 5 rows
       expect(playerCounts["22027429"]).toBe(3);
@@ -255,14 +257,14 @@ describe("CSV Data Loading Tests", () => {
           casinoRealNgr: "50.00",
         },
         {
-          playerId: "player1", 
+          playerId: "player1",
           date: new Date("2025-06-02"),
           partnerId: 100,
           casinoRealNgr: "-10.00", // Loss day
         },
         {
           playerId: "player1",
-          date: new Date("2025-06-03"), 
+          date: new Date("2025-06-03"),
           partnerId: 100,
           casinoRealNgr: "25.00",
         },
@@ -274,8 +276,8 @@ describe("CSV Data Loading Tests", () => {
       const results = await db
         .select()
         .from(playerData)
-        .where(sql`player_id = 'player1'`)
-        .orderBy(sql`date ASC`);
+        .where(sql`${playerData.playerId} = 'player1'`)
+        .orderBy(playerData.date);
 
       expect(results).toHaveLength(3);
       expect(results[0].casinoRealNgr).toBe("50.00");
@@ -283,10 +285,8 @@ describe("CSV Data Loading Tests", () => {
       expect(results[2].casinoRealNgr).toBe("25.00");
 
       // Aggregate query (total NGR across time)
-      const totalNgr = results.reduce((sum, row) => 
-        sum + parseFloat(row.casinoRealNgr), 0
-      );
-      expect(totalNgr).toBe(65.00); // 50 - 10 + 25
+      const totalNgr = results.reduce((sum, row) => sum + Number.parseFloat(row.casinoRealNgr), 0);
+      expect(totalNgr).toBe(65); // 50 - 10 + 25
     });
   });
 });
