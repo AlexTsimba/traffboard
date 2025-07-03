@@ -1,39 +1,26 @@
-// Main schema exports
-export * from "./users";
-export * from "./sessions";
-export * from "./conversions";
+/**
+ * TraffBoard Database Schema
+ * 
+ * Time-series focused schema for casino traffic and player analytics.
+ * Designed for high-volume time-series data with proper indexing
+ * for analytics queries.
+ */
 
-// Type exports for better organization
-export type {
-  // Users
-  User,
-  NewUser,
-  UserRole,
-} from "./users";
+// Export all table definitions
+export * from "./traffic-reports";
+export * from "./player-data";
 
+// Re-export types for convenience
 export type {
-  // Sessions
-  Session,
-  NewSession,
-  UserSession,
-  NewUserSession,
-} from "./sessions";
-
-export type {
-  // Conversions & Analytics
-  ConversionUpload,
-  NewConversionUpload,
-  PlayerData,
-  NewPlayerData,
   TrafficReport,
   NewTrafficReport,
-
-  // Enums
-  UploadStatus,
-  FileType,
   DeviceType,
-} from "./conversions";
+} from "./traffic-reports";
 
-// Re-export common enums for convenience
-export { USER_ROLES } from "./users";
-export { UPLOAD_STATUS, FILE_TYPES, DEVICE_TYPES } from "./conversions";
+export type {
+  PlayerData,
+  NewPlayerData,
+} from "./player-data";
+
+// Export constants
+export { DEVICE_TYPES } from "./traffic-reports";

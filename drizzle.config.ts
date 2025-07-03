@@ -1,12 +1,12 @@
 import { defineConfig } from "drizzle-kit";
-import * as dotenv from "dotenv";
+import { getDbConfig } from "./src/db/config";
 
-// Load environment variables
-dotenv.config({ path: ".env.local" });
+// Get database configuration based on environment
+const config = getDbConfig();
 
 export default defineConfig({
   // Schema location
-  schema: "./src/db/schema/*",
+  schema: "./src/db/schema/index.ts",
 
   // Output directory for migrations
   out: "./src/db/migrations",
@@ -16,7 +16,12 @@ export default defineConfig({
 
   // Database connection
   dbCredentials: {
-    url: process.env.DATABASE_URL || "postgresql://localhost:5432/traffboard_dev",
+    host: config.host,
+    port: config.port,
+    user: config.username,
+    password: config.password,
+    database: config.database,
+    ssl: config.ssl,
   },
 
   // Verbose logging for development

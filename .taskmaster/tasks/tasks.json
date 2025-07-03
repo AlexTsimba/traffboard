@@ -65,7 +65,9 @@
         "details": "1. Install and configure Drizzle ORM with PostgreSQL adapter\n2. Set up connection to PostgreSQL database\n3. Implement the following schemas using Drizzle:\n   - users table:\n     * id: serial primary key\n     * email: varchar(255) unique not null\n     * passwordHash: text not null\n     * role: varchar(50) default 'user' not null\n     * totpSecret: text\n     * createdAt: timestamp default now() not null\n   - conversions table:\n     * id: serial primary key\n     * date: date not null\n     * partnerId: varchar(100) not null\n     * campaignId: varchar(100) not null\n     * clicks: integer default 0 not null\n     * registrations: integer default 0 not null\n     * revenue: decimal(10,2) default 0 not null\n     * createdAt: timestamp default now() not null\n4. Set up migrations using drizzle-kit\n5. Create seed data for testing purposes\n6. Implement database utility functions for common operations\n<info added on 2025-07-02T15:44:00.714Z>\n## CRITICAL REQUIREMENTS\n\n**Testing & Quality Gates:**\n- Every subtask must be tested locally before completion\n- Every subtask must pass GitHub Actions workflow (build, lint, tests)  \n- NO subtask marked \"done\" without successful local + CI tests\n\n**Commit Strategy:**\n- ONE commit per subtask (not per task)\n- Commit naming: \"feat(database): implement subtask description - refs task 2.X\"\n- Each commit must be atomic and pass all quality checks\n\n**Workflow per Subtask:**\n1. Implement subtask\n2. Run `pnpm build` locally (must pass)\n3. Run `pnpm test` locally (must pass)  \n4. Run `pnpm lint` locally (must pass)\n5. Commit with correct naming convention\n6. Push to feature branch\n7. Verify GitHub Actions passes\n8. Only then mark subtask as \"done\"\n\n**Updated Schema Requirements:**\n- Add user_sessions table:\n  * id: serial primary key\n  * userId: integer references users(id)\n  * deviceInfo: text not null\n  * lastActive: timestamp default now() not null\n  * isRevoked: boolean default false not null\n  * createdAt: timestamp default now() not null\n\n- Add conversion_uploads table:\n  * id: serial primary key\n  * filename: varchar(255) not null\n  * uploadedBy: integer references users(id)\n  * recordCount: integer not null\n  * status: varchar(50) default 'pending' not null\n  * processedAt: timestamp\n  * createdAt: timestamp default now() not null\n\n- PII data exclusion: Ensure no emails or personal identifiable information in database\n- Computed fields excluded (cr/cftd/cd/rftd calculated on demand)\n\n**Environment Configuration:**\n- Development: Local PostgreSQL\n- Testing: SQLite in-memory for unit tests\n- Production: DigitalOcean PostgreSQL\n</info added on 2025-07-02T15:44:00.714Z>",
         "testStrategy": "1. Verify database connection\n2. Run and test migrations\n3. Validate schema creation\n4. Test seed data insertion\n5. Write unit tests for database utility functions\n6. Ensure proper error handling for database operations",
         "priority": "high",
-        "dependencies": [1],
+        "dependencies": [
+          1
+        ],
         "status": "in-progress",
         "subtasks": [
           {
@@ -99,8 +101,8 @@
             "id": 4,
             "title": "Create Database Utility Functions",
             "description": "Implement database connection and utility functions",
-            "details": "- Create src/db/connection.ts with database connection logic\n- Implement connection pooling and error handling\n- Create src/db/utils.ts with common database operations\n- Add database health check function\n- Implement proper connection cleanup\n- Add TypeScript types for database operations\n\nCOMMIT: \"feat(database): create database utility functions - refs task 2.4\"",
-            "status": "in-progress",
+            "details": "- Create src/db/connection.ts with database connection logic\n- Implement connection pooling and error handling\n- Create src/db/utils.ts with common database operations\n- Add database health check function\n- Implement proper connection cleanup\n- Add TypeScript types for database operations\n\nCOMMIT: \"feat(database): create database utility functions - refs task 2.4\"\n<info added on 2025-07-03T05:45:37.515Z>\nCRITICAL ISSUE: Schema constraint blocking valid data\n\n- Identified constraint `chk_player_data_positive_amounts` incorrectly enforces `casino_real_ngr >= 0`\n- Negative NGR values are valid in time series data (when player wins exceed bets)\n- Production CSV files contain legitimate negative NGR values (e.g., -2.81)\n\nRequired database utility updates:\n- Create migration script to modify the CHECK constraint to allow negative NGR values\n- Update schema.ts to properly reflect time series data reality\n- Add validation function that allows negative NGR values while maintaining other constraints\n- Implement test case with real negative NGR values to verify constraint fix\n</info added on 2025-07-03T05:45:37.515Z>",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 2
           },
@@ -108,18 +110,31 @@
             "id": 5,
             "title": "Create Seed Data System",
             "description": "Implement database seeding with demo data for testing",
-            "details": "- Create src/db/seed.ts with seeding logic\n- Load demo data from src/data/demo/ CSV files\n- Parse and clean CSV data (exclude PII, computed fields)\n- Create seed users with different roles\n- Create sample conversions and uploads data\n- Add npm script: db:seed\n- Ensure idempotent seeding (can run multiple times)\n\nCOMMIT: \"feat(database): create seed data system with demo data - refs task 2.5\"",
-            "status": "pending",
-            "dependencies": [],
+            "details": "- Create src/db/seed.ts with seeding logic\n- Load demo data from src/data/demo/ CSV files\n- Parse and clean CSV data (exclude PII, computed fields)\n- Create seed users with different roles\n- Create sample conversions and uploads data\n- Add npm script: db:seed\n- Ensure idempotent seeding (can run multiple times)\n\nCOMMIT: \"feat(database): create seed data system with demo data - refs task 2.5\"\n<info added on 2025-07-03T05:46:03.435Z>\n**UPDATED APPROACH: Simple TDD-based seed system**\n\n**Context**: Previous complex seed system failed with 572+ lint errors and corruption\n**New Strategy**: Minimal, reliable implementation\n\n**TDD Cycle**:\n1. **RED**: Create failing test with negative NGR data (-2.81)  \n2. **GREEN**: Simple function to load CSV → PostgreSQL\n3. **REFACTOR**: Add batch processing for memory efficiency\n\n**Implementation Plan**:\n- Create `src/db/seed-simple.ts` with ONE function: `loadPlayerData(csvPath, uploadId)`\n- Use streaming CSV parser for memory efficiency  \n- Batch insert (500 records) with transaction safety\n- Collect errors but don't fail entire process\n- Test with demo data first, then real production CSV files\n\n**Quality Gates STRICT**:\n- Must pass `pnpm lint` (0 errors)\n- Must pass `pnpm test` (all tests)\n- Must pass `pnpm build` (clean build)\n- Must handle negative NGR values after constraint fix\n\n**Files to create**:\n- `src/db/seed-simple.ts` - Main seeder\n- `src/db/__tests__/seed-simple.test.ts` - TDD tests  \n- Update package.json with `db:seed` script\n</info added on 2025-07-03T05:46:03.435Z>",
+            "status": "in-progress",
+            "dependencies": [
+              "2.7"
+            ],
             "parentTaskId": 2
           },
           {
             "id": 6,
             "title": "Create Database Tests",
             "description": "Implement comprehensive database testing suite",
-            "details": "- Create src/__tests__/db/ directory for database tests\n- Implement unit tests for schema validation\n- Create integration tests for database operations\n- Set up in-memory SQLite for fast unit tests\n- Test seed data loading and validation\n- Test migration up/down scenarios\n- Add database connection health checks tests\n- Ensure all tests pass before marking task complete\n\nCOMMIT: \"feat(database): create comprehensive database test suite - refs task 2.6\"",
-            "status": "pending",
+            "details": "- Create src/__tests__/db/ directory for database tests\n- Implement unit tests for schema validation\n- Create integration tests for database operations\n- Set up in-memory SQLite for fast unit tests\n- Test seed data loading and validation\n- Test migration up/down scenarios\n- Add database connection health checks tests\n- Ensure all tests pass before marking task complete\n\nCOMMIT: \"feat(database): create comprehensive database test suite - refs task 2.6\"\n<info added on 2025-07-03T16:10:17.488Z>\n- Update test approach to use real PostgreSQL database instead of SQLite mocks\n- Modify seed-simple.test.ts to connect directly to PostgreSQL\n- Test actual schema constraints with production database\n- Validate handling of negative NGR values against real constraints\n- Verify production CSV data loads correctly in PostgreSQL environment\n- Implement end-to-end testing of database seeding functionality\n- Document connection configuration for test environment\n</info added on 2025-07-03T16:10:17.488Z>\n<info added on 2025-07-03T16:32:00.689Z>\n- Created comprehensive database tests for seed-simple.test.ts using real PostgreSQL database\n- Implemented 9 test cases covering CSV data loading, negative NGR value handling, production CSV processing, error handling, schema validation, upload metadata integration, and performance tests\n- Refactored loadPlayerData function to reduce cognitive complexity from 58 to under 15\n- Extracted helper functions: parseCSVData, validateRecord, transformRecord, processBatch, insertBatch\n- Fixed all linting errors and maintained code quality standards\n- Successfully tested with real production CSV data containing 6,460 casino player records\n- Implemented proper error handling for header mismatches between production and expected formats\n- Verified negative NGR values work correctly after constraint fix\n- Configured PostgreSQL 14 with TraffBoard development and test databases\n- Deployed schema with working foreign key constraints\n- All 90 tests passing, including 9 new database seeding tests\n- Clean build compilation with only warnings (no errors)\n- Database connection and real-world data validation completed\n</info added on 2025-07-03T16:32:00.689Z>",
+            "status": "in-progress",
             "dependencies": [],
+            "parentTaskId": 2
+          },
+          {
+            "id": 7,
+            "title": "Fix Schema Constraints for Time Series Data",
+            "description": "Remove invalid constraint blocking negative NGR values in casino time series data",
+            "details": "**CRITICAL ISSUE**: Current schema has CHECK constraint `chk_player_data_positive_amounts` that incorrectly blocks negative NGR values.\n\n**Business Reality**: \n- Casino NGR (Net Gaming Revenue) can be negative when player wins exceed bets\n- This is valid temporal data for analytics\n- Production CSV files contain legitimate negative values like -2.81\n\n**Required Actions**:\n1. Create migration to drop current `chk_player_data_positive_amounts` constraint\n2. Create new constraint excluding NGR from positive-only validation\n3. Update schema/conversions.ts to reflect reality\n4. Test with real negative NGR data\n5. Regenerate migrations\n\n**New Constraint Should Be**:\n```sql\nCHECK (\n  ftd_sum >= 0 AND \n  deposits_sum >= 0 AND \n  cashouts_sum >= 0 AND \n  casino_bets_sum >= 0 AND \n  casino_wins_sum >= 0 AND\n  -- casino_real_ngr removed (can be negative)\n  fixed_per_player >= 0\n)\n```\n\nCOMMIT: \\\"fix(database): allow negative NGR values in time series data - refs task 2.4.1\\\"\n<info added on 2025-07-03T06:19:43.198Z>\n**Выполненные действия:**\n- Schema constraint `chk_player_data_positive_amounts` обновлен - NGR field удален\n- casino_real_ngr теперь может быть отрицательным (реальность casino временных рядов)\n- Применены fix-constraint.js/sql скрипты для обновления базы данных\n- Все тесты проходят (81 passed)\n- Линтинг чистый (0 ошибок)\n\n**Verification:** Схема src/db/schema/conversions.ts строки 182-191 подтверждают, что NGR больше не включен в positive constraint.\n</info added on 2025-07-03T06:19:43.198Z>",
+            "status": "done",
+            "dependencies": [
+              "2.3"
+            ],
             "parentTaskId": 2
           }
         ]
@@ -131,7 +146,9 @@
         "details": "1. Configure NextAuth.js with Drizzle adapter\n2. Implement email/password authentication strategy\n3. Add TOTP-based 2FA support using a library like 'otpauth' (v9.1.3 or later)\n4. Create protected route middleware\n5. Implement role-based access control (RBAC) for user and superuser roles\n6. Design and implement login, 2FA setup, and 2FA verification pages\n7. Create API routes for authentication operations\n8. Implement secure password hashing using bcrypt (v5.1.0 or later)\n9. Set up proper session management and CSRF protection",
         "testStrategy": "1. Unit test authentication functions\n2. Test login flow with and without 2FA\n3. Verify RBAC functionality\n4. Test protected routes for both user and superuser roles\n5. Ensure proper error handling for authentication failures\n6. Validate session management and security measures\n7. Perform security audit of authentication implementation",
         "priority": "high",
-        "dependencies": [2],
+        "dependencies": [
+          2
+        ],
         "status": "pending",
         "subtasks": []
       },
@@ -140,7 +157,10 @@
         "title": "Develop Basic Layout and Navigation",
         "description": "Integrate authentication and role-based access control into the existing layout and navigation for the TraffBoardLite MVP.",
         "status": "pending",
-        "dependencies": [1, 3],
+        "dependencies": [
+          1,
+          3
+        ],
         "priority": "medium",
         "details": "1. Integrate authentication into the main layout (src/app/main/dashboard/layout.tsx) to protect routes using NextAuth.js from Task 3\n2. Implement role-based menu visibility in the sidebar navigation (app-sidebar.tsx) and related components (nav-main.tsx, nav-user.tsx, account-switcher.tsx, theme-switcher.tsx)\n3. Update navigation items to display only for users with the appropriate roles (e.g., show 'administration' only to superusers)\n4. Ensure all navigation and layout logic is integrated with the existing Next.js 15 App Router structure\n5. Remove any redundant or legacy sidebar creation logic—use the existing sidebar and navigation components",
         "testStrategy": "1. Verify that unauthenticated users are redirected to the login page when accessing protected routes\n2. Test that authenticated users see navigation items appropriate to their roles\n3. Confirm that navigation between pages works as expected for different user roles\n4. Ensure integration with NextAuth.js is functioning (login, logout, session persistence)\n5. Perform accessibility and responsive design checks on the updated navigation and layout",
@@ -153,7 +173,11 @@
         "details": "1. Design and implement a file upload form using shadcn/ui components\n2. Create a Server Action for file upload and processing\n3. Use PapaParse (v5.4.1 or later) to process the uploaded CSV file\n4. Implement data validation using Zod (v3.21.4 or later) with the following schema:\n   - date: string (YYYY-MM-DD format)\n   - partnerId: string\n   - campaignId: string\n   - clicks: number (integer)\n   - registrations: number (integer)\n   - revenue: number (decimal)\n5. Transform and insert valid data into the conversions table\n6. Implement error handling and validation feedback\n7. Create a progress indicator for large file uploads\n8. Optimize for performance to handle files with up to 50K records\n9. Implement file type and size restrictions",
         "testStrategy": "1. Test CSV upload with various file sizes and formats\n2. Verify data validation and error handling\n3. Check database insertion accuracy\n4. Test performance with large files (up to 50K records)\n5. Ensure proper feedback for upload progress and success/failure\n6. Validate file type and size restrictions\n7. Test concurrent uploads",
         "priority": "high",
-        "dependencies": [2, 3, 4],
+        "dependencies": [
+          2,
+          3,
+          4
+        ],
         "status": "pending",
         "subtasks": []
       },
@@ -164,7 +188,11 @@
         "details": "1. Implement global filter components for date range, partner, and campaign using Zustand (v4.3.8 or later) for state management\n2. Create a Zustand store for filter state:\n   ```typescript\n   interface FilterState {\n     dateRange: [Date, Date]\n     partners: string[]\n     campaigns: string[]\n     setFilters: (filters: Partial<FilterState>) => void\n     resetFilters: () => void\n   }\n   ```\n3. Use TanStack Query (v5.0.0 or later) for data fetching with proper caching strategies\n4. Implement API routes for fetching analytics data based on filters\n5. Create KPI cards for total clicks, registrations, and revenue\n6. Implement the following charts using shadcn/ui charts (Recharts wrapper):\n   - Line chart for daily metrics\n   - Bar chart for top partners\n   - Pie chart for campaign distribution\n7. Ensure all components are responsive and mobile-friendly\n8. Implement loading states and error handling for data fetching\n9. Add a date range picker component for custom date selection",
         "testStrategy": "1. Test filter functionality and state management\n2. Verify data fetching and caching with TanStack Query\n3. Ensure charts render correctly with various data sets\n4. Test responsiveness on different screen sizes\n5. Validate loading states and error handling\n6. Performance test dashboard with large datasets\n7. Verify date range picker functionality",
         "priority": "high",
-        "dependencies": [2, 4, 5],
+        "dependencies": [
+          2,
+          4,
+          5
+        ],
         "status": "pending",
         "subtasks": []
       },
@@ -175,7 +203,11 @@
         "details": "1. Design and implement a user list page using shadcn/ui data table component\n2. Create forms for adding and editing users\n3. Implement user creation with the following fields:\n   - Email (required)\n   - Password (required)\n   - Role (user/superuser)\n4. Add functionality to edit existing user details\n5. Implement user deletion with confirmation dialog\n6. Create API routes for user CRUD operations\n7. Implement server-side pagination for the user list\n8. Add search and filter functionality to the user list\n9. Ensure proper error handling and validation for all user management operations\n10. Implement role management functionality for superusers\n11. Add audit logging for user management actions",
         "testStrategy": "1. Test CRUD operations for user management\n2. Verify role-based access control for user management features\n3. Test pagination, search, and filter functionality\n4. Ensure proper error handling and validation\n5. Verify audit logging for user management actions\n6. Test edge cases (e.g., deleting the last superuser)\n7. Perform security testing on user management endpoints",
         "priority": "medium",
-        "dependencies": [2, 3, 4],
+        "dependencies": [
+          2,
+          3,
+          4
+        ],
         "status": "pending",
         "subtasks": []
       },
@@ -184,7 +216,15 @@
         "title": "Deploy to DigitalOcean App Platform",
         "description": "Set up and deploy the TraffBoardLite MVP to a DigitalOcean Droplet (VPS) with a locally installed PostgreSQL database.",
         "status": "pending",
-        "dependencies": [1, 2, 3, 4, 5, 6, 7],
+        "dependencies": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
         "priority": "high",
         "details": "1. Create a DigitalOcean account if not already available\n2. Create and configure an Ubuntu Droplet (VPS)\n3. Install Node.js, PM2, and Nginx on the Droplet\n4. Install and configure PostgreSQL on the same Droplet\n5. Set up SSL certificates using Certbot for HTTPS via Nginx\n6. Configure environment variables securely on the Droplet\n7. Set up GitHub Actions for automatic deployment to the Droplet\n8. Configure Nginx as a reverse proxy for the Node.js application\n9. Set up logging and monitoring for the application and server\n10. Implement a health check endpoint\n11. Create a production-ready build script",
         "testStrategy": "1. Verify successful deployment to the Droplet\n2. Test database connection in the production environment\n3. Ensure all environment variables are correctly set and loaded\n4. Verify HTTPS and SSL certificate setup via Nginx and Certbot\n5. Test application functionality in the production environment\n6. Monitor application and server logs and performance\n7. Verify health check endpoint\n8. Test automatic deployment via GitHub Actions\n9. Perform load testing on the deployed application",
@@ -193,7 +233,7 @@
     ],
     "metadata": {
       "created": "2025-07-01T22:28:10.873Z",
-      "updated": "2025-07-02T16:38:22.509Z",
+      "updated": "2025-07-03T06:26:15.854Z",
       "description": "Tasks for master context"
     }
   }
