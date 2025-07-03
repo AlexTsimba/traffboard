@@ -21,11 +21,11 @@ export interface DbConfig {
 // Test database configuration for automated tests
 export const TEST_DB_CONFIG = {
   host: "localhost",
-  port: 5432,
+  port: 5433, // Docker PostgreSQL port
   database: "traffboard_test",
-  username: "postgres",
-  // eslint-disable-next-line sonarjs/no-hardcoded-passwords -- Test environment only
-  password: "test_password",
+  username: "traffboard",
+  // eslint-disable-next-line sonarjs/no-hardcoded-passwords -- Test credentials only
+  password: "traffboard_test_password", // Match docker-compose.test.yml
   max: 5,
   idle_timeout: 30,
   connect_timeout: 60,
