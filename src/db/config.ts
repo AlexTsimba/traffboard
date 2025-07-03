@@ -33,48 +33,46 @@ export const TEST_DB_CONFIG = {
 
 // Environment-based configuration
 export function getDbConfig(): DbConfig {
-  const env = process.env.NODE_ENV ?? "development";
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  const env = process.env.NODE_ENV || "development";
 
-  switch (env) {
-    case "test": {
-      return {
-        ...TEST_DB_CONFIG,
-        host: process.env.TEST_DB_HOST ?? TEST_DB_CONFIG.host,
-        port: Number.parseInt(process.env.TEST_DB_PORT ?? "5433"),
-        database: process.env.TEST_DB_NAME ?? TEST_DB_CONFIG.database,
-        username: process.env.TEST_DB_USER ?? TEST_DB_CONFIG.username,
-        password: process.env.TEST_DB_PASSWORD ?? TEST_DB_CONFIG.password,
-      };
-    }
-
-    case "development": {
-      return {
-        host: process.env.DB_HOST ?? "localhost",
-        port: Number.parseInt(process.env.DB_PORT ?? "5432"),
-        database: process.env.DB_NAME ?? "traffboard_dev",
-        username: process.env.DB_USER ?? "postgres",
-        password: process.env.DB_PASSWORD ?? "password",
-      };
-    }
-
-    case "production": {
-      return {
-        host: process.env.DB_HOST ?? "",
-        port: Number.parseInt(process.env.DB_PORT ?? "5432"),
-        database: process.env.DB_NAME ?? "",
-        username: process.env.DB_USER ?? "",
-        password: process.env.DB_PASSWORD ?? "",
-        ssl: true,
-        max: 20,
-        idle_timeout: 20,
-        connect_timeout: 10,
-      };
-    }
-
-    default: {
-      throw new Error(`Unknown environment: ${env}`);
-    }
+  if (env === "test") {
+    return {
+      ...TEST_DB_CONFIG,
+      host: process.env.TEST_DB_HOST ?? TEST_DB_CONFIG.host,
+      port: Number.parseInt(process.env.TEST_DB_PORT ?? "5433"),
+      database: process.env.TEST_DB_NAME ?? TEST_DB_CONFIG.database,
+      username: process.env.TEST_DB_USER ?? TEST_DB_CONFIG.username,
+      password: process.env.TEST_DB_PASSWORD ?? TEST_DB_CONFIG.password,
+    };
   }
+
+  if (env === "development") {
+    return {
+      host: process.env.DB_HOST ?? "localhost",
+      port: Number.parseInt(process.env.DB_PORT ?? "5432"),
+      database: process.env.DB_NAME ?? "traffboard_dev",
+      username: process.env.DB_USER ?? "postgres",
+      password: process.env.DB_PASSWORD ?? "password",
+    };
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  if (env === "production") {
+    return {
+      host: process.env.DB_HOST ?? "",
+      port: Number.parseInt(process.env.DB_PORT ?? "5432"),
+      database: process.env.DB_NAME ?? "",
+      username: process.env.DB_USER ?? "",
+      password: process.env.DB_PASSWORD ?? "",
+      ssl: true,
+      max: 20,
+      idle_timeout: 20,
+      connect_timeout: 10,
+    };
+  }
+
+  throw new Error(`Unknown environment: ${String(env)}`);
 }
 
 /**

@@ -207,6 +207,17 @@ export default tseslint.config(
       // Exclude UI library components from strict linting
       "src/components/ui/**/*.tsx",
       "src/components/ui/**/*.ts",
+      // Exclude all test files and test directories
+      "**/__tests__/**",
+      "**/*.test.ts",
+      "**/*.test.tsx",
+      "**/*.spec.ts",
+      "**/*.spec.tsx",
+      "**/test-utils.tsx",
+      "**/setup.tsx",
+      "**/mocks.ts",
+      "**/vitest.config.ts",
+      "**/vitest.config.mjs",
     ],
   },
 );
