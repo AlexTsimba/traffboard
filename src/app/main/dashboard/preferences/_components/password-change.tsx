@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -11,7 +11,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import type { PasswordChangeResponse, ErrorResponse } from "@/types/api";
+
+import { changePasswordAction } from "../_actions/profile-actions";
 
 const passwordSchema = z
   .object({
@@ -27,7 +28,7 @@ const passwordSchema = z
 type PasswordData = z.infer<typeof passwordSchema>;
 
 export function PasswordChange() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -42,39 +43,34 @@ export function PasswordChange() {
     },
   });
 
-  const onSubmit = async (data: PasswordData) => {
-    setIsSubmitting(true);
-    try {
-      const response = await fetch("/api/account/password", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+  const onSubmit = (data: PasswordData) => {
+    startTransition(async () => {
+      try {
+        const formData = new FormData();
+        formData.append("currentPassword", data.currentPassword);
+        formData.append("newPassword", data.newPassword);
+        formData.append("confirmPassword", data.confirmPassword);
 
-      const result = (await response.json()) as PasswordChangeResponse | ErrorResponse;
+        const result = await changePasswordAction(formData);
 
-      if (!response.ok) {
-        const errorResult = result as ErrorResponse;
-        throw new Error(errorResult.error || "Failed to change password");
+        if (!result.success) {
+          throw new Error(result.error);
+        }
+
+        toast({
+          title: "Success",
+          description: result.message,
+        });
+
+        form.reset();
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: error instanceof Error ? error.message : "Failed to change password",
+          variant: "destructive",
+        });
       }
-
-      toast({
-        title: "Success",
-        description: "Password changed successfully",
-      });
-
-      form.reset();
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to change password",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    });
   };
 
   return (
@@ -104,7 +100,7 @@ export function PasswordChange() {
                         placeholder="Enter current password"
                         type={showCurrentPassword ? "text" : "password"}
                         {...field}
-                        disabled={isSubmitting}
+                        disabled={isPending}
                       />
                       <Button
                         type="button"
@@ -114,7 +110,7 @@ export function PasswordChange() {
                         onClick={() => {
                           setShowCurrentPassword(!showCurrentPassword);
                         }}
-                        disabled={isSubmitting}
+                        disabled={isPending}
                       >
                         {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </Button>
@@ -137,7 +133,7 @@ export function PasswordChange() {
                         placeholder="Enter new password"
                         type={showNewPassword ? "text" : "password"}
                         {...field}
-                        disabled={isSubmitting}
+                        disabled={isPending}
                       />
                       <Button
                         type="button"
@@ -147,7 +143,7 @@ export function PasswordChange() {
                         onClick={() => {
                           setShowNewPassword(!showNewPassword);
                         }}
-                        disabled={isSubmitting}
+                        disabled={isPending}
                       >
                         {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </Button>
@@ -170,7 +166,7 @@ export function PasswordChange() {
                         placeholder="Confirm new password"
                         type={showConfirmPassword ? "text" : "password"}
                         {...field}
-                        disabled={isSubmitting}
+                        disabled={isPending}
                       />
                       <Button
                         type="button"
@@ -180,7 +176,7 @@ export function PasswordChange() {
                         onClick={() => {
                           setShowConfirmPassword(!showConfirmPassword);
                         }}
-                        disabled={isSubmitting}
+                        disabled={isPending}
                       >
                         {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </Button>
@@ -198,12 +194,12 @@ export function PasswordChange() {
                 onClick={() => {
                   form.reset();
                 }}
-                disabled={isSubmitting}
+                disabled={isPending}
               >
                 Reset
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Changing..." : "Change Password"}
+              <Button type="submit" disabled={isPending}>
+                {isPending ? "Changing..." : "Change Password"}
               </Button>
             </div>
           </form>

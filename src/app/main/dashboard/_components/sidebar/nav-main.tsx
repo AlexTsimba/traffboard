@@ -6,12 +6,6 @@ import { usePathname } from "next/navigation";
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -47,23 +41,14 @@ const NavItemExpanded = ({
       <SidebarMenuItem>
         <CollapsibleTrigger asChild>
           {item.subItems ? (
-            <SidebarMenuButton
-              disabled={item.comingSoon}
-              isActive={isActive(item.url, item.subItems)}
-              tooltip={undefined}
-            >
+            <SidebarMenuButton disabled={item.comingSoon} isActive={isActive(item.url, item.subItems)}>
               {item.icon && <item.icon />}
               <span>{item.title}</span>
               {item.comingSoon && <IsComingSoon />}
               <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
             </SidebarMenuButton>
           ) : (
-            <SidebarMenuButton
-              asChild
-              aria-disabled={item.comingSoon}
-              isActive={isActive(item.url)}
-              tooltip={undefined}
-            >
+            <SidebarMenuButton asChild aria-disabled={item.comingSoon} isActive={isActive(item.url)}>
               <Link href={item.url} target={item.newTab ? "_blank" : undefined}>
                 {item.icon && <item.icon />}
                 <span>{item.title}</span>
@@ -97,47 +82,26 @@ const NavItemExpanded = ({
 const NavItemCollapsed = ({
   item,
   isActive,
-  state,
-  isMobile,
 }: {
   item: NavMainItem;
   isActive: (url: string, subItems?: NavMainItem["subItems"]) => boolean;
-  state: string;
-  isMobile: boolean;
 }) => {
+  // For collapsed sidebar, if item has subitems, we'll just link to the first subitem or main item
+  const linkUrl = item.subItems && item.subItems.length > 0 ? item.subItems[0].url : item.url;
+
   return (
     <SidebarMenuItem key={item.title}>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <SidebarMenuButton
-            className="flex h-10 w-10 items-center"
-            disabled={item.comingSoon}
-            isActive={isActive(item.url, item.subItems)}
-            tooltip={state === "collapsed" && !isMobile ? item.title : undefined}
-          >
-            {item.icon && <item.icon className="text-xl" />}
-            <span className="sr-only">{item.title}</span>
-          </SidebarMenuButton>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="w-50 space-y-1" side="right">
-          {item.subItems?.map((subItem) => (
-            <DropdownMenuItem key={subItem.title} asChild>
-              <SidebarMenuSubButton
-                asChild
-                aria-disabled={subItem.comingSoon}
-                className="focus-visible:ring-0"
-                isActive={isActive(subItem.url)}
-              >
-                <Link href={subItem.url} target={subItem.newTab ? "_blank" : undefined}>
-                  {subItem.icon && <subItem.icon className="[&>svg]:text-sidebar-foreground" />}
-                  <span>{subItem.title}</span>
-                  {subItem.comingSoon && <IsComingSoon />}
-                </Link>
-              </SidebarMenuSubButton>
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <SidebarMenuButton
+        asChild
+        className="flex h-10 w-10 items-center justify-center"
+        isActive={isActive(item.url, item.subItems)}
+        tooltip={item.title}
+      >
+        <Link href={linkUrl} target={item.newTab ? "_blank" : undefined}>
+          {item.icon && <item.icon className="text-xl" />}
+          <span className="sr-only">{item.title}</span>
+        </Link>
+      </SidebarMenuButton>
     </SidebarMenuItem>
   );
 };
@@ -166,13 +130,7 @@ export function NavMain({ items }: NavMainProps) {
             <SidebarMenu>
               {group.items.map((item) =>
                 state === "collapsed" && !isMobile ? (
-                  <NavItemCollapsed
-                    key={item.title}
-                    isActive={isItemActive}
-                    item={item}
-                    state={state}
-                    isMobile={isMobile}
-                  />
+                  <NavItemCollapsed key={item.title} isActive={isItemActive} item={item} />
                 ) : (
                   <NavItemExpanded key={item.title} isActive={isItemActive} isSubmenuOpen={isSubmenuOpen} item={item} />
                 ),

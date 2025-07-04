@@ -1,186 +1,44 @@
 "use server";
 
-import bcryptjs from "bcryptjs";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
-import { prisma } from "@/lib/prisma";
+import { createUser, deleteUser, getUsers, updateUser } from "@/lib/data/users";
 
-import { auth } from "../../../../../../auth";
-
-// Validation schemas
+// Input validation schemas using Zod
 const createUserSchema = z.object({
   name: z.string().min(1, "Name is required").max(100),
   email: z.string().email("Invalid email format"),
   password: z.string().min(8, "Password must be at least 8 characters"),
-  role: z.enum(["user", "superuser"]),
+  role: z.enum(["user", "admin"], { message: "Role must be either user or admin" }),
 });
 
 const updateUserSchema = z.object({
   name: z.string().min(1, "Name is required").max(100),
   email: z.string().email("Invalid email format"),
-  role: z.enum(["user", "superuser"]),
-  isActive: z.boolean(),
+  role: z.enum(["user", "admin"], { message: "Role must be either user or admin" }),
 });
 
-// Helper function to check if user is superuser
-async function requireSuperuser() {
-  const session = await auth();
-
-  if (!session?.user) {
-    throw new Error("Unauthorized");
-  }
-
-  if (session.user.role !== "superuser") {
-    throw new Error("Forbidden - Superuser access required");
-  }
-
-  return session;
-}
-
-// Server action to get users with pagination
-export async function getUsersAction(page = 1, limit = 10, search = "", role = "") {
-  try {
-    await requireSuperuser();
-
-    const skip = (page - 1) * limit;
-
-    // Build filter conditions
-    interface WhereCondition {
-      OR?: { name?: { contains: string; mode: "insensitive" }; email?: { contains: string; mode: "insensitive" } }[];
-      role?: string;
-    }
-
-    const where: WhereCondition = {};
-
-    if (search) {
-      where.OR = [
-        { name: { contains: search, mode: "insensitive" } },
-        { email: { contains: search, mode: "insensitive" } },
-      ];
-    }
-
-    if (role && ["user", "superuser"].includes(role)) {
-      where.role = role;
-    }
-
-    // Get users with creator info
-    const [users, total] = await Promise.all([
-      prisma.user.findMany({
-        where,
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          role: true,
-          isActive: true,
-          lastLoginAt: true,
-          createdAt: true,
-          updatedAt: true,
-          createdByUser: {
-            select: {
-              name: true,
-              email: true,
-            },
-          },
-          lastModifiedByUser: {
-            select: {
-              name: true,
-              email: true,
-            },
-          },
-        },
-        orderBy: { createdAt: "desc" },
-        skip,
-        take: limit,
-      }),
-      prisma.user.count({ where }),
-    ]);
-
-    return {
-      success: true,
-      users,
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit),
-      },
-    };
-  } catch (error) {
-    console.error("Error fetching users:", error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Failed to fetch users",
-    };
-  }
-}
-
-// Server action to create user
+/**
+ * SECURE Server Action: Create new user
+ * Uses Data Access Layer for all authentication and authorization
+ */
 export async function createUserAction(formData: FormData) {
   try {
-    const session = await requireSuperuser();
-
-    const data = {
-      name: formData.get("name") as string,
-      email: formData.get("email") as string,
-      password: formData.get("password") as string,
-      role: formData.get("role") as string,
+    // Input validation
+    const rawData = {
+      name: formData.get("name"),
+      email: formData.get("email"),
+      password: formData.get("password"),
+      role: formData.get("role"),
     };
 
-    const validation = createUserSchema.safeParse(data);
-    if (!validation.success) {
-      return {
-        success: false,
-        error: "Validation failed",
-        details: validation.error.errors,
-      };
-    }
+    const validatedData = createUserSchema.parse(rawData);
 
-    const { name, email, password, role } = validation.data;
+    // Use secure Data Access Layer (handles auth automatically)
+    const user = await createUser(validatedData);
 
-    // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    });
-
-    if (existingUser) {
-      return {
-        success: false,
-        error: "User with this email already exists",
-      };
-    }
-
-    // Hash password
-    const passwordHash = await bcryptjs.hash(password, 12);
-
-    // Create user
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        passwordHash,
-        role,
-        createdBy: session.user.id,
-        lastModifiedBy: session.user.id,
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        isActive: true,
-        createdAt: true,
-        createdByUser: {
-          select: {
-            name: true,
-            email: true,
-          },
-        },
-      },
-    });
-
-    // Revalidate the administration page
+    // Revalidate admin pages
     revalidatePath("/main/dashboard/administration");
 
     return {
@@ -197,88 +55,31 @@ export async function createUserAction(formData: FormData) {
   }
 }
 
-// Server action to update user
+/**
+ * SECURE Server Action: Update user
+ * Uses Data Access Layer for all authentication and authorization
+ */
 export async function updateUserAction(userId: string, formData: FormData) {
   try {
-    const session = await requireSuperuser();
-
-    const data = {
-      name: formData.get("name") as string,
-      email: formData.get("email") as string,
-      role: formData.get("role") as string,
-      isActive: formData.get("isActive") === "true",
+    // Input validation
+    const rawData = {
+      name: formData.get("name"),
+      email: formData.get("email"),
+      role: formData.get("role"),
     };
 
-    const validation = updateUserSchema.safeParse(data);
-    if (!validation.success) {
-      return {
-        success: false,
-        error: "Validation failed",
-        details: validation.error.errors,
-      };
-    }
+    const validatedData = updateUserSchema.parse(rawData);
 
-    const { name, email, role, isActive } = validation.data;
+    // Use secure Data Access Layer (handles auth automatically)
+    const user = await updateUser(userId, validatedData);
 
-    // Check if user exists
-    const existingUser = await prisma.user.findUnique({
-      where: { id: userId },
-    });
-
-    if (!existingUser) {
-      return {
-        success: false,
-        error: "User not found",
-      };
-    }
-
-    // Check if email is already taken by another user
-    if (email !== existingUser.email) {
-      const emailExists = await prisma.user.findUnique({
-        where: { email },
-      });
-
-      if (emailExists) {
-        return {
-          success: false,
-          error: "Email already in use by another user",
-        };
-      }
-    }
-
-    // Update user
-    const updatedUser = await prisma.user.update({
-      where: { id: userId },
-      data: {
-        name,
-        email,
-        role,
-        isActive,
-        lastModifiedBy: session.user.id,
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        isActive: true,
-        updatedAt: true,
-        lastModifiedByUser: {
-          select: {
-            name: true,
-            email: true,
-          },
-        },
-      },
-    });
-
-    // Revalidate the administration page
+    // Revalidate admin pages
     revalidatePath("/main/dashboard/administration");
 
     return {
       success: true,
       message: "User updated successfully",
-      user: updatedUser,
+      user,
     };
   } catch (error) {
     console.error("Error updating user:", error);
@@ -289,46 +90,21 @@ export async function updateUserAction(userId: string, formData: FormData) {
   }
 }
 
-// Server action to delete/deactivate user
+/**
+ * SECURE Server Action: Delete user
+ * Uses Data Access Layer for all authentication and authorization
+ */
 export async function deleteUserAction(userId: string) {
   try {
-    const session = await requireSuperuser();
+    // Use secure Data Access Layer (handles auth automatically)
+    await deleteUser(userId);
 
-    // Check if user exists
-    const existingUser = await prisma.user.findUnique({
-      where: { id: userId },
-    });
-
-    if (!existingUser) {
-      return {
-        success: false,
-        error: "User not found",
-      };
-    }
-
-    // Prevent self-deletion
-    if (userId === session.user.id) {
-      return {
-        success: false,
-        error: "Cannot delete your own account",
-      };
-    }
-
-    // Soft delete (deactivate) the user instead of hard delete
-    await prisma.user.update({
-      where: { id: userId },
-      data: {
-        isActive: false,
-        lastModifiedBy: session.user.id,
-      },
-    });
-
-    // Revalidate the administration page
+    // Revalidate admin pages
     revalidatePath("/main/dashboard/administration");
 
     return {
       success: true,
-      message: "User deactivated successfully",
+      message: "User deleted successfully",
     };
   } catch (error) {
     console.error("Error deleting user:", error);
@@ -339,44 +115,32 @@ export async function deleteUserAction(userId: string) {
   }
 }
 
-// Server action to reactivate user
-export async function reactivateUserAction(userId: string) {
+/**
+ * SECURE Server Action: Get users list
+ * Uses Data Access Layer for all authentication and authorization
+ */
+export async function getUsersAction(page = 1, limit = 10, search = "") {
   try {
-    const session = await requireSuperuser();
-
-    // Check if user exists
-    const existingUser = await prisma.user.findUnique({
-      where: { id: userId },
-    });
-
-    if (!existingUser) {
-      return {
-        success: false,
-        error: "User not found",
-      };
-    }
-
-    // Reactivate the user
-    await prisma.user.update({
-      where: { id: userId },
-      data: {
-        isActive: true,
-        lastModifiedBy: session.user.id,
-      },
-    });
-
-    // Revalidate the administration page
-    revalidatePath("/main/dashboard/administration");
+    // Use secure Data Access Layer (handles auth automatically)
+    const { users, totalCount } = await getUsers(page, limit, search || undefined);
 
     return {
       success: true,
-      message: "User reactivated successfully",
+      users,
+      pagination: {
+        page,
+        limit,
+        total: totalCount,
+        pages: Math.ceil(totalCount / limit),
+      },
     };
   } catch (error) {
-    console.error("Error reactivating user:", error);
+    console.error("Error fetching users:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to reactivate user",
+      error: error instanceof Error ? error.message : "Failed to fetch users",
+      users: [],
+      pagination: { page: 1, limit: 10, total: 0, pages: 0 },
     };
   }
 }

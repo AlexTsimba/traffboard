@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Shield, ShieldCheck, Copy, Eye, EyeOff } from "lucide-react";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -14,9 +14,17 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import type { TwoFactorSetupResponse, TwoFactorToggleResponse, ProfileResponse, ErrorResponse } from "@/types/api";
+import type { Safe2FASetup, Safe2FAStatus } from "@/lib/data/two-factor";
+
+import {
+  get2FAStatusAction,
+  generate2FASetupAction,
+  enable2FAAction,
+  disable2FAAction,
+} from "../_actions/two-factor-actions";
 
 const setupSchema = z.object({
+  secret: z.string().min(1, "Secret is required"),
   code: z.string().min(6, "Code must be 6 digits").max(6, "Code must be 6 digits"),
 });
 
@@ -29,10 +37,10 @@ type SetupData = z.infer<typeof setupSchema>;
 type DisableData = z.infer<typeof disableSchema>;
 
 export function TwoFactorSetup() {
-  const [is2FAEnabled, setIs2FAEnabled] = useState<boolean | null>(null);
-  const [setupData, setSetupData] = useState<TwoFactorSetupResponse | null>(null);
+  const [status, setStatus] = useState<Safe2FAStatus | null>(null);
+  const [setupData, setSetupData] = useState<Safe2FASetup | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const [setupDialogOpen, setSetupDialogOpen] = useState(false);
   const [disableDialogOpen, setDisableDialogOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -40,7 +48,7 @@ export function TwoFactorSetup() {
 
   const setupForm = useForm<SetupData>({
     resolver: zodResolver(setupSchema),
-    defaultValues: { code: "" },
+    defaultValues: { secret: "", code: "" },
   });
 
   const disableForm = useForm<DisableData>({
@@ -48,124 +56,139 @@ export function TwoFactorSetup() {
     defaultValues: { password: "", code: "" },
   });
 
+  // Load 2FA status on component mount
   useEffect(() => {
-    const check2FAStatus = async () => {
+    const loadStatus = async () => {
       try {
-        const response = await fetch("/api/account/profile");
-        if (response.ok) {
-          const data = (await response.json()) as ProfileResponse;
-          // Check if user has totpSecret (this would need to be added to the profile endpoint)
-          setIs2FAEnabled(!!data.user.totpSecret);
+        const result = await get2FAStatusAction();
+        if (result.success && result.status) {
+          setStatus(result.status);
+        } else {
+          toast({
+            title: "Error",
+            description: result.error ?? "Failed to load 2FA status",
+            variant: "destructive",
+          });
         }
       } catch (error) {
-        console.error("Error checking 2FA status:", error);
+        console.error("Error loading 2FA status:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load 2FA status",
+          variant: "destructive",
+        });
       } finally {
         setLoading(false);
       }
     };
 
-    void check2FAStatus();
-  }, []);
+    void loadStatus();
+  }, [toast]);
 
-  const handleStartSetup = async () => {
-    try {
-      setIsSubmitting(true);
-      const response = await fetch("/api/account/2fa/setup");
+  const handleStartSetup = () => {
+    startTransition(async () => {
+      try {
+        const result = await generate2FASetupAction();
 
-      if (!response.ok) {
-        const error = (await response.json()) as ErrorResponse;
-        throw new Error(error.error || "Failed to start 2FA setup");
+        if (result.success && result.setupData) {
+          setSetupData(result.setupData);
+          setSetupDialogOpen(true);
+          setupForm.reset();
+        } else {
+          toast({
+            title: "Error",
+            description: result.error ?? "Failed to start 2FA setup",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        console.error("Error starting 2FA setup:", error);
+        toast({
+          title: "Error",
+          description: "Failed to start 2FA setup",
+          variant: "destructive",
+        });
       }
-
-      const data = (await response.json()) as TwoFactorSetupResponse;
-      setSetupData(data);
-      setSetupDialogOpen(true);
-      setupForm.reset();
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to start 2FA setup",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    });
   };
 
-  const handleCompleteSetup = async (data: SetupData) => {
+  const handleCompleteSetup = (data: SetupData) => {
     if (!setupData) return;
 
-    try {
-      setIsSubmitting(true);
-      const response = await fetch("/api/account/2fa/setup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          secret: setupData.secret,
-          code: data.code,
-        }),
-      });
+    startTransition(async () => {
+      try {
+        // Create FormData for Server Action
+        const formData = new FormData();
+        formData.append("secret", data.secret);
+        formData.append("code", data.code);
 
-      const result = (await response.json()) as TwoFactorToggleResponse | ErrorResponse;
+        const result = await enable2FAAction(formData);
 
-      if (!response.ok) {
-        const errorResult = result as ErrorResponse;
-        throw new Error(errorResult.error || "Failed to enable 2FA");
+        if (result.success) {
+          toast({
+            title: "Success",
+            description: "2FA has been enabled successfully",
+          });
+
+          // Update status and close dialog
+          setStatus((prev) => (prev ? { ...prev, isEnabled: true } : null));
+          setSetupDialogOpen(false);
+          setSetupData(null);
+          setupForm.reset();
+        } else {
+          toast({
+            title: "Error",
+            description: result.error ?? "Failed to enable 2FA",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        console.error("Error enabling 2FA:", error);
+        toast({
+          title: "Error",
+          description: "Failed to enable 2FA",
+          variant: "destructive",
+        });
       }
-
-      toast({
-        title: "Success",
-        description: "2FA has been enabled successfully",
-      });
-
-      setIs2FAEnabled(true);
-      setSetupDialogOpen(false);
-      setSetupData(null);
-      setupForm.reset();
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to enable 2FA",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    });
   };
 
-  const handleDisable2FA = async (data: DisableData) => {
-    try {
-      setIsSubmitting(true);
-      const response = await fetch("/api/account/2fa/disable", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
+  const handleDisable2FA = (data: DisableData) => {
+    startTransition(async () => {
+      try {
+        // Create FormData for Server Action
+        const formData = new FormData();
+        formData.append("password", data.password);
+        formData.append("code", data.code);
 
-      const result = (await response.json()) as TwoFactorToggleResponse | ErrorResponse;
+        const result = await disable2FAAction(formData);
 
-      if (!response.ok) {
-        const errorResult = result as ErrorResponse;
-        throw new Error(errorResult.error || "Failed to disable 2FA");
+        if (result.success) {
+          toast({
+            title: "Success",
+            description: "2FA has been disabled successfully",
+          });
+
+          // Update status and close dialog
+          setStatus((prev) => (prev ? { ...prev, isEnabled: false } : null));
+          setDisableDialogOpen(false);
+          disableForm.reset();
+        } else {
+          toast({
+            title: "Error",
+            description: result.error ?? "Failed to disable 2FA",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        console.error("Error disabling 2FA:", error);
+        toast({
+          title: "Error",
+          description: "Failed to disable 2FA",
+          variant: "destructive",
+        });
       }
-
-      toast({
-        title: "Success",
-        description: "2FA has been disabled successfully",
-      });
-
-      setIs2FAEnabled(false);
-      setDisableDialogOpen(false);
-      disableForm.reset();
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to disable 2FA",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    });
   };
 
   const copyToClipboard = (text: string) => {
@@ -194,7 +217,7 @@ export function TwoFactorSetup() {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          {is2FAEnabled ? <ShieldCheck className="h-5 w-5 text-green-600" /> : <Shield className="h-5 w-5" />}
+          {status?.isEnabled ? <ShieldCheck className="h-5 w-5 text-green-600" /> : <Shield className="h-5 w-5" />}
           Two-Factor Authentication
         </CardTitle>
         <CardDescription>Add an extra layer of security to your account with TOTP-based authentication</CardDescription>
@@ -203,10 +226,12 @@ export function TwoFactorSetup() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium">Status:</span>
-            <Badge variant={is2FAEnabled ? "default" : "secondary"}>{is2FAEnabled ? "Enabled" : "Disabled"}</Badge>
+            <Badge variant={status?.isEnabled ? "default" : "secondary"}>
+              {status?.isEnabled ? "Enabled" : "Disabled"}
+            </Badge>
           </div>
 
-          {is2FAEnabled ? (
+          {status?.isEnabled ? (
             <Dialog open={disableDialogOpen} onOpenChange={setDisableDialogOpen}>
               <DialogTrigger asChild>
                 <Button variant="destructive" size="sm">
@@ -237,7 +262,7 @@ export function TwoFactorSetup() {
                                 type={showPassword ? "text" : "password"}
                                 placeholder="Enter your password"
                                 {...field}
-                                disabled={isSubmitting}
+                                disabled={isPending}
                               />
                               <Button
                                 type="button"
@@ -247,7 +272,7 @@ export function TwoFactorSetup() {
                                 onClick={() => {
                                   setShowPassword(!showPassword);
                                 }}
-                                disabled={isSubmitting}
+                                disabled={isPending}
                               >
                                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                               </Button>
@@ -265,7 +290,7 @@ export function TwoFactorSetup() {
                         <FormItem>
                           <FormLabel>Verification Code</FormLabel>
                           <FormControl>
-                            <Input placeholder="Enter 6-digit code" {...field} disabled={isSubmitting} maxLength={6} />
+                            <Input placeholder="Enter 6-digit code" {...field} disabled={isPending} maxLength={6} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -279,12 +304,12 @@ export function TwoFactorSetup() {
                         onClick={() => {
                           setDisableDialogOpen(false);
                         }}
-                        disabled={isSubmitting}
+                        disabled={isPending}
                       >
                         Cancel
                       </Button>
-                      <Button type="submit" variant="destructive" disabled={isSubmitting}>
-                        {isSubmitting ? "Disabling..." : "Disable 2FA"}
+                      <Button type="submit" variant="destructive" disabled={isPending}>
+                        {isPending ? "Disabling..." : "Disable 2FA"}
                       </Button>
                     </div>
                   </form>
@@ -294,16 +319,16 @@ export function TwoFactorSetup() {
           ) : (
             <Button
               onClick={() => {
-                void handleStartSetup();
+                handleStartSetup();
               }}
-              disabled={isSubmitting}
+              disabled={isPending}
             >
-              {isSubmitting ? "Setting up..." : "Enable 2FA"}
+              {isPending ? "Setting up..." : "Enable 2FA"}
             </Button>
           )}
         </div>
 
-        {is2FAEnabled && (
+        {status?.isEnabled && (
           <div className="text-muted-foreground text-sm">
             Two-factor authentication is enabled. Use your authenticator app to generate codes when signing in.
           </div>
@@ -357,12 +382,24 @@ export function TwoFactorSetup() {
                   >
                     <FormField
                       control={setupForm.control}
+                      name="secret"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Input type="hidden" {...field} value={setupData.secret} />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={setupForm.control}
                       name="code"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Verification Code</FormLabel>
                           <FormControl>
-                            <Input placeholder="Enter 6-digit code" {...field} disabled={isSubmitting} maxLength={6} />
+                            <Input placeholder="Enter 6-digit code" {...field} disabled={isPending} maxLength={6} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -376,12 +413,12 @@ export function TwoFactorSetup() {
                         onClick={() => {
                           setSetupDialogOpen(false);
                         }}
-                        disabled={isSubmitting}
+                        disabled={isPending}
                       >
                         Cancel
                       </Button>
-                      <Button type="submit" disabled={isSubmitting}>
-                        {isSubmitting ? "Verifying..." : "Enable 2FA"}
+                      <Button type="submit" disabled={isPending}>
+                        {isPending ? "Verifying..." : "Enable 2FA"}
                       </Button>
                     </div>
                   </form>

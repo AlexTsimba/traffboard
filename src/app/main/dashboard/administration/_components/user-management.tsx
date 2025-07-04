@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, Search, MoreHorizontal, Edit2, Trash2, RotateCcw } from "lucide-react";
+import { Plus, Search, MoreHorizontal, Edit2, Trash2 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useTransition } from "react";
 
@@ -16,8 +16,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
+import type { SafeUser } from "@/lib/data/users";
 
-import { deleteUserAction, reactivateUserAction } from "../_actions/user-actions";
+import { deleteUserAction } from "../_actions/user-actions";
 
 import { CreateUserForm } from "./create-user-form";
 
@@ -40,19 +41,6 @@ const getStatusBadgeVariant = {
   inactive: "outline" as const,
 };
 
-interface User {
-  id: string;
-  name: string | null;
-  email: string;
-  role: string;
-  isActive: boolean;
-  lastLoginAt: Date | null;
-  createdAt: Date;
-  updatedAt: Date;
-  createdByUser: { name: string | null; email: string } | null;
-  lastModifiedByUser: { name: string | null; email: string } | null;
-}
-
 interface Pagination {
   page: number;
   limit: number;
@@ -61,7 +49,7 @@ interface Pagination {
 }
 
 interface UserManagementProps {
-  readonly initialUsers: User[];
+  readonly initialUsers: SafeUser[];
   readonly initialPagination: Pagination;
   readonly initialSearch: string;
   readonly initialRole: string;
@@ -104,10 +92,10 @@ export function UserManagement({
     router.refresh();
   };
 
-  const handleUserAction = (userId: string, action: "delete" | "reactivate") => {
+  const handleDeleteUser = (userId: string) => {
     startTransition(async () => {
       try {
-        const result = action === "delete" ? await deleteUserAction(userId) : await reactivateUserAction(userId);
+        const result = await deleteUserAction(userId);
 
         if (result.success) {
           toast({
@@ -203,16 +191,13 @@ export function UserManagement({
                     <Badge variant={getRoleBadgeVariant(user.role)}>{user.role}</Badge>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={user.isActive ? getStatusBadgeVariant.active : getStatusBadgeVariant.inactive}>
-                      {user.isActive ? "Active" : "Inactive"}
+                    <Badge
+                      variant={(user.isActive ?? true) ? getStatusBadgeVariant.active : getStatusBadgeVariant.inactive}
+                    >
+                      {(user.isActive ?? true) ? "Active" : "Inactive"}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-muted-foreground text-sm">
-                    {formatDate(user.createdAt)}
-                    {user.createdByUser && (
-                      <div className="text-xs">by {user.createdByUser.name ?? user.createdByUser.email}</div>
-                    )}
-                  </TableCell>
+                  <TableCell className="text-muted-foreground text-sm">{formatDate(user.createdAt)}</TableCell>
                   <TableCell className="text-muted-foreground text-sm">
                     {user.lastLoginAt ? formatDate(user.lastLoginAt) : "Never"}
                   </TableCell>
@@ -228,25 +213,15 @@ export function UserManagement({
                           <Edit2 className="mr-2 h-4 w-4" />
                           Edit
                         </DropdownMenuItem>
-                        {user.isActive ? (
+                        {(user.isActive ?? true) && (
                           <DropdownMenuItem
                             className="text-destructive"
                             onClick={() => {
-                              handleUserAction(user.id, "delete");
+                              handleDeleteUser(user.id);
                             }}
                           >
                             <Trash2 className="mr-2 h-4 w-4" />
                             Deactivate
-                          </DropdownMenuItem>
-                        ) : (
-                          <DropdownMenuItem
-                            className="text-green-600"
-                            onClick={() => {
-                              handleUserAction(user.id, "reactivate");
-                            }}
-                          >
-                            <RotateCcw className="mr-2 h-4 w-4" />
-                            Reactivate
                           </DropdownMenuItem>
                         )}
                       </DropdownMenuContent>

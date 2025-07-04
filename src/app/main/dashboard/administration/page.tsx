@@ -1,29 +1,10 @@
 import { Suspense } from "react";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { requireAdminPageAuth } from "@/lib/auth/page-protection";
+import { getUsers } from "@/lib/data/users";
 
-import { getUsersAction } from "./_actions/user-actions";
 import { UserManagement } from "./_components/user-management";
-
-interface User {
-  id: string;
-  name: string | null;
-  email: string;
-  role: string;
-  isActive: boolean;
-  lastLoginAt: Date | null;
-  createdAt: Date;
-  updatedAt: Date;
-  createdByUser: { name: string | null; email: string } | null;
-  lastModifiedByUser: { name: string | null; email: string } | null;
-}
-
-interface Pagination {
-  page: number;
-  limit: number;
-  total: number;
-  pages: number;
-}
 
 interface AdministrationPageProps {
   readonly searchParams?: Promise<{
@@ -34,22 +15,22 @@ interface AdministrationPageProps {
 }
 
 export default async function AdministrationPage({ searchParams }: AdministrationPageProps) {
+  // SECURITY: Require admin authentication at page level
+  await requireAdminPageAuth();
+
   const resolvedSearchParams = await searchParams;
   const page = Number(resolvedSearchParams?.page) || 1;
   const search = resolvedSearchParams?.search ?? "";
-  const role = resolvedSearchParams?.role ?? "";
 
-  // Load users server-side
-  const usersResult = await getUsersAction(page, 10, search, role);
+  // Load users server-side using secure Data Access Layer
+  const { users, totalCount } = await getUsers(page, 10, search || undefined);
 
-  // Extract values with proper type guards
-  let initialUsers: User[] = [];
-  let initialPagination: Pagination = { page: 1, limit: 10, total: 0, pages: 0 };
-
-  if (usersResult.success) {
-    initialUsers = usersResult.users as User[];
-    initialPagination = usersResult.pagination as Pagination;
-  }
+  const pagination = {
+    page,
+    limit: 10,
+    total: totalCount,
+    pages: Math.ceil(totalCount / 10),
+  };
 
   return (
     <div className="@container/main flex flex-col gap-4 md:gap-6">
@@ -111,10 +92,10 @@ export default async function AdministrationPage({ searchParams }: Administratio
               }
             >
               <UserManagement
-                initialUsers={initialUsers}
-                initialPagination={initialPagination}
+                initialUsers={users}
+                initialPagination={pagination}
                 initialSearch={search}
-                initialRole={role}
+                initialRole=""
               />
             </Suspense>
           </div>

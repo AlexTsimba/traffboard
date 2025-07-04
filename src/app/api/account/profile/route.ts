@@ -1,95 +1,50 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { z } from "zod";
 
-import { prisma } from "@/lib/prisma";
+import { requireAuth } from "@/lib/data/auth";
+import { getCurrentUserProfile, updateUser } from "@/lib/data/users";
 
-import { auth } from "../../../../../auth";
-
-// Validation schema for profile updates
-const updateProfileSchema = z.object({
-  name: z.string().min(1, "Name is required").max(100),
-  email: z.string().email("Invalid email format"),
-});
-
-// GET /api/account/profile - Get current user's profile
+/**
+ * SECURE API Route: Get current user's profile
+ * Uses Data Access Layer for all authentication and data access
+ */
 export async function GET() {
   try {
-    const session = await auth();
-
-    if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        lastLoginAt: true,
-        createdAt: true,
-        updatedAt: true,
-        totpSecret: true,
-      },
-    });
-
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
+    // Use secure Data Access Layer (handles auth automatically)
+    const user = await getCurrentUserProfile();
 
     return NextResponse.json({ user });
   } catch (error) {
     console.error("Error fetching profile:", error);
+
+    if (error instanceof Error && error.message === "Authentication required") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
-// PATCH /api/account/profile - Update current user's profile
+/**
+ * SECURE API Route: Update current user's profile
+ * Uses Data Access Layer for all authentication and validation
+ */
 export async function PATCH(request: NextRequest) {
   try {
-    const session = await auth();
+    // Get current user
+    const currentUser = await requireAuth();
 
-    if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // Parse and validate request body
+    const body = await request.json();
+
+    if (!body.name || !body.email) {
+      return NextResponse.json({ error: "Name and email are required" }, { status: 400 });
     }
 
-    const body = (await request.json()) as unknown;
-    const validation = updateProfileSchema.safeParse(body);
-
-    if (!validation.success) {
-      return NextResponse.json({ error: "Validation failed", details: validation.error.errors }, { status: 400 });
-    }
-
-    const { name, email } = validation.data;
-
-    // Check if email is being changed and if it's unique
-    if (email !== session.user.email) {
-      const existingUser = await prisma.user.findUnique({
-        where: { email },
-      });
-
-      if (existingUser) {
-        return NextResponse.json({ error: "Email already exists" }, { status: 409 });
-      }
-    }
-
-    // Update user profile
-    const updatedUser = await prisma.user.update({
-      where: { id: session.user.id },
-      data: {
-        name,
-        email,
-        lastModifiedBy: session.user.id,
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        updatedAt: true,
-      },
+    // Use secure Data Access Layer (handles validation and auth)
+    const updatedUser = await updateUser(currentUser.id, {
+      name: body.name,
+      email: body.email,
     });
 
     return NextResponse.json({
@@ -98,6 +53,16 @@ export async function PATCH(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error updating profile:", error);
+
+    if (error instanceof Error) {
+      if (error.message === "Authentication required") {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+      if (error.message === "Email already exists") {
+        return NextResponse.json({ error: "Email already exists" }, { status: 409 });
+      }
+    }
+
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

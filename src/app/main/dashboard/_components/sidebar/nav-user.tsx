@@ -29,6 +29,7 @@ export function NavUser({
     readonly name: string;
     readonly email: string;
     readonly avatar: string;
+    readonly role: string;
   };
 }) {
   const { isMobile } = useSidebar();
@@ -79,12 +80,14 @@ export function NavUser({
                   Preferences
                 </a>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <a href="/main/dashboard/administration">
-                  <Shield />
-                  Administration
-                </a>
-              </DropdownMenuItem>
+              {user.role === "superuser" && (
+                <DropdownMenuItem asChild>
+                  <a href="/main/dashboard/administration">
+                    <Shield />
+                    Administration
+                  </a>
+                </DropdownMenuItem>
+              )}
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => void handleLogout()}>

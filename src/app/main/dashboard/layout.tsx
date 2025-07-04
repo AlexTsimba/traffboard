@@ -4,29 +4,25 @@ import { type ReactNode } from "react";
 import { AppSidebar } from "@/app/main/dashboard/_components/sidebar/app-sidebar";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { requirePageAuth } from "@/lib/auth/page-protection";
 import { getSidebarVariant, getSidebarCollapsible, getContentLayout } from "@/lib/layout-preferences";
 import { cn } from "@/lib/utils";
-
-import { auth } from "../../../../auth";
 
 import { SearchDialog } from "./_components/sidebar/search-dialog";
 
 export default async function Layout({ children }: Readonly<{ children: ReactNode }>) {
+  // SECURITY: Page-level authentication check (replaces vulnerable middleware)
+  const { user } = await requirePageAuth();
+
   const cookieStore = await cookies();
   const defaultOpen = cookieStore.get("sidebar_state")?.value === "true";
 
-  const session = await auth();
-  const currentUser = session?.user
-    ? {
-        name: session.user.name ?? "User",
-        email: session.user.email ?? "",
-        avatar: session.user.image ?? "",
-      }
-    : {
-        name: "Guest User",
-        email: "guest@example.com",
-        avatar: "",
-      };
+  const currentUser = {
+    name: user.name ?? "User",
+    email: user.email,
+    avatar: "", // Avatar support will be added in future version
+    role: user.role,
+  };
 
   const sidebarVariant = await getSidebarVariant();
   const sidebarCollapsible = await getSidebarCollapsible();

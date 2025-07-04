@@ -1,12 +1,12 @@
 "use client";
 
-import type { SessionData } from "@/types/api";
+import type { SafeSession } from "@/lib/data/sessions";
 
 import { SessionManagement } from "./session-management";
 import { TwoFactorSetup } from "./two-factor-setup";
 
 interface SecuritySettingsProps {
-  readonly initialSessions: SessionData[];
+  readonly initialSessions: SafeSession[];
 }
 
 export function SecuritySettings({ initialSessions }: SecuritySettingsProps) {

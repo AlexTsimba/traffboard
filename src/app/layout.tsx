@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { type ReactNode } from "react";
 
+import { SessionProviderWrapper } from "@/components/providers/session-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { APP_CONFIG } from "@/config/app-config";
 
@@ -19,10 +20,12 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
   return (
     <html suppressHydrationWarning className="light" lang="en">
       <body className={`${inter.className} min-h-screen antialiased`}>
-        <ThemeProvider disableTransitionOnChange attribute="class" defaultTheme="light" enableSystem={false}>
-          {children}
-          <Toaster />
-        </ThemeProvider>
+        <SessionProviderWrapper>
+          <ThemeProvider disableTransitionOnChange attribute="class" defaultTheme="light" enableSystem={false}>
+            {children}
+            <Toaster />
+          </ThemeProvider>
+        </SessionProviderWrapper>
       </body>
     </html>
   );

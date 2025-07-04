@@ -19,7 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import type { SessionData } from "@/types/api";
+import type { SafeSession } from "@/lib/data/sessions";
 
 import { revokeSessionAction, revokeAllOtherSessionsAction } from "../_actions/session-actions";
 
@@ -33,10 +33,10 @@ const formatDate = (date: Date | string) => {
   }).format(date instanceof Date ? date : new Date(date));
 };
 
-const getRelativeTime = (dateString: string) => {
+const getRelativeTime = (date: Date | string) => {
   const now = Date.now();
-  const date = new Date(dateString).getTime();
-  const diffInMs = now - date;
+  const dateTime = date instanceof Date ? date.getTime() : new Date(date).getTime();
+  const diffInMs = now - dateTime;
   const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
 
   if (diffInMinutes < 1) return "Just now";
@@ -76,7 +76,7 @@ const parseUserAgent = (userAgent: string | null) => {
 };
 
 interface SessionManagementProps {
-  readonly initialSessions: SessionData[];
+  readonly initialSessions: SafeSession[];
 }
 
 export function SessionManagement({ initialSessions }: SessionManagementProps) {

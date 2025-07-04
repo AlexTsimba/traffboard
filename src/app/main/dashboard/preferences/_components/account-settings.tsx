@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState, useEffect } from "react";
+import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -10,7 +10,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import type { ProfileResponse, User } from "@/types/api";
+import type { SafeUser } from "@/lib/data/users";
+
+import { updateProfileAction } from "../_actions/profile-actions";
 
 const profileSchema = z.object({
   name: z.string().min(1, "Name is required").max(100),
@@ -29,100 +31,57 @@ const formatDate = (date: Date | string) => {
   }).format(date instanceof Date ? date : new Date(date));
 };
 
-// User type imported from @/types/api
+interface AccountSettingsProps {
+  readonly initialUser: SafeUser;
+}
 
-export function AccountSettings() {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+export function AccountSettings({ initialUser }: AccountSettingsProps) {
+  const [user, setUser] = useState<SafeUser>(initialUser);
+  const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
 
   const form = useForm<ProfileData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      name: "",
-      email: "",
+      name: user.name ?? "",
+      email: user.email,
     },
   });
 
-  useEffect(() => {
-    const fetchProfile = async () => {
+  const onSubmit = (data: ProfileData) => {
+    startTransition(async () => {
       try {
-        const response = await fetch("/api/account/profile");
-        if (!response.ok) {
-          throw new Error("Failed to fetch profile");
+        const formData = new FormData();
+        formData.append("name", data.name);
+        formData.append("email", data.email);
+
+        const result = await updateProfileAction(formData);
+
+        if (!result.success) {
+          throw new Error(result.error);
         }
 
-        const data = (await response.json()) as ProfileResponse;
-        setUser(data.user);
-        form.reset({
-          name: data.user.name ?? "",
-          email: data.user.email,
+        if (result.user) {
+          setUser(result.user);
+          form.reset({
+            name: result.user.name ?? "",
+            email: result.user.email,
+          });
+        }
+
+        toast({
+          title: "Success",
+          description: result.message,
         });
-      } catch {
+      } catch (error) {
         toast({
           title: "Error",
-          description: "Failed to load profile",
+          description: error instanceof Error ? error.message : "Failed to update profile",
           variant: "destructive",
         });
-      } finally {
-        setLoading(false);
       }
-    };
-
-    void fetchProfile();
-  }, [form, toast]);
-
-  const onSubmit = async (data: ProfileData) => {
-    setIsSubmitting(true);
-    try {
-      const response = await fetch("/api/account/profile", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      const result = (await response.json()) as ProfileResponse | { error: string };
-
-      if (!response.ok) {
-        throw new Error("error" in result ? result.error : "Failed to update profile");
-      }
-
-      if ("user" in result) {
-        setUser(result.user);
-      }
-      toast({
-        title: "Success",
-        description: "Profile updated successfully",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to update profile",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    });
   };
-
-  if (loading) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Account Settings</CardTitle>
-          <CardDescription>Manage your account information</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex h-32 items-center justify-center">
-            <div className="text-muted-foreground">Loading...</div>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
 
   return (
     <div className="space-y-6">
@@ -147,7 +106,7 @@ export function AccountSettings() {
                   <FormItem>
                     <FormLabel>Full Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter your full name" {...field} disabled={isSubmitting} />
+                      <Input placeholder="Enter your full name" {...field} disabled={isPending} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -161,7 +120,7 @@ export function AccountSettings() {
                   <FormItem>
                     <FormLabel>Email Address</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter your email" type="email" {...field} disabled={isSubmitting} />
+                      <Input placeholder="Enter your email" type="email" {...field} disabled={isPending} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -173,14 +132,17 @@ export function AccountSettings() {
                   type="button"
                   variant="outline"
                   onClick={() => {
-                    form.reset();
+                    form.reset({
+                      name: user.name ?? "",
+                      email: user.email,
+                    });
                   }}
-                  disabled={isSubmitting}
+                  disabled={isPending}
                 >
                   Reset
                 </Button>
-                <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? "Updating..." : "Update Profile"}
+                <Button type="submit" disabled={isPending}>
+                  {isPending ? "Updating..." : "Update Profile"}
                 </Button>
               </div>
             </form>
@@ -188,34 +150,32 @@ export function AccountSettings() {
         </CardContent>
       </Card>
 
-      {user && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Account Information</CardTitle>
-            <CardDescription>Read-only information about your account</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <div className="text-muted-foreground text-sm font-medium">Role</div>
-                <p className="text-sm capitalize">{user.role}</p>
-              </div>
-              <div>
-                <div className="text-muted-foreground text-sm font-medium">Account Created</div>
-                <p className="text-sm">{formatDate(user.createdAt)}</p>
-              </div>
-              <div>
-                <div className="text-muted-foreground text-sm font-medium">Last Updated</div>
-                <p className="text-sm">{formatDate(user.updatedAt)}</p>
-              </div>
-              <div>
-                <div className="text-muted-foreground text-sm font-medium">Last Login</div>
-                <p className="text-sm">{user.lastLoginAt ? formatDate(user.lastLoginAt) : "Never"}</p>
-              </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Account Information</CardTitle>
+          <CardDescription>Read-only information about your account</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <div className="text-muted-foreground text-sm font-medium">Role</div>
+              <p className="text-sm capitalize">{user.role}</p>
             </div>
-          </CardContent>
-        </Card>
-      )}
+            <div>
+              <div className="text-muted-foreground text-sm font-medium">Account Created</div>
+              <p className="text-sm">{formatDate(user.createdAt)}</p>
+            </div>
+            <div>
+              <div className="text-muted-foreground text-sm font-medium">Last Updated</div>
+              <p className="text-sm">{formatDate(user.updatedAt)}</p>
+            </div>
+            <div>
+              <div className="text-muted-foreground text-sm font-medium">Last Login</div>
+              <p className="text-sm">{user.lastLoginAt ? formatDate(user.lastLoginAt) : "Never"}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
