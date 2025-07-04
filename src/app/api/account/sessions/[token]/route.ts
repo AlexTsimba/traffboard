@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "../../../../../../auth";
 
 // DELETE /api/account/sessions/[token] - Revoke specific session
-export async function DELETE(request: NextRequest, { params }: { params: { token: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ token: string }> }) {
   try {
     const session = await auth();
 
@@ -14,13 +14,11 @@ export async function DELETE(request: NextRequest, { params }: { params: { token
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const sessionToken = params.token;
-    const currentSessionToken = session.sessionToken;
+    const { token } = await params;
+    const sessionToken = token;
 
-    // Prevent user from revoking their current session
-    if (sessionToken === currentSessionToken) {
-      return NextResponse.json({ error: "Cannot revoke current session. Please logout normally." }, { status: 400 });
-    }
+    // Note: With JWT strategy, we can't easily get the current session token
+    // This is a limitation of JWT-based sessions vs database sessions
 
     // Find and revoke the session
     const targetSession = await prisma.session.findFirst({

@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "../../../../../auth";
 
 interface RouteContext {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 // Define a type for the PATCH request body
@@ -24,7 +24,7 @@ export async function GET(_req: NextRequest, { params }: RouteContext) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     const upload = await prisma.conversionUpload.findFirst({
       where: {
@@ -52,7 +52,7 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await params;
     // Explicitly type the request body
     const { status, recordCount, errorLog } = (await request.json()) as UpdateUploadRequestBody;
 
