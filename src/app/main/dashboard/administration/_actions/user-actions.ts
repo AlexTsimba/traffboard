@@ -4,9 +4,9 @@ import bcryptjs from "bcryptjs";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
-import { auth } from "../../../../../../auth";
-
 import { prisma } from "@/lib/prisma";
+
+import { auth } from "../../../../../../auth";
 
 // Validation schemas
 const createUserSchema = z.object({

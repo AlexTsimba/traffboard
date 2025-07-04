@@ -10,23 +10,23 @@ async function requireSuperuser() {
   const session = await auth();
 
   if (!session?.user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return { error: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) };
   }
 
   if (session.user.role !== "superuser") {
-    return NextResponse.json({ error: "Forbidden - Superuser access required" }, { status: 403 });
+    return { error: NextResponse.json({ error: "Forbidden - Superuser access required" }, { status: 403 }) };
   }
 
-  return null;
+  return { session };
 }
 
 // POST /api/admin/users/[id]/2fa-reset - Admin reset 2FA for a user
 export async function POST(_request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
-    const authError = await requireSuperuser();
-    if (authError) return authError;
+    const authResult = await requireSuperuser();
+    if ("error" in authResult) return authResult.error;
 
-    const session = await auth();
+    const { session } = authResult;
     const { id } = await context.params;
 
     // Check if target user exists
@@ -50,7 +50,7 @@ export async function POST(_request: NextRequest, context: { params: Promise<{ i
 
     // Prevent admin from resetting their own 2FA via this endpoint
     // (they should use the regular user flow)
-    if (id === session.user?.id) {
+    if (id === session.user.id) {
       return NextResponse.json(
         { error: "Cannot reset your own 2FA via admin endpoint. Use account settings instead." },
         { status: 400 },

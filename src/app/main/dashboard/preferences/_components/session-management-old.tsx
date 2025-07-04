@@ -18,8 +18,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import type { SessionsResponse, SessionRevocationResponse, ErrorResponse, SessionData } from "@/types/api";
 
-const formatDate = (dateString: string) => {
+const _formatDate = (dateString: string) => {
   return new Intl.DateTimeFormat("en-US", {
     year: "numeric",
     month: "short",
@@ -37,31 +38,18 @@ const getRelativeTime = (dateString: string) => {
 
   if (diffInMinutes < 1) return "Just now";
   if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
-  
+
   const diffInHours = Math.floor(diffInMinutes / 60);
   if (diffInHours < 24) return `${diffInHours}h ago`;
-  
+
   const diffInDays = Math.floor(diffInHours / 24);
   if (diffInDays < 7) return `${diffInDays}d ago`;
-  
+
   const diffInWeeks = Math.floor(diffInDays / 7);
   return `${diffInWeeks}w ago`;
 };
 
-interface SessionData {
-  sessionToken: string;
-  ipAddress: string | null;
-  userAgent: string | null;
-  deviceType: string | null;
-  browser: string | null;
-  os: string | null;
-  country: string | null;
-  city: string | null;
-  lastActivity: string;
-  createdAt: string;
-  expires: string;
-  isCurrent: boolean;
-}
+// SessionData type imported from @/types/api
 
 export function SessionManagement() {
   const [sessions, setSessions] = useState<SessionData[]>([]);
@@ -78,7 +66,7 @@ export function SessionManagement() {
           throw new Error("Failed to fetch sessions");
         }
 
-        const data = await response.json();
+        const data = (await response.json()) as SessionsResponse;
         setSessions(data.sessions);
       } catch {
         toast({
@@ -102,7 +90,7 @@ export function SessionManagement() {
       });
 
       if (!response.ok) {
-        const error = await response.json();
+        const error = (await response.json()) as ErrorResponse;
         throw new Error(error.error || "Failed to revoke session");
       }
 
@@ -132,11 +120,11 @@ export function SessionManagement() {
       });
 
       if (!response.ok) {
-        const error = await response.json();
+        const error = (await response.json()) as ErrorResponse;
         throw new Error(error.error || "Failed to revoke sessions");
       }
 
-      const result = await response.json();
+      const result = (await response.json()) as SessionRevocationResponse;
 
       // Keep only the current session
       setSessions(sessions.filter((s) => s.isCurrent));
@@ -164,8 +152,9 @@ export function SessionManagement() {
       case "tablet": {
         return <Tablet className="h-5 w-5" />;
       }
-      case undefined:
-      case null:
+      case undefined: {
+        return <Monitor className="h-5 w-5" />;
+      }
       default: {
         return <Monitor className="h-5 w-5" />;
       }
@@ -208,7 +197,7 @@ export function SessionManagement() {
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="font-medium">
-                      {session.browser || "Unknown Browser"} on {session.os || "Unknown OS"}
+                      {session.browser ?? "Unknown Browser"} on {session.os ?? "Unknown OS"}
                     </span>
                     <Badge variant="default">Current</Badge>
                   </div>
@@ -217,7 +206,7 @@ export function SessionManagement() {
                       <MapPin className="h-3 w-3" />
                       {session.city && session.country
                         ? `${session.city}, ${session.country}`
-                        : session.ipAddress || "Unknown location"}
+                        : (session.ipAddress ?? "Unknown location")}
                     </div>
                     <div className="mt-1 flex items-center gap-1">
                       <Calendar className="h-3 w-3" />
@@ -250,7 +239,13 @@ export function SessionManagement() {
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={revokeAllOtherSessions}>Revoke All</AlertDialogAction>
+                    <AlertDialogAction
+                      onClick={() => {
+                        void revokeAllOtherSessions();
+                      }}
+                    >
+                      Revoke All
+                    </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
@@ -263,14 +258,14 @@ export function SessionManagement() {
                     {getDeviceIcon(session.deviceType)}
                     <div>
                       <div className="font-medium">
-                        {session.browser || "Unknown Browser"} on {session.os || "Unknown OS"}
+                        {session.browser ?? "Unknown Browser"} on {session.os ?? "Unknown OS"}
                       </div>
                       <div className="text-muted-foreground text-sm">
                         <div className="flex items-center gap-1">
                           <MapPin className="h-3 w-3" />
                           {session.city && session.country
                             ? `${session.city}, ${session.country}`
-                            : session.ipAddress || "Unknown location"}
+                            : (session.ipAddress ?? "Unknown location")}
                         </div>
                         <div className="mt-1 flex items-center gap-1">
                           <Calendar className="h-3 w-3" />
@@ -294,7 +289,11 @@ export function SessionManagement() {
                       </AlertDialogHeader>
                       <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => revokeSession(session.sessionToken)}>
+                        <AlertDialogAction
+                          onClick={() => {
+                            void revokeSession(session.sessionToken);
+                          }}
+                        >
                           Revoke Session
                         </AlertDialogAction>
                       </AlertDialogFooter>

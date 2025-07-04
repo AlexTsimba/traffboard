@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import type { ProfileResponse, User } from "@/types/api";
 
 const profileSchema = z.object({
   name: z.string().min(1, "Name is required").max(100),
@@ -18,25 +19,17 @@ const profileSchema = z.object({
 
 type ProfileData = z.infer<typeof profileSchema>;
 
-const formatDate = (dateString: string) => {
+const formatDate = (date: Date | string) => {
   return new Intl.DateTimeFormat("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
     hour: "2-digit",
     minute: "2-digit",
-  }).format(new Date(dateString));
+  }).format(date instanceof Date ? date : new Date(date));
 };
 
-interface User {
-  id: string;
-  name: string | null;
-  email: string;
-  role: string;
-  lastLoginAt: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
+// User type imported from @/types/api
 
 export function AccountSettings() {
   const [user, setUser] = useState<User | null>(null);
@@ -60,10 +53,10 @@ export function AccountSettings() {
           throw new Error("Failed to fetch profile");
         }
 
-        const data = await response.json();
+        const data = (await response.json()) as ProfileResponse;
         setUser(data.user);
         form.reset({
-          name: data.user.name || "",
+          name: data.user.name ?? "",
           email: data.user.email,
         });
       } catch {
@@ -91,13 +84,15 @@ export function AccountSettings() {
         body: JSON.stringify(data),
       });
 
-      const result = await response.json();
+      const result = (await response.json()) as ProfileResponse | { error: string };
 
       if (!response.ok) {
-        throw new Error(result.error || "Failed to update profile");
+        throw new Error("error" in result ? result.error : "Failed to update profile");
       }
 
-      setUser(result.user);
+      if ("user" in result) {
+        setUser(result.user);
+      }
       toast({
         title: "Success",
         description: "Profile updated successfully",
@@ -138,7 +133,13 @@ export function AccountSettings() {
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                void form.handleSubmit(onSubmit)(e);
+              }}
+              className="space-y-4"
+            >
               <FormField
                 control={form.control}
                 name="name"
@@ -196,19 +197,19 @@ export function AccountSettings() {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-muted-foreground text-sm font-medium">Role</label>
+                <div className="text-muted-foreground text-sm font-medium">Role</div>
                 <p className="text-sm capitalize">{user.role}</p>
               </div>
               <div>
-                <label className="text-muted-foreground text-sm font-medium">Account Created</label>
+                <div className="text-muted-foreground text-sm font-medium">Account Created</div>
                 <p className="text-sm">{formatDate(user.createdAt)}</p>
               </div>
               <div>
-                <label className="text-muted-foreground text-sm font-medium">Last Updated</label>
+                <div className="text-muted-foreground text-sm font-medium">Last Updated</div>
                 <p className="text-sm">{formatDate(user.updatedAt)}</p>
               </div>
               <div>
-                <label className="text-muted-foreground text-sm font-medium">Last Login</label>
+                <div className="text-muted-foreground text-sm font-medium">Last Login</div>
                 <p className="text-sm">{user.lastLoginAt ? formatDate(user.lastLoginAt) : "Never"}</p>
               </div>
             </div>

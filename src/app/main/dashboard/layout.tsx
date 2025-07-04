@@ -7,11 +7,26 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/s
 import { getSidebarVariant, getSidebarCollapsible, getContentLayout } from "@/lib/layout-preferences";
 import { cn } from "@/lib/utils";
 
+import { auth } from "../../../../auth";
+
 import { SearchDialog } from "./_components/sidebar/search-dialog";
 
 export default async function Layout({ children }: Readonly<{ children: ReactNode }>) {
   const cookieStore = await cookies();
   const defaultOpen = cookieStore.get("sidebar_state")?.value === "true";
+
+  const session = await auth();
+  const currentUser = session?.user
+    ? {
+        name: session.user.name ?? "User",
+        email: session.user.email ?? "",
+        avatar: session.user.image ?? "",
+      }
+    : {
+        name: "Guest User",
+        email: "guest@example.com",
+        avatar: "",
+      };
 
   const sidebarVariant = await getSidebarVariant();
   const sidebarCollapsible = await getSidebarCollapsible();
@@ -19,7 +34,7 @@ export default async function Layout({ children }: Readonly<{ children: ReactNod
 
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
-      <AppSidebar collapsible={sidebarCollapsible} variant={sidebarVariant} />
+      <AppSidebar collapsible={sidebarCollapsible} variant={sidebarVariant} user={currentUser} />
       <SidebarInset className="flex h-screen flex-col">
         {/* Sticky Header */}
         <header className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 flex h-12 shrink-0 items-center gap-2 border-b backdrop-blur transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">

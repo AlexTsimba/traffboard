@@ -15,6 +15,13 @@ import {
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
 import { getInitials } from "@/lib/utils";
 
+import { logoutAction } from "./_actions/logout-action";
+
+// Move handleLogout to outer scope to fix linting issue
+async function handleLogout() {
+  await logoutAction();
+}
+
 export function NavUser({
   user,
 }: {
@@ -80,7 +87,7 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => void handleLogout()}>
               <LogOut />
               Log out
             </DropdownMenuItem>

@@ -2,8 +2,28 @@ import { Suspense } from "react";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import { UserManagement } from "./_components/user-management";
 import { getUsersAction } from "./_actions/user-actions";
+import { UserManagement } from "./_components/user-management";
+
+interface User {
+  id: string;
+  name: string | null;
+  email: string;
+  role: string;
+  isActive: boolean;
+  lastLoginAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+  createdByUser: { name: string | null; email: string } | null;
+  lastModifiedByUser: { name: string | null; email: string } | null;
+}
+
+interface Pagination {
+  page: number;
+  limit: number;
+  total: number;
+  pages: number;
+}
 
 interface AdministrationPageProps {
   readonly searchParams?: Promise<{
@@ -21,6 +41,15 @@ export default async function AdministrationPage({ searchParams }: Administratio
 
   // Load users server-side
   const usersResult = await getUsersAction(page, 10, search, role);
+
+  // Extract values with proper type guards
+  let initialUsers: User[] = [];
+  let initialPagination: Pagination = { page: 1, limit: 10, total: 0, pages: 0 };
+
+  if (usersResult.success) {
+    initialUsers = usersResult.users as User[];
+    initialPagination = usersResult.pagination as Pagination;
+  }
 
   return (
     <div className="@container/main flex flex-col gap-4 md:gap-6">
@@ -76,10 +105,14 @@ export default async function AdministrationPage({ searchParams }: Administratio
           <div className="rounded-lg border p-6">
             <h3 className="mb-4 text-lg font-semibold">User Management</h3>
             <p className="text-muted-foreground mb-6 text-sm">Manage user accounts and permissions</p>
-            <Suspense fallback={<div className="flex h-32 items-center justify-center text-muted-foreground">Loading users...</div>}>
-              <UserManagement 
-                initialUsers={usersResult.success ? usersResult.users : []}
-                initialPagination={usersResult.success ? usersResult.pagination : { page: 1, limit: 10, total: 0, pages: 0 }}
+            <Suspense
+              fallback={
+                <div className="text-muted-foreground flex h-32 items-center justify-center">Loading users...</div>
+              }
+            >
+              <UserManagement
+                initialUsers={initialUsers}
+                initialPagination={initialPagination}
                 initialSearch={search}
                 initialRole={role}
               />

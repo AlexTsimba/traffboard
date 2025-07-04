@@ -1,8 +1,8 @@
 "use client";
 
 import { Monitor, Smartphone, Tablet, MapPin, Calendar, Shield, Trash2 } from "lucide-react";
-import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
 
 import {
   AlertDialog,
@@ -19,17 +19,18 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import type { SessionData } from "@/types/api";
 
 import { revokeSessionAction, revokeAllOtherSessionsAction } from "../_actions/session-actions";
 
-const formatDate = (dateString: string) => {
+const formatDate = (date: Date | string) => {
   return new Intl.DateTimeFormat("en-US", {
     year: "numeric",
     month: "short",
     day: "numeric",
     hour: "2-digit",
     minute: "2-digit",
-  }).format(new Date(dateString));
+  }).format(date instanceof Date ? date : new Date(date));
 };
 
 const getRelativeTime = (dateString: string) => {
@@ -40,13 +41,13 @@ const getRelativeTime = (dateString: string) => {
 
   if (diffInMinutes < 1) return "Just now";
   if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
-  
+
   const diffInHours = Math.floor(diffInMinutes / 60);
   if (diffInHours < 24) return `${diffInHours}h ago`;
-  
+
   const diffInDays = Math.floor(diffInHours / 24);
   if (diffInDays < 7) return `${diffInDays}d ago`;
-  
+
   const diffInWeeks = Math.floor(diffInDays / 7);
   return `${diffInWeeks}w ago`;
 };
@@ -74,23 +75,8 @@ const parseUserAgent = (userAgent: string | null) => {
   return { browser, os };
 };
 
-interface Session {
-  sessionToken: string;
-  expires: string;
-  ipAddress: string | null;
-  userAgent: string | null;
-  deviceType: string | null;
-  browser: string | null;
-  os: string | null;
-  country: string | null;
-  city: string | null;
-  lastActivity: string;
-  createdAt: string;
-  isCurrent: boolean;
-}
-
 interface SessionManagementProps {
-  readonly initialSessions: Session[];
+  readonly initialSessions: SessionData[];
 }
 
 export function SessionManagement({ initialSessions }: SessionManagementProps) {
@@ -106,7 +92,7 @@ export function SessionManagement({ initialSessions }: SessionManagementProps) {
     startTransition(async () => {
       try {
         const result = await revokeSessionAction(sessionToken);
-        
+
         if (result.success) {
           toast({
             title: "Success",
@@ -120,7 +106,7 @@ export function SessionManagement({ initialSessions }: SessionManagementProps) {
             variant: "destructive",
           });
         }
-      } catch (error) {
+      } catch {
         toast({
           title: "Error",
           description: "An unexpected error occurred",
@@ -137,7 +123,7 @@ export function SessionManagement({ initialSessions }: SessionManagementProps) {
     startTransition(async () => {
       try {
         const result = await revokeAllOtherSessionsAction();
-        
+
         if (result.success) {
           toast({
             title: "Success",
@@ -151,7 +137,7 @@ export function SessionManagement({ initialSessions }: SessionManagementProps) {
             variant: "destructive",
           });
         }
-      } catch (error) {
+      } catch {
         toast({
           title: "Error",
           description: "An unexpected error occurred",
@@ -165,12 +151,18 @@ export function SessionManagement({ initialSessions }: SessionManagementProps) {
 
   const getDeviceIcon = (deviceType: string | null) => {
     switch (deviceType?.toLowerCase()) {
-      case "mobile":
+      case "mobile": {
         return <Smartphone className="h-5 w-5" />;
-      case "tablet":
+      }
+      case "tablet": {
         return <Tablet className="h-5 w-5" />;
-      default:
+      }
+      case undefined: {
         return <Monitor className="h-5 w-5" />;
+      }
+      default: {
+        return <Monitor className="h-5 w-5" />;
+      }
     }
   };
 
@@ -184,9 +176,7 @@ export function SessionManagement({ initialSessions }: SessionManagementProps) {
           <Shield className="h-5 w-5" />
           Session Management
         </CardTitle>
-        <CardDescription>
-          Manage your active sessions across different devices and locations
-        </CardDescription>
+        <CardDescription>Manage your active sessions across different devices and locations</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Current Session */}
@@ -197,17 +187,17 @@ export function SessionManagement({ initialSessions }: SessionManagementProps) {
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-3">
                   {getDeviceIcon(currentSession.deviceType)}
-                  <div className="flex-1 min-w-0">
+                  <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <p className="font-medium text-sm">
-                        {currentSession.browser || parseUserAgent(currentSession.userAgent).browser} on{" "}
-                        {currentSession.os || parseUserAgent(currentSession.userAgent).os}
+                      <p className="text-sm font-medium">
+                        {currentSession.browser ?? parseUserAgent(currentSession.userAgent).browser} on{" "}
+                        {currentSession.os ?? parseUserAgent(currentSession.userAgent).os}
                       </p>
                       <Badge variant="default" className="text-xs">
                         Current
                       </Badge>
                     </div>
-                    <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground">
+                    <div className="text-muted-foreground mt-1 flex items-center gap-4 text-xs">
                       {currentSession.ipAddress && (
                         <span className="flex items-center gap-1">
                           <MapPin className="h-3 w-3" />
@@ -224,9 +214,7 @@ export function SessionManagement({ initialSessions }: SessionManagementProps) {
                         Active {getRelativeTime(currentSession.lastActivity)}
                       </span>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Started {formatDate(currentSession.createdAt)}
-                    </p>
+                    <p className="text-muted-foreground mt-1 text-xs">Started {formatDate(currentSession.createdAt)}</p>
                   </div>
                 </div>
               </div>
@@ -237,15 +225,11 @@ export function SessionManagement({ initialSessions }: SessionManagementProps) {
         {/* Other Sessions */}
         {otherSessions.length > 0 && (
           <div>
-            <div className="flex items-center justify-between mb-3">
+            <div className="mb-3 flex items-center justify-between">
               <h3 className="text-sm font-medium">Other Sessions</h3>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={isPending || revokingAll}
-                  >
+                  <Button variant="outline" size="sm" disabled={isPending || revokingAll}>
                     {revokingAll ? "Revoking..." : "Revoke All"}
                   </Button>
                 </AlertDialogTrigger>
@@ -253,13 +237,15 @@ export function SessionManagement({ initialSessions }: SessionManagementProps) {
                   <AlertDialogHeader>
                     <AlertDialogTitle>Revoke All Other Sessions</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This will sign you out of all other devices. You'll need to sign in again on those devices.
+                      This will sign you out of all other devices. You&apos;ll need to sign in again on those devices.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
                     <AlertDialogAction
-                      onClick={() => handleRevokeAllOtherSessions()}
+                      onClick={() => {
+                        handleRevokeAllOtherSessions();
+                      }}
                       className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                     >
                       Revoke All
@@ -278,11 +264,11 @@ export function SessionManagement({ initialSessions }: SessionManagementProps) {
                     <div className="flex items-start justify-between">
                       <div className="flex items-start gap-3">
                         {getDeviceIcon(session.deviceType)}
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-sm">
-                            {session.browser || browser} on {session.os || os}
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium">
+                            {session.browser ?? browser} on {session.os ?? os}
                           </p>
-                          <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground">
+                          <div className="text-muted-foreground mt-1 flex items-center gap-4 text-xs">
                             {session.ipAddress && (
                               <span className="flex items-center gap-1">
                                 <MapPin className="h-3 w-3" />
@@ -299,18 +285,12 @@ export function SessionManagement({ initialSessions }: SessionManagementProps) {
                               Active {getRelativeTime(session.lastActivity)}
                             </span>
                           </div>
-                          <p className="text-xs text-muted-foreground mt-1">
-                            Started {formatDate(session.createdAt)}
-                          </p>
+                          <p className="text-muted-foreground mt-1 text-xs">Started {formatDate(session.createdAt)}</p>
                         </div>
                       </div>
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            disabled={isPending || isRevoking}
-                          >
+                          <Button variant="outline" size="sm" disabled={isPending || isRevoking}>
                             <Trash2 className="h-4 w-4" />
                             {isRevoking ? "Revoking..." : "Revoke"}
                           </Button>
@@ -319,13 +299,15 @@ export function SessionManagement({ initialSessions }: SessionManagementProps) {
                           <AlertDialogHeader>
                             <AlertDialogTitle>Revoke Session</AlertDialogTitle>
                             <AlertDialogDescription>
-                              This will sign out this device. You'll need to sign in again on that device.
+                              This will sign out this device. You&apos;ll need to sign in again on that device.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
                             <AlertDialogAction
-                              onClick={() => handleRevokeSession(session.sessionToken)}
+                              onClick={() => {
+                                handleRevokeSession(session.sessionToken);
+                              }}
                               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                             >
                               Revoke Session
@@ -343,10 +325,10 @@ export function SessionManagement({ initialSessions }: SessionManagementProps) {
 
         {/* No Other Sessions */}
         {otherSessions.length === 0 && (
-          <div className="text-center py-8 text-muted-foreground">
-            <Shield className="h-12 w-12 mx-auto mb-4 opacity-50" />
+          <div className="text-muted-foreground py-8 text-center">
+            <Shield className="mx-auto mb-4 h-12 w-12 opacity-50" />
             <p className="text-sm">No other active sessions</p>
-            <p className="text-xs mt-1">You're only signed in on this device</p>
+            <p className="mt-1 text-xs">You&apos;re only signed in on this device</p>
           </div>
         )}
       </CardContent>

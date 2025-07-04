@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 import { Plus, Search, MoreHorizontal, Edit2, Trash2, RotateCcw } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useTransition } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,16 +18,17 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useToast } from "@/hooks/use-toast";
 
 import { deleteUserAction, reactivateUserAction } from "../_actions/user-actions";
+
 import { CreateUserForm } from "./create-user-form";
 
-const formatDate = (dateString: string) => {
+const formatDate = (date: Date | string) => {
   return new Intl.DateTimeFormat("en-US", {
     year: "numeric",
     month: "short",
     day: "numeric",
     hour: "2-digit",
     minute: "2-digit",
-  }).format(new Date(dateString));
+  }).format(date instanceof Date ? date : new Date(date));
 };
 
 const getRoleBadgeVariant = (role: string): "destructive" | "secondary" => {
@@ -45,9 +46,11 @@ interface User {
   email: string;
   role: string;
   isActive: boolean;
-  lastLoginAt: string | null;
-  createdAt: string;
+  lastLoginAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
   createdByUser: { name: string | null; email: string } | null;
+  lastModifiedByUser: { name: string | null; email: string } | null;
 }
 
 interface Pagination {
@@ -68,12 +71,12 @@ export function UserManagement({
   initialUsers,
   initialPagination,
   initialSearch,
-  _initialRole,
+  initialRole: _initialRole,
 }: UserManagementProps) {
   const [searchTerm, setSearchTerm] = useState(initialSearch);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
-  
+
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
@@ -104,10 +107,8 @@ export function UserManagement({
   const handleUserAction = (userId: string, action: "delete" | "reactivate") => {
     startTransition(async () => {
       try {
-        const result = action === "delete" 
-          ? await deleteUserAction(userId)
-          : await reactivateUserAction(userId);
-        
+        const result = action === "delete" ? await deleteUserAction(userId) : await reactivateUserAction(userId);
+
         if (result.success) {
           toast({
             title: "Success",
@@ -122,6 +123,7 @@ export function UserManagement({
           });
         }
       } catch (error) {
+        console.error("User action error:", error);
         toast({
           title: "Error",
           description: "An unexpected error occurred",
@@ -229,7 +231,9 @@ export function UserManagement({
                         {user.isActive ? (
                           <DropdownMenuItem
                             className="text-destructive"
-                            onClick={() => handleUserAction(user.id, "delete")}
+                            onClick={() => {
+                              handleUserAction(user.id, "delete");
+                            }}
                           >
                             <Trash2 className="mr-2 h-4 w-4" />
                             Deactivate
@@ -237,7 +241,9 @@ export function UserManagement({
                         ) : (
                           <DropdownMenuItem
                             className="text-green-600"
-                            onClick={() => handleUserAction(user.id, "reactivate")}
+                            onClick={() => {
+                              handleUserAction(user.id, "reactivate");
+                            }}
                           >
                             <RotateCcw className="mr-2 h-4 w-4" />
                             Reactivate

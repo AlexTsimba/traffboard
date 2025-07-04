@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import type { PasswordChangeResponse, ErrorResponse } from "@/types/api";
 
 const passwordSchema = z
   .object({
@@ -52,10 +53,11 @@ export function PasswordChange() {
         body: JSON.stringify(data),
       });
 
-      const result = await response.json();
+      const result = (await response.json()) as PasswordChangeResponse | ErrorResponse;
 
       if (!response.ok) {
-        throw new Error(result.error || "Failed to change password");
+        const errorResult = result as ErrorResponse;
+        throw new Error(errorResult.error || "Failed to change password");
       }
 
       toast({
@@ -83,7 +85,13 @@ export function PasswordChange() {
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              void form.handleSubmit(onSubmit)(e);
+            }}
+            className="space-y-4"
+          >
             <FormField
               control={form.control}
               name="currentPassword"

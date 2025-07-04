@@ -2,9 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 
-import { auth } from "../../../../../../auth";
-
 import { prisma } from "@/lib/prisma";
+
+import { auth } from "../../../../../../auth";
 
 // Helper function to check if user is authenticated
 async function requireAuth() {
@@ -30,6 +30,7 @@ export async function getSessionsAction() {
       },
       select: {
         sessionToken: true,
+        userId: true,
         expires: true,
         ipAddress: true,
         userAgent: true,
@@ -49,9 +50,12 @@ export async function getSessionsAction() {
     const sessionsWithCurrent = sessions.map((s, index) => ({
       ...s,
       isCurrent: index === 0, // Mark first session as current for now
+      deviceName: null, // Add missing fields
+      location: null,
       // Convert dates to strings for client
       expires: s.expires.toISOString(),
       lastActivity: s.lastActivity.toISOString(),
+      lastActiveAt: s.lastActivity.toISOString(),
       createdAt: s.createdAt.toISOString(),
     }));
 

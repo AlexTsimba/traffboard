@@ -1,14 +1,22 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type { SessionData } from "@/types/api";
 
+import { getSessionsAction } from "./_actions/session-actions";
 import { AccountSettings } from "./_components/account-settings";
 import AppearanceSettings from "./_components/appearance-settings";
 import { PasswordChange } from "./_components/password-change";
 import { SecuritySettings } from "./_components/security-settings";
-import { getSessionsAction } from "./_actions/session-actions";
 
 export default async function SettingsPage() {
   // Load sessions server-side
   const sessionsResult = await getSessionsAction();
+
+  // Extract sessions with proper type guards
+  let initialSessions: SessionData[] = [];
+
+  if (sessionsResult.success) {
+    initialSessions = (sessionsResult.sessions ?? []) as SessionData[];
+  }
 
   return (
     <div className="@container/main flex flex-col gap-4">
@@ -28,9 +36,7 @@ export default async function SettingsPage() {
           </div>
         </TabsContent>
         <TabsContent className="pt-2" value="security">
-          <SecuritySettings 
-            initialSessions={sessionsResult.success ? sessionsResult.sessions : []}
-          />
+          <SecuritySettings initialSessions={initialSessions} />
         </TabsContent>
         <TabsContent className="pt-2" value="appearance">
           <AppearanceSettings />

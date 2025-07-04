@@ -21,21 +21,21 @@ async function requireSuperuser() {
   const session = await auth();
 
   if (!session?.user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return { error: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) };
   }
 
   if (session.user.role !== "superuser") {
-    return NextResponse.json({ error: "Forbidden - Superuser access required" }, { status: 403 });
+    return { error: NextResponse.json({ error: "Forbidden - Superuser access required" }, { status: 403 }) };
   }
 
-  return null;
+  return { session };
 }
 
 // GET /api/admin/users/[id] - Get specific user details
 export async function GET(_request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
-    const authError = await requireSuperuser();
-    if (authError) return authError;
+    const authResult = await requireSuperuser();
+    if ("error" in authResult) return authResult.error;
 
     const { id } = await context.params;
 
@@ -85,12 +85,12 @@ export async function GET(_request: NextRequest, context: { params: Promise<{ id
 // PATCH /api/admin/users/[id] - Update user
 export async function PATCH(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
-    const authError = await requireSuperuser();
-    if (authError) return authError;
+    const authResult = await requireSuperuser();
+    if ("error" in authResult) return authResult.error;
 
-    const session = await auth();
+    const { session } = authResult;
     const { id } = await context.params;
-    const body = await request.json();
+    const body = (await request.json()) as unknown;
 
     const validation = updateUserSchema.safeParse(body);
     if (!validation.success) {
@@ -146,14 +146,15 @@ export async function PATCH(request: NextRequest, context: { params: Promise<{ i
 
     const updateData: UpdateData = {
       ...updates,
-      lastModifiedBy: session?.user?.id,
+      lastModifiedBy: session.user.id,
     };
 
     // Hash password if provided
     if (updates.password) {
       const passwordHash = await bcryptjs.hash(updates.password, 12);
-      const { password, ...updatesWithoutPassword } = updates;
-      Object.assign(updateData, updatesWithoutPassword, { passwordHash, lastModifiedBy: session?.user?.id });
+      const updatesWithoutPassword = { ...updates };
+      delete updatesWithoutPassword.password;
+      Object.assign(updateData, updatesWithoutPassword, { passwordHash, lastModifiedBy: session.user.id });
     }
 
     // Update user
@@ -189,10 +190,10 @@ export async function PATCH(request: NextRequest, context: { params: Promise<{ i
 // DELETE /api/admin/users/[id] - Delete user (soft delete by deactivating)
 export async function DELETE(_request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
-    const authError = await requireSuperuser();
-    if (authError) return authError;
+    const authResult = await requireSuperuser();
+    if ("error" in authResult) return authResult.error;
 
-    const session = await auth();
+    const { session } = authResult;
     const { id } = await context.params;
 
     // Check if user exists
@@ -206,7 +207,7 @@ export async function DELETE(_request: NextRequest, context: { params: Promise<{
     }
 
     // Prevent deleting yourself
-    if (id === session?.user?.id) {
+    if (id === session.user.id) {
       return NextResponse.json({ error: "Cannot delete your own account" }, { status: 400 });
     }
 
@@ -226,7 +227,7 @@ export async function DELETE(_request: NextRequest, context: { params: Promise<{
       where: { id },
       data: {
         isActive: false,
-        lastModifiedBy: session?.user?.id,
+        lastModifiedBy: session.user.id,
       },
     });
 

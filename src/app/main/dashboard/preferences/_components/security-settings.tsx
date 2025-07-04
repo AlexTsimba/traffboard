@@ -1,25 +1,12 @@
 "use client";
 
+import type { SessionData } from "@/types/api";
+
 import { SessionManagement } from "./session-management";
 import { TwoFactorSetup } from "./two-factor-setup";
 
-interface Session {
-  sessionToken: string;
-  expires: string;
-  ipAddress: string | null;
-  userAgent: string | null;
-  deviceType: string | null;
-  browser: string | null;
-  os: string | null;
-  country: string | null;
-  city: string | null;
-  lastActivity: string;
-  createdAt: string;
-  isCurrent: boolean;
-}
-
 interface SecuritySettingsProps {
-  readonly initialSessions: Session[];
+  readonly initialSessions: SessionData[];
 }
 
 export function SecuritySettings({ initialSessions }: SecuritySettingsProps) {

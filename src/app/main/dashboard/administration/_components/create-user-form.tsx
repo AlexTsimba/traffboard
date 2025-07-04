@@ -22,9 +22,9 @@ export function CreateUserForm({ onUserCreated }: CreateUserFormProps) {
 
   const [, formAction, isPending] = useActionState(
     async (
-      _prevState: { success: boolean; error?: string },
-      formData: FormData
-    ) => {
+      _prevState: { success: boolean; reset?: boolean; error?: string },
+      formData: FormData,
+    ): Promise<{ success: boolean; reset?: boolean; error?: string }> => {
       const result = await createUserAction(formData);
 
       if (result.success) {
@@ -43,33 +43,19 @@ export function CreateUserForm({ onUserCreated }: CreateUserFormProps) {
         return { success: false, error: result.error };
       }
     },
-    { success: false }
+    { success: false, error: undefined },
   );
 
   return (
     <form action={formAction} className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="name">Full Name</Label>
-        <Input
-          id="name"
-          name="name"
-          placeholder="Enter full name"
-          disabled={isPending}
-          required
-          maxLength={100}
-        />
+        <Input id="name" name="name" placeholder="Enter full name" disabled={isPending} required maxLength={100} />
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
-        <Input
-          id="email"
-          name="email"
-          type="email"
-          placeholder="Enter email address"
-          disabled={isPending}
-          required
-        />
+        <Input id="email" name="email" type="email" placeholder="Enter email address" disabled={isPending} required />
       </div>
 
       <div className="space-y-2">

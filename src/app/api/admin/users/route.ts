@@ -20,21 +20,21 @@ async function requireSuperuser() {
   const session = await auth();
 
   if (!session?.user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return { error: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) };
   }
 
   if (session.user.role !== "superuser") {
-    return NextResponse.json({ error: "Forbidden - Superuser access required" }, { status: 403 });
+    return { error: NextResponse.json({ error: "Forbidden - Superuser access required" }, { status: 403 }) };
   }
 
-  return null;
+  return { session };
 }
 
 // GET /api/admin/users - List all users with pagination
 export async function GET(request: NextRequest) {
   try {
-    const authError = await requireSuperuser();
-    if (authError) return authError;
+    const authResult = await requireSuperuser();
+    if ("error" in authResult) return authResult.error;
 
     const { searchParams } = new URL(request.url);
     const page = Number.parseInt(searchParams.get("page") ?? "1");
@@ -114,11 +114,11 @@ export async function GET(request: NextRequest) {
 // POST /api/admin/users - Create new user
 export async function POST(request: NextRequest) {
   try {
-    const authError = await requireSuperuser();
-    if (authError) return authError;
+    const authResult = await requireSuperuser();
+    if ("error" in authResult) return authResult.error;
 
-    const session = await auth();
-    const body = await request.json();
+    const { session } = authResult;
+    const body = (await request.json()) as unknown;
 
     const validation = createUserSchema.safeParse(body);
     if (!validation.success) {
@@ -146,8 +146,8 @@ export async function POST(request: NextRequest) {
         email,
         passwordHash,
         role,
-        createdBy: session?.user?.id,
-        lastModifiedBy: session?.user?.id,
+        createdBy: session.user.id,
+        lastModifiedBy: session.user.id,
       },
       select: {
         id: true,
