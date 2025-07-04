@@ -63,7 +63,9 @@
         "title": "Database Setup and Models Implementation",
         "description": "Set up the database connection using Prisma ORM with PostgreSQL, implement data models optimized for affiliate/gambling analytics, integrate NextAuth.js v5 for authentication, and import real data from CSV files.",
         "status": "pending",
-        "dependencies": [1],
+        "dependencies": [
+          1
+        ],
         "priority": "high",
         "details": "1. Install and configure Prisma ORM with PostgreSQL adapter\n2. Set up connection to PostgreSQL database\n3. Implement the following schemas using Prisma:\n   - users table:\n     * id: serial primary key\n     * email: varchar(255) unique not null\n     * passwordHash: text not null\n     * role: varchar(50) default 'user' not null\n     * totpSecret: text\n     * createdAt: timestamp default now() not null\n   - user_sessions table:\n     * id: serial primary key\n     * userId: integer references users(id)\n     * deviceInfo: text not null\n     * lastActive: timestamp default now() not null\n     * isRevoked: boolean default false not null\n     * createdAt: timestamp default now() not null\n   - analytics tables (e.g., clicks, registrations, revenue) based on CSV data analysis\n4. Integrate NextAuth.js v5 with Prisma adapter for authentication\n5. Import real data from overall_rows.csv and traffic_report.csv into the database\n6. Set up migrations using Prisma Migrate\n7. Create seed data for testing purposes using Prisma's seeding capabilities\n8. Implement database utility functions for common operations\n9. Optimize database setup for deployment on DigitalOcean App Platform",
         "testStrategy": "1. Verify database connection\n2. Run and test migrations\n3. Validate schema creation\n4. Test seed data insertion\n5. Write unit tests for database utility functions\n6. Ensure proper error handling for database operations\n7. Test NextAuth.js v5 authentication flow\n8. Validate CSV data import and analytics functionality",
@@ -83,7 +85,9 @@
             "description": "Install and configure NextAuth.js v5 with Prisma adapter for complete authentication system",
             "details": "**Goal:** Working authentication system with user management\n\n**Actions:**\n- Install NextAuth.js v5: next-auth@beta @auth/prisma-adapter bcryptjs\n- Install types: @types/bcryptjs\n- Create auth.config.ts with basic configuration\n- Create auth.ts with NextAuth + PrismaAdapter setup\n- Add authentication models to Prisma schema (User, Account, Session, VerificationToken)\n- Create app/api/auth/[...nextauth]/route.ts for API routes\n- Add middleware.ts for route protection\n- Create lib/auth.ts for server-side auth utilities\n- Add NEXTAUTH_SECRET and NEXTAUTH_URL to environment variables\n- Implement basic email/password authentication\n- Test complete auth flow (signup, login, session)\n\n**Acceptance Criteria:**\n- NextAuth.js v5 fully configured\n- Prisma adapter working\n- User registration/login functional\n- Protected routes working\n- Session management active\n- Database tables created\n\n**Commit:** \"feat(auth): setup nextauth v5 with prisma adapter - refs task 2.2\"",
             "status": "pending",
-            "dependencies": ["2.1"],
+            "dependencies": [
+              "2.1"
+            ],
             "parentTaskId": 2
           },
           {
@@ -92,7 +96,9 @@
             "description": "Create comprehensive Prisma schema optimized for affiliate/gambling analytics based on CSV data analysis",
             "details": "**Goal:** Complete database schema for analytics platform\n\n**Actions:**\n- Analyze CSV structure from overall_rows.csv and traffic_report.csv\n- Design schema for affiliate/gambling analytics:\n  * Partner model (company info, emails, tags)\n  * Campaign model (campaign details, promo codes)\n  * Player model (signup data, financial metrics, country info)\n  * TrafficReport model (time-series traffic data with conversion metrics)\n- Add proper relationships (Partner -> Campaigns -> Players, TrafficReports)\n- Implement database indexes for analytics queries:\n  * Date-based indexes for time-series data\n  * Partner/Campaign indexes for business analytics\n  * Composite indexes for complex reporting queries\n- Add data validation and constraints\n- Optimize schema for PostgreSQL performance\n- Run prisma generate to create TypeScript types\n- Create and apply initial migration with prisma migrate dev\n\n**Acceptance Criteria:**\n- Schema matches CSV data structure\n- All relationships properly defined\n- Performance indexes implemented\n- TypeScript types generated\n- Migration successfully applied\n- Database optimized for analytics queries\n\n**Commit:** \"feat(database): create analytics schema with indexes - refs task 2.3\"",
             "status": "pending",
-            "dependencies": ["2.1"],
+            "dependencies": [
+              "2.1"
+            ],
             "parentTaskId": 2
           },
           {
@@ -101,7 +107,9 @@
             "description": "Build complete CSV import system with data transformation, validation, and batch processing",
             "details": "**Goal:** Import and process real CSV data into database\n\n**Actions:**\n- Install CSV processing dependencies: csv-parser, @types/csv-parser\n- Create lib/csv-import.ts with generic CSV reading utilities\n- Build data transformation functions:\n  * Clean and validate overall_rows.csv data (6460 records)\n  * Process traffic_report.csv data (4141 records)\n  * Handle data type conversions (dates, numbers, nulls)\n  * Extract unique Partners and Campaigns\n- Implement batch processing for performance (1000 records per batch)\n- Create prisma/seed.ts with complete seeding logic:\n  * Import Partners (from CSV unique values)\n  * Import Campaigns (linked to Partners)\n  * Import Players (from overall_rows.csv)\n  * Import TrafficReports (from traffic_report.csv)\n- Add data validation and error handling\n- Implement idempotent seeding (can run multiple times safely)\n- Add progress logging and performance metrics\n- Test with real CSV files\n\n**Acceptance Criteria:**\n- CSV parsing utilities working\n- All data imported successfully\n- Batch processing implemented\n- Error handling robust\n- Seeding is idempotent\n- Performance optimized\n- Real data accessible in database\n\n**Commit:** \"feat(database): implement csv import with batch processing - refs task 2.4\"",
             "status": "pending",
-            "dependencies": ["2.3"],
+            "dependencies": [
+              "2.3"
+            ],
             "parentTaskId": 2
           },
           {
@@ -110,28 +118,73 @@
             "description": "Optimize database setup for DigitalOcean deployment with connection pooling and production configurations",
             "details": "**Goal:** Production-ready database setup for DigitalOcean App Platform\n\n**Actions:**\n- Configure Prisma for DigitalOcean Managed Database:\n  * Update DATABASE_URL format for DO (with SSL mode required)\n  * Add connection pooling configuration (?pgbouncer=true&connection_limit=10)\n  * Configure pool settings for managed database\n- Create lib/db-config.ts for environment-specific configurations\n- Add production optimizations:\n  * Connection string validation\n  * Pool size optimization for DO instance sizes\n  * Query timeout configurations\n  * SSL/TLS settings for managed database\n- Update Prisma client instantiation for production:\n  * Singleton pattern for serverless\n  * Connection string preprocessing\n  * Error handling for connection issues\n- Create health check API route: app/api/health/database/route.ts\n- Add environment variable validation\n- Document DigitalOcean deployment requirements\n- Test connection to DO managed database\n- Create .do/app.yaml configuration for deployment\n\n**Acceptance Criteria:**\n- Database optimized for DigitalOcean\n- Connection pooling configured\n- Health checks functional\n- Production settings ready\n- Deployment configuration complete\n- Documentation updated\n\n**Commit:** \"feat(database): optimize for digitalocean deployment - refs task 2.5\"",
             "status": "pending",
-            "dependencies": ["2.2", "2.4"],
+            "dependencies": [
+              "2.2",
+              "2.4"
+            ],
             "parentTaskId": 2
           }
         ]
       },
       {
         "id": 3,
-        "title": "Implement Authentication and 2FA",
-        "description": "Set up user authentication with NextAuth.js and implement Two-Factor Authentication (2FA) using TOTP.",
-        "details": "1. Configure NextAuth.js with Drizzle adapter\n2. Implement email/password authentication strategy\n3. Add TOTP-based 2FA support using a library like 'otpauth' (v9.1.3 or later)\n4. Create protected route middleware\n5. Implement role-based access control (RBAC) for user and superuser roles\n6. Design and implement login, 2FA setup, and 2FA verification pages\n7. Create API routes for authentication operations\n8. Implement secure password hashing using bcrypt (v5.1.0 or later)\n9. Set up proper session management and CSRF protection",
-        "testStrategy": "1. Unit test authentication functions\n2. Test login flow with and without 2FA\n3. Verify RBAC functionality\n4. Test protected routes for both user and superuser roles\n5. Ensure proper error handling for authentication failures\n6. Validate session management and security measures\n7. Perform security audit of authentication implementation",
-        "priority": "high",
-        "dependencies": [2],
+        "title": "Implement Hardened Authentication & Account Management",
+        "description": "To deliver a complete, secure authentication and user management system tailored for an internal tool, broken down into four testable feature sets.",
         "status": "pending",
-        "subtasks": []
+        "dependencies": [
+          2
+        ],
+        "priority": "high",
+        "details": "1. Build admin UI for user management\n2. Secure login with rate-limiting & protected routes\n3. User self-service for profile/password updates\n4. Full 2FA lifecycle (setup, verify, recovery, admin reset)\n5. Active session management with remote revocation",
+        "testStrategy": "1. API tests for login, admin actions, and 2FA flow\n2. UI/integration tests for password changes, profile updates, and session revocation",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Admin-Controlled Access & Secure Entry",
+            "description": "A locked-down system where only Administrators can provision users through a dedicated UI. All application routes are protected, and the login process is hardened against basic attacks. Public registration is fully removed.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "Key Functionality Tests:\\n- Test Login: Verify a user can log in with correct credentials and is blocked with incorrect ones.\\n- Test Admin User Creation: As an Admin, create a new user through the UI and confirm they can log in.\\n- Test Access Control: 1. Confirm a non-admin user cannot view the administration page. 2. Confirm an unauthenticated user is redirected from /main/dashboard to the login page.",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "User Account Self-Service",
+            "description": "A fully functional \"Account Settings\" area where users can securely manage their own profiles and change their passwords.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "Key Functionality Tests:\\n- Test Password Change: As a logged-in user, successfully change the password by providing the correct current password.\\n- Test Failed Password Change: Confirm the password change is rejected if the current password is incorrect.\\n- Test Profile Update: As a user, update profile information and verify it persists.",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Hardened 2FA & Account Recovery",
+            "description": "A complete 2FA system. Users can enable TOTP-based 2FA, which is then enforced at login. Administrators have the power to disable 2FA for any user as a recovery measure.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "Key Functionality Tests:\\n- Test 2FA Enablement: As a user, successfully scan a QR code and enable 2FA by providing a valid TOTP code.\\n- Test 2FA Login: Log out and log back in as the 2FA-enabled user, confirming the application requires and validates the TOTP code after the password.\\n- Test Admin 2FA Reset: As an Admin, disable 2FA for the test user and confirm they can once again log in with only their password.",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Active Session Management & Auditing",
+            "description": "A security feature allowing users to view all their active sessions (device, IP address, last active time) and remotely terminate any suspicious session, forcing an immediate logout on that device.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "Key Functionality Tests:\\n- Test Session Listing: Log in from two different browsers/devices. Confirm both sessions appear correctly in the \"Active Sessions\" list for the user.\\n- Test Session Revocation: From Browser A, revoke the session corresponding to Browser B. In Browser B, attempt to navigate to a new page and confirm the action fails and the user is logged out.",
+            "testStrategy": ""
+          }
+        ]
       },
       {
         "id": 4,
         "title": "Develop Basic Layout and Navigation",
         "description": "Integrate authentication and role-based access control into the existing layout and navigation for the TraffBoardLite MVP.",
         "status": "pending",
-        "dependencies": [1, 3],
+        "dependencies": [
+          1,
+          3
+        ],
         "priority": "medium",
         "details": "1. Integrate authentication into the main layout (src/app/main/dashboard/layout.tsx) to protect routes using NextAuth.js from Task 3\n2. Implement role-based menu visibility in the sidebar navigation (app-sidebar.tsx) and related components (nav-main.tsx, nav-user.tsx, account-switcher.tsx, theme-switcher.tsx)\n3. Update navigation items to display only for users with the appropriate roles (e.g., show 'administration' only to superusers)\n4. Ensure all navigation and layout logic is integrated with the existing Next.js 15 App Router structure\n5. Remove any redundant or legacy sidebar creation logic—use the existing sidebar and navigation components",
         "testStrategy": "1. Verify that unauthenticated users are redirected to the login page when accessing protected routes\n2. Test that authenticated users see navigation items appropriate to their roles\n3. Confirm that navigation between pages works as expected for different user roles\n4. Ensure integration with NextAuth.js is functioning (login, logout, session persistence)\n5. Perform accessibility and responsive design checks on the updated navigation and layout",
@@ -144,7 +197,11 @@
         "details": "1. Design and implement a file upload form using shadcn/ui components\n2. Create a Server Action for file upload and processing\n3. Use PapaParse (v5.4.1 or later) to process the uploaded CSV file\n4. Implement data validation using Zod (v3.21.4 or later) with the following schema:\n   - date: string (YYYY-MM-DD format)\n   - partnerId: string\n   - campaignId: string\n   - clicks: number (integer)\n   - registrations: number (integer)\n   - revenue: number (decimal)\n5. Transform and insert valid data into the conversions table\n6. Implement error handling and validation feedback\n7. Create a progress indicator for large file uploads\n8. Optimize for performance to handle files with up to 50K records\n9. Implement file type and size restrictions",
         "testStrategy": "1. Test CSV upload with various file sizes and formats\n2. Verify data validation and error handling\n3. Check database insertion accuracy\n4. Test performance with large files (up to 50K records)\n5. Ensure proper feedback for upload progress and success/failure\n6. Validate file type and size restrictions\n7. Test concurrent uploads",
         "priority": "high",
-        "dependencies": [2, 3, 4],
+        "dependencies": [
+          2,
+          3,
+          4
+        ],
         "status": "pending",
         "subtasks": []
       },
@@ -155,7 +212,11 @@
         "details": "1. Implement global filter components for date range, partner, and campaign using Zustand (v4.3.8 or later) for state management\n2. Create a Zustand store for filter state:\n   ```typescript\n   interface FilterState {\n     dateRange: [Date, Date]\n     partners: string[]\n     campaigns: string[]\n     setFilters: (filters: Partial<FilterState>) => void\n     resetFilters: () => void\n   }\n   ```\n3. Use TanStack Query (v5.0.0 or later) for data fetching with proper caching strategies\n4. Implement API routes for fetching analytics data based on filters\n5. Create KPI cards for total clicks, registrations, and revenue\n6. Implement the following charts using shadcn/ui charts (Recharts wrapper):\n   - Line chart for daily metrics\n   - Bar chart for top partners\n   - Pie chart for campaign distribution\n7. Ensure all components are responsive and mobile-friendly\n8. Implement loading states and error handling for data fetching\n9. Add a date range picker component for custom date selection",
         "testStrategy": "1. Test filter functionality and state management\n2. Verify data fetching and caching with TanStack Query\n3. Ensure charts render correctly with various data sets\n4. Test responsiveness on different screen sizes\n5. Validate loading states and error handling\n6. Performance test dashboard with large datasets\n7. Verify date range picker functionality",
         "priority": "high",
-        "dependencies": [2, 4, 5],
+        "dependencies": [
+          2,
+          4,
+          5
+        ],
         "status": "pending",
         "subtasks": []
       },
@@ -166,7 +227,11 @@
         "details": "1. Design and implement a user list page using shadcn/ui data table component\n2. Create forms for adding and editing users\n3. Implement user creation with the following fields:\n   - Email (required)\n   - Password (required)\n   - Role (user/superuser)\n4. Add functionality to edit existing user details\n5. Implement user deletion with confirmation dialog\n6. Create API routes for user CRUD operations\n7. Implement server-side pagination for the user list\n8. Add search and filter functionality to the user list\n9. Ensure proper error handling and validation for all user management operations\n10. Implement role management functionality for superusers\n11. Add audit logging for user management actions",
         "testStrategy": "1. Test CRUD operations for user management\n2. Verify role-based access control for user management features\n3. Test pagination, search, and filter functionality\n4. Ensure proper error handling and validation\n5. Verify audit logging for user management actions\n6. Test edge cases (e.g., deleting the last superuser)\n7. Perform security testing on user management endpoints",
         "priority": "medium",
-        "dependencies": [2, 3, 4],
+        "dependencies": [
+          2,
+          3,
+          4
+        ],
         "status": "pending",
         "subtasks": []
       },
@@ -175,7 +240,15 @@
         "title": "Deploy to DigitalOcean App Platform",
         "description": "Set up and deploy the TraffBoardLite MVP to a DigitalOcean Droplet (VPS) with a locally installed PostgreSQL database.",
         "status": "pending",
-        "dependencies": [1, 2, 3, 4, 5, 6, 7],
+        "dependencies": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
         "priority": "high",
         "details": "1. Create a DigitalOcean account if not already available\n2. Create and configure an Ubuntu Droplet (VPS)\n3. Install Node.js, PM2, and Nginx on the Droplet\n4. Install and configure PostgreSQL on the same Droplet\n5. Set up SSL certificates using Certbot for HTTPS via Nginx\n6. Configure environment variables securely on the Droplet\n7. Set up GitHub Actions for automatic deployment to the Droplet\n8. Configure Nginx as a reverse proxy for the Node.js application\n9. Set up logging and monitoring for the application and server\n10. Implement a health check endpoint\n11. Create a production-ready build script",
         "testStrategy": "1. Verify successful deployment to the Droplet\n2. Test database connection in the production environment\n3. Ensure all environment variables are correctly set and loaded\n4. Verify HTTPS and SSL certificate setup via Nginx and Certbot\n5. Test application functionality in the production environment\n6. Monitor application and server logs and performance\n7. Verify health check endpoint\n8. Test automatic deployment via GitHub Actions\n9. Perform load testing on the deployed application",
@@ -188,7 +261,9 @@
         "details": "### Implementation Steps\n1. **Migrate from Drizzle to Prisma**:\n   - Install the Prisma CLI and introspect the database.\n   - Generate Prisma Client and replace Drizzle queries with Prisma queries.\n   - Ensure incremental adoption is feasible if needed.\n2. **Set Up NextAuth.js v5**:\n   - Update NextAuth.js to version 5 and integrate it with Prisma ORM.\n   - Implement email/password authentication strategy.\n   - Configure role-based access control (RBAC).\n3. **Import CSV Data**:\n   - Use PapaParse to process `overall_rows.csv` and `traffic_report.csv` files.\n   - Validate data using Zod and insert into the database.\n4. **Test and Verify**:\n   - Run migrations and verify schema creation.\n   - Test authentication flows and data insertion.\n\n### Technical Considerations\n- Ensure compatibility with existing Next.js 15 setup.\n- Use Drizzle Kit for any remaining database introspection if needed.\n- Document any changes in database schema or authentication logic.",
         "testStrategy": "1. Verify successful migration from Drizzle to Prisma by checking database schema and query functionality.\n2. Test NextAuth.js v5 setup by validating authentication flows and RBAC.\n3. Confirm CSV data is correctly imported and validated.\n4. Ensure all changes are compatible with the existing project architecture.\n5. Perform end-to-end testing of authentication and data management features.",
         "status": "pending",
-        "dependencies": [2],
+        "dependencies": [
+          2
+        ],
         "priority": "high",
         "subtasks": []
       }

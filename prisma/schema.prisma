@@ -25,10 +25,22 @@ model User {
   role          String    @default("user") // user | superuser
   passwordHash  String?   // for email/password auth
   totpSecret    String?   // for 2FA
+  isActive      Boolean   @default(true)  // for account enable/disable
+  
+  // User management audit fields
+  createdBy     String?   // ID of user who created this account
+  lastModifiedBy String? // ID of user who last modified this account
+  lastLoginAt   DateTime? // Track last login time
   
   accounts      Account[]
   sessions      Session[]
   uploads       ConversionUpload[]
+  
+  // Self-referential relations for audit trail
+  createdUsers     User[] @relation("UserCreatedBy")
+  modifiedUsers    User[] @relation("UserModifiedBy")
+  createdByUser    User?  @relation("UserCreatedBy", fields: [createdBy], references: [id])
+  lastModifiedByUser User? @relation("UserModifiedBy", fields: [lastModifiedBy], references: [id])
   
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -63,6 +75,17 @@ model Session {
   userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  // Session metadata for tracking
+  ipAddress    String?
+  userAgent    String?
+  deviceType   String?  // mobile, desktop, tablet
+  browser      String?
+  os           String?
+  country      String?
+  city         String?
+  isActive     Boolean  @default(true)
+  lastActivity DateTime @default(now())
  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -1,7 +1,8 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import { AccountProfile } from "./_components/account-profile";
+import { AccountSettings } from "./_components/account-settings";
 import AppearanceSettings from "./_components/appearance-settings";
+import { PasswordChange } from "./_components/password-change";
 import { SecuritySettings } from "./_components/security-settings";
 
 export default function SettingsPage() {
@@ -17,7 +18,10 @@ export default function SettingsPage() {
           </TabsList>
         </div>
         <TabsContent className="pt-2" value="account">
-          <AccountProfile />
+          <div className="space-y-6">
+            <AccountSettings />
+            <PasswordChange />
+          </div>
         </TabsContent>
         <TabsContent className="pt-2" value="security">
           <SecuritySettings />

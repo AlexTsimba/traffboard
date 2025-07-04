@@ -1,5 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+import { UserManagement } from "./_components/user-management";
+
 export default function AdministrationPage() {
   return (
     <div className="@container/main flex flex-col gap-4 md:gap-6">
@@ -54,17 +56,8 @@ export default function AdministrationPage() {
         <TabsContent className="space-y-6" value="users">
           <div className="rounded-lg border p-6">
             <h3 className="mb-4 text-lg font-semibold">User Management</h3>
-            <div className="mb-4 flex items-center justify-between">
-              <p className="text-muted-foreground text-sm">Manage user accounts and permissions</p>
-              <button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2">
-                Add User
-              </button>
-            </div>
-
-            <div className="text-muted-foreground py-12 text-center">
-              <p className="text-lg">User management interface</p>
-              <p className="text-sm">Create, edit, and manage user accounts and roles</p>
-            </div>
+            <p className="text-muted-foreground mb-6 text-sm">Manage user accounts and permissions</p>
+            <UserManagement />
           </div>
         </TabsContent>
       </Tabs>
