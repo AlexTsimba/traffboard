@@ -50,7 +50,7 @@ const NavItemExpanded = ({
             <SidebarMenuButton
               disabled={item.comingSoon}
               isActive={isActive(item.url, item.subItems)}
-              tooltip={item.title}
+              tooltip={undefined}
             >
               {item.icon && <item.icon />}
               <span>{item.title}</span>
@@ -62,7 +62,7 @@ const NavItemExpanded = ({
               asChild
               aria-disabled={item.comingSoon}
               isActive={isActive(item.url)}
-              tooltip={item.title}
+              tooltip={undefined}
             >
               <Link href={item.url} target={item.newTab ? "_blank" : undefined}>
                 {item.icon && <item.icon />}
@@ -97,9 +97,13 @@ const NavItemExpanded = ({
 const NavItemCollapsed = ({
   item,
   isActive,
+  state,
+  isMobile,
 }: {
   item: NavMainItem;
   isActive: (url: string, subItems?: NavMainItem["subItems"]) => boolean;
+  state: string;
+  isMobile: boolean;
 }) => {
   return (
     <SidebarMenuItem key={item.title}>
@@ -109,7 +113,7 @@ const NavItemCollapsed = ({
             className="flex h-10 w-10 items-center"
             disabled={item.comingSoon}
             isActive={isActive(item.url, item.subItems)}
-            tooltip={item.title}
+            tooltip={state === "collapsed" && !isMobile ? item.title : undefined}
           >
             {item.icon && <item.icon className="text-xl" />}
             <span className="sr-only">{item.title}</span>
@@ -162,7 +166,13 @@ export function NavMain({ items }: NavMainProps) {
             <SidebarMenu>
               {group.items.map((item) =>
                 state === "collapsed" && !isMobile ? (
-                  <NavItemCollapsed key={item.title} isActive={isItemActive} item={item} />
+                  <NavItemCollapsed
+                    key={item.title}
+                    isActive={isItemActive}
+                    item={item}
+                    state={state}
+                    isMobile={isMobile}
+                  />
                 ) : (
                   <NavItemExpanded key={item.title} isActive={isItemActive} isSubmenuOpen={isSubmenuOpen} item={item} />
                 ),
