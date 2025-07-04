@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Plus, Search, MoreHorizontal, Edit2, Trash2, RotateCcw } from "lucide-react";
+import { Plus, Search, MoreHorizontal, Edit2, Trash2 } from "lucide-react";
+import { useState, useEffect } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,9 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useToast } from "@/hooks/use-toast";
 
-import { deleteUserAction, reactivateUserAction } from "../_actions/user-actions";
 import { CreateUserForm } from "./create-user-form";
 
 const formatDate = (dateString: string) => {
@@ -50,86 +47,70 @@ interface User {
   createdByUser: { name: string | null; email: string } | null;
 }
 
-interface Pagination {
-  page: number;
-  limit: number;
-  total: number;
-  pages: number;
+interface UsersResponse {
+  users: User[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    pages: number;
+  };
 }
 
-interface UserManagementProps {
-  readonly initialUsers: User[];
-  readonly initialPagination: Pagination;
-  readonly initialSearch: string;
-  readonly initialRole: string;
-}
-
-export function UserManagement({
-  initialUsers,
-  initialPagination,
-  initialSearch,
-  _initialRole,
-}: UserManagementProps) {
-  const [searchTerm, setSearchTerm] = useState(initialSearch);
+export function UserManagement() {
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
-  const [isPending, startTransition] = useTransition();
-  
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const { toast } = useToast();
 
-  const handleSearch = () => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (searchTerm) {
-      params.set("search", searchTerm);
-    } else {
-      params.delete("search");
+  const fetchUsers = async (page = 1, search = "") => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: "10",
+        ...(search && { search }),
+      });
+
+      const response = await fetch(`/api/admin/users?${params}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch users");
+      }
+
+      const data = (await response.json()) as UsersResponse;
+      setUsers(data.users);
+      setCurrentPage(data.pagination.page);
+      setTotalPages(data.pagination.pages);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    } finally {
+      setLoading(false);
     }
-    params.set("page", "1"); // Reset to first page
-    router.push(`?${params.toString()}`);
   };
 
-  const handlePageChange = (newPage: number) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("page", newPage.toString());
-    router.push(`?${params.toString()}`);
+  useEffect(() => {
+    void fetchUsers(currentPage, searchTerm);
+  }, [currentPage, searchTerm]);
+
+  const handleSearch = () => {
+    setCurrentPage(1);
+    void fetchUsers(1, searchTerm);
   };
 
   const handleUserCreated = () => {
     setCreateDialogOpen(false);
-    // Refresh the page to show new user
-    router.refresh();
+    void fetchUsers(currentPage, searchTerm);
   };
 
-  const handleUserAction = (userId: string, action: "delete" | "reactivate") => {
-    startTransition(async () => {
-      try {
-        const result = action === "delete" 
-          ? await deleteUserAction(userId)
-          : await reactivateUserAction(userId);
-        
-        if (result.success) {
-          toast({
-            title: "Success",
-            description: result.message,
-          });
-          router.refresh(); // Refresh to show updated user list
-        } else {
-          toast({
-            title: "Error",
-            description: result.error,
-            variant: "destructive",
-          });
-        }
-      } catch (error) {
-        toast({
-          title: "Error",
-          description: "An unexpected error occurred",
-          variant: "destructive",
-        });
-      }
-    });
-  };
+  if (loading) {
+    return (
+      <div className="flex h-32 items-center justify-center">
+        <div className="text-muted-foreground">Loading users...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -186,14 +167,14 @@ export function UserManagement({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {initialUsers.length === 0 ? (
+            {users.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={7} className="py-8 text-center">
                   <div className="text-muted-foreground">No users found</div>
                 </TableCell>
               </TableRow>
             ) : (
-              initialUsers.map((user) => (
+              users.map((user) => (
                 <TableRow key={user.id}>
                   <TableCell className="font-medium">{user.name ?? "—"}</TableCell>
                   <TableCell>{user.email}</TableCell>
@@ -217,32 +198,19 @@ export function UserManagement({
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" disabled={isPending}>
+                        <Button variant="ghost" size="sm">
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem disabled>
+                        <DropdownMenuItem>
                           <Edit2 className="mr-2 h-4 w-4" />
                           Edit
                         </DropdownMenuItem>
-                        {user.isActive ? (
-                          <DropdownMenuItem
-                            className="text-destructive"
-                            onClick={() => handleUserAction(user.id, "delete")}
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Deactivate
-                          </DropdownMenuItem>
-                        ) : (
-                          <DropdownMenuItem
-                            className="text-green-600"
-                            onClick={() => handleUserAction(user.id, "reactivate")}
-                          >
-                            <RotateCcw className="mr-2 h-4 w-4" />
-                            Reactivate
-                          </DropdownMenuItem>
-                        )}
+                        <DropdownMenuItem className="text-destructive">
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Deactivate
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -253,19 +221,19 @@ export function UserManagement({
         </Table>
       </div>
 
-      {initialPagination.pages > 1 && (
+      {totalPages > 1 && (
         <div className="flex items-center justify-between">
           <div className="text-muted-foreground text-sm">
-            Page {initialPagination.page} of {initialPagination.pages}
+            Page {currentPage} of {totalPages}
           </div>
           <div className="flex items-center space-x-2">
             <Button
               variant="outline"
               size="sm"
               onClick={() => {
-                handlePageChange(Math.max(1, initialPagination.page - 1));
+                setCurrentPage(Math.max(1, currentPage - 1));
               }}
-              disabled={initialPagination.page === 1 || isPending}
+              disabled={currentPage === 1}
             >
               Previous
             </Button>
@@ -273,9 +241,9 @@ export function UserManagement({
               variant="outline"
               size="sm"
               onClick={() => {
-                handlePageChange(Math.min(initialPagination.pages, initialPagination.page + 1));
+                setCurrentPage(Math.min(totalPages, currentPage + 1));
               }}
-              disabled={initialPagination.page === initialPagination.pages || isPending}
+              disabled={currentPage === totalPages}
             >
               Next
             </Button>

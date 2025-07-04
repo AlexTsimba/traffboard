@@ -1,187 +1,134 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { useActionState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 
-const createUserSchema = z.object({
-  name: z.string().min(1, "Name is required").max(100),
-  email: z.string().email("Invalid email format"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-  role: z.enum(["user", "superuser"]),
-});
-
-type CreateUserData = z.infer<typeof createUserSchema>;
+import { createUserAction } from "../_actions/user-actions";
 
 interface CreateUserFormProps {
   readonly onUserCreated: () => void;
 }
 
 export function CreateUserForm({ onUserCreated }: CreateUserFormProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
 
-  const form = useForm<CreateUserData>({
-    resolver: zodResolver(createUserSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      password: "",
-      role: "user",
-    },
-  });
+  const [, formAction, isPending] = useActionState(
+    async (
+      _prevState: { success: boolean; error?: string },
+      formData: FormData
+    ) => {
+      const result = await createUserAction(formData);
 
-  const onSubmit = async (data: CreateUserData) => {
-    setIsSubmitting(true);
-    try {
-      const response = await fetch("/api/admin/users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      const result = (await response.json()) as { error?: string };
-
-      if (!response.ok) {
-        throw new Error(result.error ?? "Failed to create user");
+      if (result.success) {
+        toast({
+          title: "Success",
+          description: result.message,
+        });
+        onUserCreated();
+        return { success: true, reset: true };
+      } else {
+        toast({
+          title: "Error",
+          description: result.error,
+          variant: "destructive",
+        });
+        return { success: false, error: result.error };
       }
-
-      toast({
-        title: "Success",
-        description: "User created successfully",
-      });
-
-      form.reset();
-      onUserCreated();
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to create user",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+    },
+    { success: false }
+  );
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={(e) => {
-          void form.handleSubmit(onSubmit)(e);
-        }}
-        className="space-y-4"
-      >
-        <FormField
-          control={form.control}
+    <form action={formAction} className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="name">Full Name</Label>
+        <Input
+          id="name"
           name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Full Name</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter full name" {...field} disabled={isSubmitting} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          placeholder="Enter full name"
+          disabled={isPending}
+          required
+          maxLength={100}
         />
+      </div>
 
-        <FormField
-          control={form.control}
+      <div className="space-y-2">
+        <Label htmlFor="email">Email</Label>
+        <Input
+          id="email"
           name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter email address" type="email" {...field} disabled={isSubmitting} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          type="email"
+          placeholder="Enter email address"
+          disabled={isPending}
+          required
         />
+      </div>
 
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <div className="relative">
-                  <Input
-                    placeholder="Enter password"
-                    type={showPassword ? "text" : "password"}
-                    {...field}
-                    disabled={isSubmitting}
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute top-0 right-0 h-full px-3 py-2 hover:bg-transparent"
-                    onClick={() => {
-                      setShowPassword(!showPassword);
-                    }}
-                    disabled={isSubmitting}
-                  >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </Button>
-                </div>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="role"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Role</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isSubmitting}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a role" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="user">User</SelectItem>
-                  <SelectItem value="superuser">Superuser</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="flex justify-end space-x-2 pt-4">
+      <div className="space-y-2">
+        <Label htmlFor="password">Password</Label>
+        <div className="relative">
+          <Input
+            id="password"
+            name="password"
+            placeholder="Enter password"
+            type={showPassword ? "text" : "password"}
+            disabled={isPending}
+            required
+            minLength={8}
+          />
           <Button
             type="button"
-            variant="outline"
+            variant="ghost"
+            size="sm"
+            className="absolute top-0 right-0 h-full px-3 py-2 hover:bg-transparent"
             onClick={() => {
-              form.reset();
+              setShowPassword(!showPassword);
             }}
-            disabled={isSubmitting}
+            disabled={isPending}
           >
-            Reset
-          </Button>
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Creating..." : "Create User"}
+            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </Button>
         </div>
-      </form>
-    </Form>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="role">Role</Label>
+        <Select name="role" defaultValue="user" disabled={isPending}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select a role" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="user">User</SelectItem>
+            <SelectItem value="superuser">Superuser</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="flex justify-end space-x-2 pt-4">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => {
+            // Reset form by clearing inputs
+            const form = document.querySelector("form");
+            form?.reset();
+          }}
+          disabled={isPending}
+        >
+          Reset
+        </Button>
+        <Button type="submit" disabled={isPending}>
+          {isPending ? "Creating..." : "Create User"}
+        </Button>
+      </div>
+    </form>
   );
 }

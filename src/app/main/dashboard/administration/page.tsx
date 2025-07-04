@@ -1,8 +1,26 @@
+import { Suspense } from "react";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { UserManagement } from "./_components/user-management";
+import { getUsersAction } from "./_actions/user-actions";
 
-export default function AdministrationPage() {
+interface AdministrationPageProps {
+  readonly searchParams?: {
+    readonly page?: string;
+    readonly search?: string;
+    readonly role?: string;
+  };
+}
+
+export default async function AdministrationPage({ searchParams }: AdministrationPageProps) {
+  const page = Number(searchParams?.page) ?? 1;
+  const search = searchParams?.search ?? "";
+  const role = searchParams?.role ?? "";
+
+  // Load users server-side
+  const usersResult = await getUsersAction(page, 10, search, role);
+
   return (
     <div className="@container/main flex flex-col gap-4 md:gap-6">
       <div className="space-y-2">
@@ -57,7 +75,14 @@ export default function AdministrationPage() {
           <div className="rounded-lg border p-6">
             <h3 className="mb-4 text-lg font-semibold">User Management</h3>
             <p className="text-muted-foreground mb-6 text-sm">Manage user accounts and permissions</p>
-            <UserManagement />
+            <Suspense fallback={<div className="flex h-32 items-center justify-center text-muted-foreground">Loading users...</div>}>
+              <UserManagement 
+                initialUsers={usersResult.success ? usersResult.users : []}
+                initialPagination={usersResult.success ? usersResult.pagination : { page: 1, limit: 10, total: 0, pages: 0 }}
+                initialSearch={search}
+                initialRole={role}
+              />
+            </Suspense>
           </div>
         </TabsContent>
       </Tabs>
