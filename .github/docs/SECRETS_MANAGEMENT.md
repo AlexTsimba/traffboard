@@ -149,6 +149,7 @@ GitHub provides audit logs for secret access:
    ```
 
 2. **Investigation**:
+
    - Check audit logs for unauthorized access
    - Review recent workflow runs
    - Scan for potential data exposure

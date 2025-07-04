@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 // Mock the database health check
-vi.mock("@/db", () => ({
+vi.mock("@/lib/database", () => ({
   checkDatabaseHealth: vi.fn(),
 }));
 
@@ -15,7 +15,7 @@ describe("/api/health", () => {
   });
 
   it("should return healthy status when database is healthy", async () => {
-    const { checkDatabaseHealth } = await import("@/db");
+    const { checkDatabaseHealth } = await import("@/lib/database");
 
     vi.mocked(checkDatabaseHealth).mockResolvedValue({
       status: "healthy",
@@ -41,7 +41,7 @@ describe("/api/health", () => {
   });
 
   it("should return degraded status when database is unhealthy", async () => {
-    const { checkDatabaseHealth } = await import("@/db");
+    const { checkDatabaseHealth } = await import("@/lib/database");
 
     vi.mocked(checkDatabaseHealth).mockResolvedValue({
       status: "unhealthy",
@@ -65,7 +65,7 @@ describe("/api/health", () => {
   });
 
   it("should return unhealthy status when health check throws error", async () => {
-    const { checkDatabaseHealth } = await import("@/db");
+    const { checkDatabaseHealth } = await import("@/lib/database");
 
     vi.mocked(checkDatabaseHealth).mockRejectedValue(new Error("Unexpected error"));
 
@@ -89,7 +89,7 @@ describe("/api/health", () => {
   });
 
   it("should include memory information", async () => {
-    const { checkDatabaseHealth } = await import("@/db");
+    const { checkDatabaseHealth } = await import("@/lib/database");
 
     vi.mocked(checkDatabaseHealth).mockResolvedValue({
       status: "healthy",
@@ -117,7 +117,7 @@ describe("/api/health", () => {
   });
 
   it("should include standard health check fields", async () => {
-    const { checkDatabaseHealth } = await import("@/db");
+    const { checkDatabaseHealth } = await import("@/lib/database");
 
     vi.mocked(checkDatabaseHealth).mockResolvedValue({
       status: "healthy",
