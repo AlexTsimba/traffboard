@@ -17,6 +17,25 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 
 import { CreateUserForm } from "./create-user-form";
 
+const formatDate = (dateString: string) => {
+  return new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(dateString));
+};
+
+const getRoleBadgeVariant = (role: string): "destructive" | "secondary" => {
+  return role === "superuser" ? "destructive" : "secondary";
+};
+
+const getStatusBadgeVariant = {
+  active: "default" as const,
+  inactive: "outline" as const,
+};
+
 interface User {
   id: string;
   name: string | null;
@@ -60,7 +79,7 @@ export function UserManagement() {
         throw new Error("Failed to fetch users");
       }
 
-      const data: UsersResponse = await response.json();
+      const data = (await response.json()) as UsersResponse;
       setUsers(data.users);
       setCurrentPage(data.pagination.page);
       setTotalPages(data.pagination.pages);
@@ -72,35 +91,17 @@ export function UserManagement() {
   };
 
   useEffect(() => {
-    fetchUsers(currentPage, searchTerm);
-  }, [currentPage]);
+    void fetchUsers(currentPage, searchTerm);
+  }, [currentPage, searchTerm]);
 
   const handleSearch = () => {
     setCurrentPage(1);
-    fetchUsers(1, searchTerm);
+    void fetchUsers(1, searchTerm);
   };
 
   const handleUserCreated = () => {
     setCreateDialogOpen(false);
-    fetchUsers(currentPage, searchTerm);
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Intl.DateTimeFormat("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(new Date(dateString));
-  };
-
-  const getRoleBadgeVariant = (role: string) => {
-    return role === "superuser" ? "destructive" : "secondary";
-  };
-
-  const getStatusBadgeVariant = (isActive: boolean) => {
-    return isActive ? "default" : "outline";
+    void fetchUsers(currentPage, searchTerm);
   };
 
   if (loading) {
@@ -175,20 +176,20 @@ export function UserManagement() {
             ) : (
               users.map((user) => (
                 <TableRow key={user.id}>
-                  <TableCell className="font-medium">{user.name || "—"}</TableCell>
+                  <TableCell className="font-medium">{user.name ?? "—"}</TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>
                     <Badge variant={getRoleBadgeVariant(user.role)}>{user.role}</Badge>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={getStatusBadgeVariant(user.isActive)}>
+                    <Badge variant={user.isActive ? getStatusBadgeVariant.active : getStatusBadgeVariant.inactive}>
                       {user.isActive ? "Active" : "Inactive"}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-muted-foreground text-sm">
                     {formatDate(user.createdAt)}
                     {user.createdByUser && (
-                      <div className="text-xs">by {user.createdByUser.name || user.createdByUser.email}</div>
+                      <div className="text-xs">by {user.createdByUser.name ?? user.createdByUser.email}</div>
                     )}
                   </TableCell>
                   <TableCell className="text-muted-foreground text-sm">

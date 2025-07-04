@@ -22,7 +22,7 @@ const createUserSchema = z.object({
 type CreateUserData = z.infer<typeof createUserSchema>;
 
 interface CreateUserFormProps {
-  onUserCreated: () => void;
+  readonly onUserCreated: () => void;
 }
 
 export function CreateUserForm({ onUserCreated }: CreateUserFormProps) {
@@ -51,10 +51,10 @@ export function CreateUserForm({ onUserCreated }: CreateUserFormProps) {
         body: JSON.stringify(data),
       });
 
-      const result = await response.json();
+      const result = (await response.json()) as { error?: string };
 
       if (!response.ok) {
-        throw new Error(result.error || "Failed to create user");
+        throw new Error(result.error ?? "Failed to create user");
       }
 
       toast({
@@ -77,7 +77,12 @@ export function CreateUserForm({ onUserCreated }: CreateUserFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form
+        onSubmit={(e) => {
+          void form.handleSubmit(onSubmit)(e);
+        }}
+        className="space-y-4"
+      >
         <FormField
           control={form.control}
           name="name"
