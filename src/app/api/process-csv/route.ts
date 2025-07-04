@@ -1,128 +1,119 @@
+import fs from "node:fs/promises";
+import path from "node:path";
+
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import { z } from "zod";
+
+import type { DataProcessingResult } from "@/lib/data-transformers";
+import { processPlayerDataCSV, processTrafficDataCSV } from "@/lib/data-transformers";
+import { prisma } from "@/lib/prisma";
 
 import { auth } from "../../../../auth";
-import { prisma } from "@/lib/prisma";
-import { processPlayerDataCSV, processTrafficDataCSV } from "@/lib/data-transformers";
+
+const processCsvBodySchema = z.object({
+  uploadId: z.string(),
+});
+
+type UploadStatus = "processing" | "completed" | "failed";
+
+async function updateUploadStatus(
+  uploadId: string,
+  status: UploadStatus,
+  details: {
+    processedCount?: number;
+    errorLog?: string[];
+  } = {},
+) {
+  const { processedCount, errorLog } = details;
+  await prisma.conversionUpload.update({
+    where: { id: uploadId },
+    data: {
+      status,
+      ...(processedCount !== undefined && { recordCount: processedCount }),
+      ...(errorLog && { errorLog: errorLog.join("\n") }),
+    },
+  });
+}
+
+async function handleProcessingResult(uploadId: string, result: DataProcessingResult<unknown>) {
+  if (result.errors.length > 0) {
+    await updateUploadStatus(uploadId, "failed", {
+      processedCount: result.processedCount,
+      errorLog: result.errors,
+    });
+    return NextResponse.json(
+      {
+        message: "Processing completed with errors",
+        processedCount: result.processedCount,
+        errors: result.errors,
+      },
+      { status: 207 },
+    );
+  }
+
+  await updateUploadStatus(uploadId, "completed", {
+    processedCount: result.processedCount,
+  });
+
+  return NextResponse.json({
+    message: "File processed successfully",
+    processedCount: result.processedCount,
+  });
+}
 
 export async function POST(request: NextRequest) {
+  const session = await auth();
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  let uploadId: string;
   try {
-    const session = await auth();
-    if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const body = (await request.json()) as unknown;
+    const { uploadId: id } = processCsvBodySchema.parse(body);
+    uploadId = id;
+  } catch {
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+  }
 
-    const { csvContent, fileType, uploadId } = await request.json();
+  const upload = await prisma.conversionUpload.findUnique({ where: { id: uploadId } });
+  if (!upload) {
+    return NextResponse.json({ error: "Upload not found" }, { status: 404 });
+  }
 
-    // Validate input
-    if (!csvContent || !fileType || !uploadId) {
-      return NextResponse.json(
-        { error: "Missing required fields: csvContent, fileType, uploadId" },
-        { status: 400 }
-      );
-    }
+  try {
+    await updateUploadStatus(uploadId, "processing");
 
-    if (!["players", "traffic"].includes(fileType)) {
-      return NextResponse.json(
-        { error: "Invalid file type. Must be 'players' or 'traffic'" },
-        { status: 400 }
-      );
-    }
+    const filePath = path.join(process.cwd(), "public", "uploads", upload.fileName);
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    const fileBuffer = await fs.readFile(filePath);
+    const csvContent = fileBuffer.toString("utf8");
 
-    // Verify upload record exists and belongs to user
-    const upload = await prisma.conversionUpload.findFirst({
-      where: {
-        id: uploadId,
-        uploadedBy: session.user.id,
-      },
-    });
-
-    if (!upload) {
-      return NextResponse.json({ error: "Upload record not found" }, { status: 404 });
-    }
-
-    // Update upload status to processing
-    await prisma.conversionUpload.update({
-      where: { id: uploadId },
-      data: { status: "processing" },
-    });
-
-    let result;
-    let insertCount = 0;
-
-    try {
-      if (fileType === "players") {
-        result = processPlayerDataCSV(csvContent);
-        
-        if (result.success && result.data.length > 0) {
-          // Batch insert player data (1000 records at a time)
-          const batchSize = 1000;
-          for (let i = 0; i < result.data.length; i += batchSize) {
-            const batch = result.data.slice(i, i + batchSize);
-            const insertResult = await prisma.playerData.createMany({
-              data: batch,
-              skipDuplicates: true,
-            });
-            insertCount += insertResult.count;
-          }
-        }
-      } else {
-        result = processTrafficDataCSV(csvContent);
-        
-        if (result.success && result.data.length > 0) {
-          // Batch insert traffic data (1000 records at a time)
-          const batchSize = 1000;
-          for (let i = 0; i < result.data.length; i += batchSize) {
-            const batch = result.data.slice(i, i + batchSize);
-            const insertResult = await prisma.trafficReport.createMany({
-              data: batch,
-              skipDuplicates: true,
-            });
-            insertCount += insertResult.count;
-          }
-        }
+    if (upload.fileType === "player") {
+      const result = processPlayerDataCSV(csvContent);
+      if (result.data.length > 0) {
+        await prisma.playerData.createMany({
+          data: result.data,
+          skipDuplicates: true,
+        });
       }
-
-      // Update upload record with results
-      const finalStatus = result.success ? "completed" : "failed";
-      const errorLog = result.errors.length > 0 ? result.errors.join("\n") : null;
-
-      await prisma.conversionUpload.update({
-        where: { id: uploadId },
-        data: {
-          status: finalStatus,
-          recordCount: insertCount,
-          errorLog,
-        },
-      });
-
-      return NextResponse.json({
-        success: result.success,
-        processedCount: result.processedCount,
-        insertedCount: insertCount,
-        errorCount: result.errorCount,
-        errors: result.errors,
-        uploadId,
-      });
-
-    } catch (processingError) {
-      // Update upload status to failed
-      await prisma.conversionUpload.update({
-        where: { id: uploadId },
-        data: {
-          status: "failed",
-          errorLog: processingError instanceof Error ? processingError.message : String(processingError),
-        },
-      });
-
-      throw processingError;
+      return await handleProcessingResult(uploadId, result);
     }
 
+    const result = processTrafficDataCSV(csvContent);
+    if (result.data.length > 0) {
+      await prisma.trafficReport.createMany({
+        data: result.data,
+        skipDuplicates: true,
+      });
+    }
+    return await handleProcessingResult(uploadId, result);
   } catch (error) {
-    console.error("CSV processing failed:", error);
-    return NextResponse.json(
-      { error: "Failed to process CSV data" },
-      { status: 500 }
-    );
+    console.error(`[Process CSV Error] Upload ID: ${uploadId}`, error);
+    await updateUploadStatus(uploadId, "failed", {
+      errorLog: [error instanceof Error ? error.message : "An unknown error occurred"],
+    });
+    return NextResponse.json({ error: "Failed to process file" }, { status: 500 });
   }
 }

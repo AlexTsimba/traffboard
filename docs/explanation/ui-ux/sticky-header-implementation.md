@@ -39,12 +39,10 @@ Implemented a sticky header for all dashboard pages to improve navigation and ma
 ### 📏 **Key Layout Changes:**
 
 1. **SidebarInset Container:**
-
    - Added `flex h-screen flex-col` to create full-height flex container
    - This ensures proper height distribution between header and content
 
 2. **Sticky Header:**
-
    - Added `sticky top-0 z-50` for sticky positioning
    - Added `bg-background/95 backdrop-blur` for glass effect
    - Added `supports-[backdrop-filter]:bg-background/60` for better transparency support

@@ -1,9 +1,18 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth } from "../../../../auth";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+
 import { prisma } from "@/lib/prisma";
 
+import { auth } from "../../../../auth";
+
+// Define a type for the POST request body
+interface UploadRequestBody {
+  fileName: string;
+  fileType: string;
+}
+
 // GET /api/uploads - List user's upload history
-export async function GET() {
+export async function GET(_req: NextRequest) {
   try {
     const session = await auth();
     if (!session?.user) {
@@ -19,10 +28,7 @@ export async function GET() {
     return NextResponse.json({ uploads });
   } catch (error) {
     console.error("Failed to fetch uploads:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch uploads" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch uploads" }, { status: 500 });
   }
 }
 
@@ -34,14 +40,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { fileName, fileType } = await request.json();
+    // Explicitly type the request body
+    const { fileName, fileType } = (await request.json()) as UploadRequestBody;
 
     // Validate fileType
     if (!["players", "traffic"].includes(fileType)) {
-      return NextResponse.json(
-        { error: "Invalid file type. Must be 'players' or 'traffic'" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Invalid file type. Must be 'players' or 'traffic'" }, { status: 400 });
     }
 
     const upload = await prisma.conversionUpload.create({
@@ -56,9 +60,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ upload }, { status: 201 });
   } catch (error) {
     console.error("Failed to create upload record:", error);
-    return NextResponse.json(
-      { error: "Failed to create upload record" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to create upload record" }, { status: 500 });
   }
 }

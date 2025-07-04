@@ -1,70 +1,57 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth } from "../../../../auth";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { z } from "zod";
+
 import { prisma } from "@/lib/prisma";
 
-// GET /api/traffic - Get traffic report data with filtering and pagination
-export async function GET(request: NextRequest) {
-  try {
-    const session = await auth();
-    if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+import { auth } from "../../../../auth";
+
+const trafficFiltersSchema = z.object({
+  foreignPartnerId: z.union([z.string(), z.array(z.string())]).optional(),
+  foreignCampaignId: z.union([z.string(), z.array(z.string())]).optional(),
+  trafficSource: z.union([z.string(), z.array(z.string())]).optional(),
+  deviceType: z.union([z.string(), z.array(z.string())]).optional(),
+  country: z.union([z.string(), z.array(z.string())]).optional(),
+  date: z
+    .object({
+      from: z.string().optional(),
+      to: z.string().optional(),
+    })
+    .optional(),
+});
+
+type TrafficFilters = z.infer<typeof trafficFiltersSchema>;
+
+function buildWhereClause(filters: TrafficFilters): Record<string, unknown> {
+  const whereClause: Record<string, unknown> = {};
+  const filterMappings: (keyof TrafficFilters)[] = [
+    "foreignPartnerId",
+    "foreignCampaignId",
+    "trafficSource",
+    "deviceType",
+    "country",
+  ];
+
+  for (const key of filterMappings) {
+    // eslint-disable-next-line security/detect-object-injection
+    const value = filters[key];
+    if (value) {
+      // eslint-disable-next-line security/detect-object-injection
+      whereClause[key] = { in: Array.isArray(value) ? value : [value] };
     }
-
-    const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = Math.min(parseInt(searchParams.get("limit") || "50"), 100);
-    const partnerId = searchParams.get("partnerId");
-    const campaignId = searchParams.get("campaignId");
-    const trafficSource = searchParams.get("trafficSource");
-    const deviceType = searchParams.get("deviceType");
-    const country = searchParams.get("country");
-    const startDate = searchParams.get("startDate");
-    const endDate = searchParams.get("endDate");
-
-    const skip = (page - 1) * limit;
-
-    // Build where clause
-    const where: any = {};
-    if (partnerId) where.foreignPartnerId = partnerId;
-    if (campaignId) where.foreignCampaignId = campaignId;
-    if (trafficSource) where.trafficSource = trafficSource;
-    if (deviceType) where.deviceType = deviceType;
-    if (country) where.country = country;
-    if (startDate || endDate) {
-      where.date = {};
-      if (startDate) where.date.gte = new Date(startDate);
-      if (endDate) where.date.lte = new Date(endDate);
-    }
-
-    const [traffic, total] = await Promise.all([
-      prisma.trafficReport.findMany({
-        where,
-        skip,
-        take: limit,
-        orderBy: { date: "desc" },
-      }),
-      prisma.trafficReport.count({ where }),
-    ]);
-
-    return NextResponse.json({
-      traffic,
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit),
-      },
-    });
-  } catch (error) {
-    console.error("Failed to fetch traffic data:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch traffic data" },
-      { status: 500 }
-    );
   }
+
+  if (filters.date) {
+    const { from, to } = filters.date;
+    whereClause.date = {
+      ...(from && { gte: new Date(from) }),
+      ...(to && { lte: new Date(to) }),
+    };
+  }
+  return whereClause;
 }
 
-// POST /api/traffic - Bulk create traffic data (for CSV processing)
+// POST /api/traffic
 export async function POST(request: NextRequest) {
   try {
     const session = await auth();
@@ -72,38 +59,39 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { traffic } = await request.json();
+    const page = request.nextUrl.searchParams.get("page") ?? "1";
+    const limit = request.nextUrl.searchParams.get("limit") ?? "10";
+    const pageNumber = Number.parseInt(page, 10);
+    const limitNumber = Number.parseInt(limit, 10);
+    const offset = (pageNumber - 1) * limitNumber;
 
-    if (!Array.isArray(traffic) || traffic.length === 0) {
-      return NextResponse.json(
-        { error: "Invalid data: traffic array required" },
-        { status: 400 }
-      );
-    }
+    const body: unknown = await request.json();
+    const filters = trafficFiltersSchema.parse(body);
+    const whereClause = buildWhereClause(filters);
 
-    // Limit batch size to prevent overwhelming the database
-    if (traffic.length > 1000) {
-      return NextResponse.json(
-        { error: "Batch size too large. Maximum 1000 records per request" },
-        { status: 400 }
-      );
-    }
-
-    const result = await prisma.trafficReport.createMany({
-      data: traffic,
-      skipDuplicates: true,
+    const traffic = await prisma.trafficReport.findMany({
+      where: whereClause,
+      skip: offset,
+      take: limitNumber,
+      orderBy: {
+        date: "desc",
+      },
     });
+
+    const totalRecords = await prisma.trafficReport.count({ where: whereClause });
 
     return NextResponse.json({
-      success: true,
-      created: result.count,
-      total: traffic.length,
+      data: traffic,
+      total: totalRecords,
+      page: pageNumber,
+      limit: limitNumber,
+      totalPages: Math.ceil(totalRecords / limitNumber),
     });
   } catch (error) {
-    console.error("Failed to create traffic data:", error);
-    return NextResponse.json(
-      { error: "Failed to create traffic data" },
-      { status: 500 }
-    );
+    console.error("Failed to fetch traffic data:", error);
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: error.errors }, { status: 400 });
+    }
+    return NextResponse.json({ error: "Failed to fetch traffic data" }, { status: 500 });
   }
 }

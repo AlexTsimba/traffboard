@@ -1,10 +1,19 @@
-import { PlayerDataRow, TrafficReportRow, safeParseDate, safeParseNumber, safeParseDecimal, safeParseBoolean } from "./csv-parser";
+import type { PlayerDataRow, TrafficReportRow } from "./csv-parser";
+import {
+  parseCSV,
+  safeParseBoolean,
+  safeParseDate,
+  safeParseDecimal,
+  safeParseNumber,
+  validatePlayerDataRow,
+  validateTrafficReportRow,
+} from "./csv-parser";
 
 export interface TransformedPlayerData {
   playerId: string;
   originalPlayerId: string;
-  signUpDate: Date | null;
-  firstDepositDate: Date | null;
+  signUpDate: Date | undefined | null;
+  firstDepositDate: Date | undefined | null;
   partnerId: string;
   companyName: string;
   partnersEmail: string | null;
@@ -62,30 +71,30 @@ export interface TransformedTrafficData {
 
 export function transformPlayerData(row: PlayerDataRow): TransformedPlayerData {
   return {
-    playerId: row["Player ID"]?.trim() || "",
-    originalPlayerId: row["Original player ID"]?.trim() || "",
+    playerId: row["Player ID"],
+    originalPlayerId: row["Original player ID"],
     signUpDate: safeParseDate(row["Sign up date"]),
     firstDepositDate: safeParseDate(row["First deposit date"]),
-    partnerId: row["Partner ID"]?.trim() || "",
-    companyName: row["Company name"]?.trim() || "",
-    partnersEmail: row["Partners email"]?.trim() || null,
-    partnerTags: row["Partner tags"]?.trim() || null,
-    campaignId: row["Campaign ID"]?.trim() || "",
-    campaignName: row["Campaign name"]?.trim() || null,
-    promoId: row["Promo ID"]?.trim() || null,
-    promoCode: row["Promo code"]?.trim() || null,
-    playerCountry: row["Player country"]?.trim() || null,
-    tagClickid: row["Tag: clickid"]?.trim() || null,
-    tagOs: row["Tag: os"]?.trim() || null,
-    tagSource: row["Tag: source"]?.trim() || null,
-    tagSub2: row["Tag: sub2"]?.trim() || null,
-    tagWebId: row["Tag: webID"]?.trim() || null,
-    date: safeParseDate(row["Date"]) || new Date(),
-    prequalified: safeParseBoolean(row["Prequalified"]),
-    duplicate: safeParseBoolean(row["Duplicate"]),
+    partnerId: row["Partner ID"],
+    companyName: row["Company name"],
+    partnersEmail: row["Partners email"] || null,
+    partnerTags: row["Partner tags"] || null,
+    campaignId: row["Campaign ID"],
+    campaignName: row["Campaign name"] || null,
+    promoId: row["Promo ID"] || null,
+    promoCode: row["Promo code"] || null,
+    playerCountry: row["Player country"] || null,
+    tagClickid: row["Tag: clickid"] || null,
+    tagOs: row["Tag: os"] || null,
+    tagSource: row["Tag: source"] || null,
+    tagSub2: row["Tag: sub2"] || null,
+    tagWebId: row["Tag: webID"] || null,
+    date: safeParseDate(row.Date) ?? new Date(),
+    prequalified: safeParseBoolean(row.Prequalified),
+    duplicate: safeParseBoolean(row.Duplicate),
     selfExcluded: safeParseBoolean(row["Self-excluded"]),
-    disabled: safeParseBoolean(row["Disabled"]),
-    currency: row["Currency"]?.trim() || "",
+    disabled: safeParseBoolean(row.Disabled),
+    currency: row.Currency,
     ftdCount: safeParseNumber(row["FTD count"]),
     ftdSum: safeParseDecimal(row["FTD sum"]),
     depositsCount: safeParseNumber(row["Deposits count"]),
@@ -102,16 +111,16 @@ export function transformPlayerData(row: PlayerDataRow): TransformedPlayerData {
 
 export function transformTrafficData(row: TrafficReportRow): TransformedTrafficData {
   return {
-    date: safeParseDate(row.date) || new Date(),
-    foreignBrandId: row.foreign_brand_id?.trim() || "",
-    foreignPartnerId: row.foreign_partner_id?.trim() || "",
-    foreignCampaignId: row.foreign_campaign_id?.trim() || "",
-    foreignLandingId: row.foreign_landing_id?.trim() || null,
-    trafficSource: row.traffic_source?.trim() || "",
-    deviceType: row.device_type?.trim() || "",
-    userAgentFamily: row.user_agent_family?.trim() || null,
-    osFamily: row.os_family?.trim() || null,
-    country: row.country?.trim() || "",
+    date: safeParseDate(row.date) ?? new Date(),
+    foreignBrandId: row.foreign_brand_id,
+    foreignPartnerId: row.foreign_partner_id,
+    foreignCampaignId: row.foreign_campaign_id,
+    foreignLandingId: row.foreign_landing_id || null,
+    trafficSource: row.traffic_source,
+    deviceType: row.device_type,
+    userAgentFamily: row.user_agent_family || null,
+    osFamily: row.os_family || null,
+    country: row.country,
     allClicks: safeParseNumber(row.all_clicks),
     uniqueClicks: safeParseNumber(row.unique_clicks),
     registrationsCount: safeParseNumber(row.registrations_count),
@@ -137,7 +146,7 @@ export function processPlayerDataCSV(csvContent: string): DataProcessingResult<T
   const errors: string[] = [...parseResult.errors];
   const validData: TransformedPlayerData[] = [];
 
-  parseResult.data.forEach((row, index) => {
+  for (const [index, row] of parseResult.data.entries()) {
     const validationErrors = validatePlayerDataRow(row, index + 1);
     if (validationErrors.length > 0) {
       errors.push(...validationErrors);
@@ -146,10 +155,12 @@ export function processPlayerDataCSV(csvContent: string): DataProcessingResult<T
         const transformed = transformPlayerData(row);
         validData.push(transformed);
       } catch (error) {
-        errors.push(`Row ${index + 1}: Transformation error - ${error instanceof Error ? error.message : String(error)}`);
+        errors.push(
+          `Row ${index + 1}: Transformation error - ${error instanceof Error ? error.message : String(error)}`,
+        );
       }
     }
-  });
+  }
 
   return {
     success: errors.length === 0,
@@ -165,7 +176,7 @@ export function processTrafficDataCSV(csvContent: string): DataProcessingResult<
   const errors: string[] = [...parseResult.errors];
   const validData: TransformedTrafficData[] = [];
 
-  parseResult.data.forEach((row, index) => {
+  for (const [index, row] of parseResult.data.entries()) {
     const validationErrors = validateTrafficReportRow(row, index + 1);
     if (validationErrors.length > 0) {
       errors.push(...validationErrors);
@@ -174,10 +185,12 @@ export function processTrafficDataCSV(csvContent: string): DataProcessingResult<
         const transformed = transformTrafficData(row);
         validData.push(transformed);
       } catch (error) {
-        errors.push(`Row ${index + 1}: Transformation error - ${error instanceof Error ? error.message : String(error)}`);
+        errors.push(
+          `Row ${index + 1}: Transformation error - ${error instanceof Error ? error.message : String(error)}`,
+        );
       }
     }
-  });
+  }
 
   return {
     success: errors.length === 0,
@@ -187,6 +200,3 @@ export function processTrafficDataCSV(csvContent: string): DataProcessingResult<
     data: validData,
   };
 }
-
-// Import missing functions
-import { parseCSV, validatePlayerDataRow, validateTrafficReportRow } from "./csv-parser";

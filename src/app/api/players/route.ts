@@ -1,68 +1,60 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth } from "../../../../auth";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { z } from "zod";
+
 import { prisma } from "@/lib/prisma";
 
-// GET /api/players - Get player data with filtering and pagination
-export async function GET(request: NextRequest) {
-  try {
-    const session = await auth();
-    if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+import { auth } from "../../../../auth";
 
-    const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = Math.min(parseInt(searchParams.get("limit") || "50"), 100);
-    const partnerId = searchParams.get("partnerId");
-    const campaignId = searchParams.get("campaignId");
-    const country = searchParams.get("country");
-    const currency = searchParams.get("currency");
-    const startDate = searchParams.get("startDate");
-    const endDate = searchParams.get("endDate");
+const playerFiltersSchema = z.object({
+  partnerId: z.union([z.string(), z.array(z.string())]).optional(),
+  campaignId: z.union([z.string(), z.array(z.string())]).optional(),
+  playerCountry: z.union([z.string(), z.array(z.string())]).optional(),
+  currency: z.union([z.string(), z.array(z.string())]).optional(),
+  date: z
+    .object({
+      from: z.string().optional(),
+      to: z.string().optional(),
+    })
+    .optional(),
+});
 
-    const skip = (page - 1) * limit;
+type PlayerFilters = z.infer<typeof playerFiltersSchema>;
 
-    // Build where clause
-    const where: any = {};
-    if (partnerId) where.partnerId = partnerId;
-    if (campaignId) where.campaignId = campaignId;
-    if (country) where.playerCountry = country;
-    if (currency) where.currency = currency;
-    if (startDate || endDate) {
-      where.date = {};
-      if (startDate) where.date.gte = new Date(startDate);
-      if (endDate) where.date.lte = new Date(endDate);
-    }
+function buildWhereClause(filters: PlayerFilters) {
+  const whereClause: Record<string, unknown> = {};
 
-    const [players, total] = await Promise.all([
-      prisma.playerData.findMany({
-        where,
-        skip,
-        take: limit,
-        orderBy: { date: "desc" },
-      }),
-      prisma.playerData.count({ where }),
-    ]);
-
-    return NextResponse.json({
-      players,
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit),
-      },
-    });
-  } catch (error) {
-    console.error("Failed to fetch player data:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch player data" },
-      { status: 500 }
-    );
+  if (filters.partnerId) {
+    whereClause.partnerId = {
+      in: Array.isArray(filters.partnerId) ? filters.partnerId : [filters.partnerId],
+    };
   }
+  if (filters.campaignId) {
+    whereClause.campaignId = {
+      in: Array.isArray(filters.campaignId) ? filters.campaignId : [filters.campaignId],
+    };
+  }
+  if (filters.playerCountry) {
+    whereClause.playerCountry = {
+      in: Array.isArray(filters.playerCountry) ? filters.playerCountry : [filters.playerCountry],
+    };
+  }
+  if (filters.currency) {
+    whereClause.currency = {
+      in: Array.isArray(filters.currency) ? filters.currency : [filters.currency],
+    };
+  }
+  if (filters.date) {
+    const { from, to } = filters.date;
+    whereClause.date = {
+      ...(from && { gte: new Date(from) }),
+      ...(to && { lte: new Date(to) }),
+    };
+  }
+  return whereClause;
 }
 
-// POST /api/players - Bulk create player data (for CSV processing)
+// GET /api/players
 export async function POST(request: NextRequest) {
   try {
     const session = await auth();
@@ -70,38 +62,39 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { players } = await request.json();
+    const page = request.nextUrl.searchParams.get("page") ?? "1";
+    const limit = request.nextUrl.searchParams.get("limit") ?? "10";
+    const pageNumber = Number.parseInt(page, 10);
+    const limitNumber = Number.parseInt(limit, 10);
+    const offset = (pageNumber - 1) * limitNumber;
 
-    if (!Array.isArray(players) || players.length === 0) {
-      return NextResponse.json(
-        { error: "Invalid data: players array required" },
-        { status: 400 }
-      );
-    }
+    const body: unknown = await request.json();
+    const filters = playerFiltersSchema.parse(body);
+    const whereClause = buildWhereClause(filters);
 
-    // Limit batch size to prevent overwhelming the database
-    if (players.length > 1000) {
-      return NextResponse.json(
-        { error: "Batch size too large. Maximum 1000 records per request" },
-        { status: 400 }
-      );
-    }
-
-    const result = await prisma.playerData.createMany({
-      data: players,
-      skipDuplicates: true,
+    const players = await prisma.playerData.findMany({
+      where: whereClause,
+      skip: offset,
+      take: limitNumber,
+      orderBy: {
+        date: "desc",
+      },
     });
+
+    const totalRecords = await prisma.playerData.count({ where: whereClause });
 
     return NextResponse.json({
-      success: true,
-      created: result.count,
-      total: players.length,
+      data: players,
+      total: totalRecords,
+      page: pageNumber,
+      limit: limitNumber,
+      totalPages: Math.ceil(totalRecords / limitNumber),
     });
   } catch (error) {
-    console.error("Failed to create player data:", error);
-    return NextResponse.json(
-      { error: "Failed to create player data" },
-      { status: 500 }
-    );
+    console.error("Failed to fetch players:", error);
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: error.errors }, { status: 400 });
+    }
+    return NextResponse.json({ error: "Failed to fetch players" }, { status: 500 });
   }
 }

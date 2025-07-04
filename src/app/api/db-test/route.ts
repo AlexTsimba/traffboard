@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
-import { testDatabaseConnection, ensureDatabaseTables } from "@/lib/db-test";
+
+import { ensureDatabaseTables, testDatabaseConnection } from "@/lib/db-test";
 
 export async function GET() {
   try {
     const connectionTest = await testDatabaseConnection();
     const tablesTest = await ensureDatabaseTables();
-    
+
     return NextResponse.json({
       success: connectionTest.success && tablesTest.success,
       connection: connectionTest,
@@ -19,7 +20,7 @@ export async function GET() {
         error: error instanceof Error ? error.message : String(error),
         timestamp: new Date().toISOString(),
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

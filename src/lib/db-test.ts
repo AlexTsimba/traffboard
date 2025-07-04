@@ -6,11 +6,11 @@ export async function testDatabaseConnection() {
     // Test basic connection
     await prisma.$queryRaw`SELECT 1`;
     console.log("✅ Database connection successful");
-    
+
     // Test that we can query the User table (from NextAuth)
     const userCount = await prisma.user.count();
     console.log(`✅ User table accessible, count: ${userCount}`);
-    
+
     return { success: true, userCount };
   } catch (error) {
     console.error("❌ Database connection failed:", error);

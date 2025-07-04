@@ -27,12 +27,12 @@ export interface PlayerDataRow {
   "Tag: source": string;
   "Tag: sub2": string;
   "Tag: webID": string;
-  "Date": string;
-  "Prequalified": string;
-  "Duplicate": string;
+  Date: string;
+  Prequalified: string;
+  Duplicate: string;
   "Self-excluded": string;
-  "Disabled": string;
-  "Currency": string;
+  Disabled: string;
+  Currency: string;
   "FTD count": string;
   "FTD sum": string;
   "Deposits count": string;
@@ -47,30 +47,30 @@ export interface PlayerDataRow {
 }
 
 export interface TrafficReportRow {
-  "date": string;
-  "foreign_brand_id": string;
-  "foreign_partner_id": string;
-  "foreign_campaign_id": string;
-  "foreign_landing_id": string;
-  "traffic_source": string;
-  "device_type": string;
-  "user_agent_family": string;
-  "os_family": string;
-  "country": string;
-  "all_clicks": string;
-  "unique_clicks": string;
-  "registrations_count": string;
-  "ftd_count": string;
-  "deposits_count": string;
-  "cr": string;
-  "cftd": string;
-  "cd": string;
-  "rftd": string;
+  date: string;
+  foreign_brand_id: string;
+  foreign_partner_id: string;
+  foreign_campaign_id: string;
+  foreign_landing_id: string;
+  traffic_source: string;
+  device_type: string;
+  user_agent_family: string;
+  os_family: string;
+  country: string;
+  all_clicks: string;
+  unique_clicks: string;
+  registrations_count: string;
+  ftd_count: string;
+  deposits_count: string;
+  cr: string;
+  cftd: string;
+  cd: string;
+  rftd: string;
 }
 
 export function parseCSV<T>(csvContent: string): CSVParseResult<T> {
   const errors: string[] = [];
-  
+
   try {
     const result = Papa.parse<T>(csvContent, {
       header: true,
@@ -78,7 +78,7 @@ export function parseCSV<T>(csvContent: string): CSVParseResult<T> {
       transformHeader: (header: string) => header.trim(),
       complete: (results) => {
         if (results.errors.length > 0) {
-          errors.push(...results.errors.map(err => `Row ${err.row}: ${err.message}`));
+          errors.push(...results.errors.map((err) => `Row ${err.row}: ${err.message}`));
         }
       },
     });
@@ -103,82 +103,90 @@ export function parseCSV<T>(csvContent: string): CSVParseResult<T> {
 
 export function validatePlayerDataRow(row: PlayerDataRow, rowIndex: number): string[] {
   const errors: string[] = [];
-  
+
   // Required fields validation
-  if (!row["Player ID"]?.trim()) {
+  if (!row["Player ID"]) {
     errors.push(`Row ${rowIndex}: Player ID is required`);
   }
-  
-  if (!row["Partner ID"]?.trim()) {
+
+  if (!row["Partner ID"]) {
     errors.push(`Row ${rowIndex}: Partner ID is required`);
   }
-  
-  if (!row["Campaign ID"]?.trim()) {
+
+  if (!row["Campaign ID"]) {
     errors.push(`Row ${rowIndex}: Campaign ID is required`);
   }
-  
-  if (!row["Date"]?.trim()) {
+
+  if (!row.Date) {
     errors.push(`Row ${rowIndex}: Date is required`);
   }
-  
-  if (!row["Currency"]?.trim()) {
+
+  if (!row.Currency) {
     errors.push(`Row ${rowIndex}: Currency is required`);
   }
 
   // Date validation
-  if (row["Date"] && !isValidDate(row["Date"])) {
+  if (row.Date && !isValidDate(row.Date)) {
     errors.push(`Row ${rowIndex}: Invalid date format for Date field`);
   }
-  
+
   if (row["Sign up date"] && !isValidDate(row["Sign up date"])) {
     errors.push(`Row ${rowIndex}: Invalid date format for Sign up date`);
   }
-  
+
   if (row["First deposit date"] && !isValidDate(row["First deposit date"])) {
     errors.push(`Row ${rowIndex}: Invalid date format for First deposit date`);
   }
 
   // Numeric validation
   const numericFields = [
-    "FTD count", "FTD sum", "Deposits count", "Deposits sum",
-    "Cashouts count", "Cashouts sum", "Casino bets count", 
-    "Casino Real NGR", "Fixed per player", "Casino bets sum", "Casino wins sum"
+    "FTD count",
+    "FTD sum",
+    "Deposits count",
+    "Deposits sum",
+    "Cashouts count",
+    "Cashouts sum",
+    "Casino bets count",
+    "Casino Real NGR",
+    "Fixed per player",
+    "Casino bets sum",
+    "Casino wins sum",
   ];
-  
-  numericFields.forEach(field => {
+
+  for (const field of numericFields) {
     if (row[field as keyof PlayerDataRow] && !isValidNumber(row[field as keyof PlayerDataRow])) {
       errors.push(`Row ${rowIndex}: Invalid number format for ${field}`);
     }
-  });
+  }
 
   return errors;
 }
 
 export function validateTrafficReportRow(row: TrafficReportRow, rowIndex: number): string[] {
   const errors: string[] = [];
-  
+
   // Required fields validation
-  if (!row.date?.trim()) {
+  if (!row.date) {
     errors.push(`Row ${rowIndex}: Date is required`);
   }
-  
-  if (!row.foreign_partner_id?.trim()) {
+
+  if (!row.foreign_partner_id) {
     errors.push(`Row ${rowIndex}: Foreign partner ID is required`);
   }
-  
-  if (!row.foreign_campaign_id?.trim()) {
+
+  if (!row.foreign_campaign_id) {
     errors.push(`Row ${rowIndex}: Foreign campaign ID is required`);
   }
-  
-  if (!row.traffic_source?.trim()) {
+
+  if (!row.traffic_source) {
     errors.push(`Row ${rowIndex}: Traffic source is required`);
   }
-  
-  if (!row.device_type?.trim()) {
+
+  if (!row.device_type) {
     errors.push(`Row ${rowIndex}: Device type is required`);
   }
-  
-  if (!row.country?.trim()) {
+
+  if (!row.country) {
     errors.push(`Row ${rowIndex}: Country is required`);
   }
 
@@ -189,15 +197,22 @@ export function validateTrafficReportRow(row: TrafficReportRow, rowIndex: number
 
   // Numeric validation
   const numericFields = [
-    "all_clicks", "unique_clicks", "registrations_count", 
-    "ftd_count", "deposits_count", "cr", "cftd", "cd", "rftd"
+    "all_clicks",
+    "unique_clicks",
+    "registrations_count",
+    "ftd_count",
+    "deposits_count",
+    "cr",
+    "cftd",
+    "cd",
+    "rftd",
   ];
-  
-  numericFields.forEach(field => {
+
+  for (const field of numericFields) {
     if (row[field as keyof TrafficReportRow] && !isValidNumber(row[field as keyof TrafficReportRow])) {
       errors.push(`Row ${rowIndex}: Invalid number format for ${field}`);
     }
-  });
+  }
 
   return errors;
 }
@@ -205,33 +220,33 @@ export function validateTrafficReportRow(row: TrafficReportRow, rowIndex: number
 function isValidDate(dateString: string): boolean {
   if (!dateString) return true; // Optional field
   const date = new Date(dateString);
-  return !isNaN(date.getTime());
+  return !Number.isNaN(date.getTime());
 }
 
 function isValidNumber(value: string): boolean {
   if (!value) return true; // Optional field
-  return !isNaN(Number(value));
+  return !Number.isNaN(Number.parseFloat(value));
 }
 
-export function safeParseDate(dateString: string): Date | null {
-  if (!dateString) return null;
+export function safeParseDate(dateString: string | undefined): Date | undefined {
+  if (!dateString) return undefined;
   const date = new Date(dateString);
-  return isNaN(date.getTime()) ? null : date;
+  return Number.isNaN(date.getTime()) ? undefined : date;
 }
 
-export function safeParseNumber(value: string): number {
+export function safeParseNumber(value: string | undefined): number {
   if (!value) return 0;
-  const num = Number(value);
-  return isNaN(num) ? 0 : num;
+  const num = Number.parseInt(value, 10);
+  return Number.isNaN(num) ? 0 : num;
 }
 
-export function safeParseDecimal(value: string): number {
+export function safeParseDecimal(value: string | undefined): number {
   if (!value) return 0;
-  const num = parseFloat(value);
-  return isNaN(num) ? 0 : num;
+  const num = Number.parseFloat(value);
+  return Number.isNaN(num) ? 0 : num;
 }
 
-export function safeParseBoolean(value: string): boolean {
+export function safeParseBoolean(value: string | undefined): boolean {
   if (!value) return false;
   return value === "1" || value.toLowerCase() === "true";
 }

@@ -101,14 +101,7 @@ export default tseslint.config(
       ...pluginReactHooks.configs.recommended.rules,
       "react/react-in-jsx-scope": "off",
       "react/prop-types": "off",
-      "react/jsx-sort-props": [
-        "warn",
-        {
-          callbacksLast: true,
-          shorthandFirst: true,
-          reservedFirst: true,
-        },
-      ],
+      "react/jsx-sort-props": "off",
 
       // Next.js rules - using core-web-vitals config
       ...pluginNext.configs.recommended.rules,
@@ -153,11 +146,14 @@ export default tseslint.config(
       "sonarjs/pseudo-random": "warn",
 
       ...unicorn.configs.recommended.rules,
+      "unicorn/no-nested-ternary": "warn",
+      "unicorn/no-array-reduce": "off",
+      "unicorn/prefer-ternary": "warn",
       "unicorn/prevent-abbreviations": "off",
       "unicorn/filename-case": "off",
-      "unicorn/no-null": "warn",
+      "unicorn/no-null": "off",
       "unicorn/no-document-cookie": "warn",
-      "unicorn/explicit-length-check": "warn",
+      "unicorn/explicit-length-check": "off",
 
       // Prettier integration - change to warn to not block CI
       "prettier/prettier": "warn",

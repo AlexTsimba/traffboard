@@ -175,7 +175,6 @@ try {
 ### **Starting a New Feature**
 
 1. **Understand the request**
-
    - What's the core functionality?
    - What pages/components are needed?
    - What data needs to be stored?
@@ -190,7 +189,6 @@ try {
    ```
 
 3. **Plan the minimal implementation**
-
    - Database schema (if needed)
    - API routes (if needed)
    - UI components
@@ -206,14 +204,12 @@ try {
 
 1. **Read the error message completely**
 2. **Check obvious causes first:**
-
    - Missing imports
    - Typos in file names
    - Wrong file paths
    - Missing environment variables
 
 3. **Use your reasoning to trace the problem:**
-
    - TypeScript errors → Check types
    - Runtime errors → Check data flow
    - Build errors → Check dependencies
