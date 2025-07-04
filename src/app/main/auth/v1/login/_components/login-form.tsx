@@ -37,12 +37,12 @@ export function LoginFormV1() {
     });
 
     if (result?.error) {
-      toast.error("Login Failed", {
-        description: "Invalid email or password. Please try again.",
+      toast.error("Authentication Failed", {
+        description: "Invalid credentials. Please check your email and password.",
       });
     } else {
-      toast.success("Login Successful", {
-        description: "Redirecting you to the dashboard...",
+      toast.success("Authentication Successful", {
+        description: "Welcome to TraffBoard Analytics Dashboard",
       });
       router.push("/main/dashboard");
     }
@@ -63,7 +63,7 @@ export function LoginFormV1() {
             <FormItem>
               <FormLabel>Email Address</FormLabel>
               <FormControl>
-                <Input autoComplete="email" id="email" placeholder="you@example.com" type="email" {...field} />
+                <Input autoComplete="email" id="email" placeholder="admin@traffboard.com" type="email" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -108,7 +108,7 @@ export function LoginFormV1() {
           )}
         />
         <Button className="w-full" type="submit">
-          Login
+          Sign In to TraffBoard
         </Button>
       </form>
     </Form>

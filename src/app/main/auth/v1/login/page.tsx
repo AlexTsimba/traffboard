@@ -1,7 +1,4 @@
-import { Command } from "lucide-react";
-import Link from "next/link";
-
-import { Button } from "@/components/ui/button";
+import { BarChart3 } from "lucide-react";
 
 import { LoginFormV1 } from "./_components/login-form";
 
@@ -11,10 +8,10 @@ export default function LoginV1() {
       <div className="bg-primary hidden lg:block lg:w-1/3">
         <div className="flex h-full flex-col items-center justify-center p-12 text-center">
           <div className="space-y-6">
-            <Command className="text-primary-foreground mx-auto size-12" />
+            <BarChart3 className="text-primary-foreground mx-auto size-12" />
             <div className="space-y-2">
-              <h1 className="text-primary-foreground text-5xl font-light">Hello again</h1>
-              <p className="text-primary-foreground/80 text-xl">Login to continue</p>
+              <h1 className="text-primary-foreground text-5xl font-light">TraffBoard</h1>
+              <p className="text-primary-foreground/80 text-xl">Analytics Dashboard</p>
             </div>
           </div>
         </div>
@@ -23,21 +20,15 @@ export default function LoginV1() {
       <div className="bg-background flex w-full items-center justify-center p-8 lg:w-2/3">
         <div className="w-full max-w-md space-y-10 py-24 lg:py-32">
           <div className="space-y-4 text-center">
-            <div className="text-foreground font-medium tracking-tight">Login</div>
+            <div className="text-foreground font-medium tracking-tight">Sign In</div>
             <div className="text-muted-foreground mx-auto max-w-xl">
-              Welcome back. Enter your email and password, let&apos;s hope you remember them this time.
+              Welcome to TraffBoard. Enter your credentials to access the analytics dashboard.
             </div>
           </div>
           <div className="space-y-4">
             <LoginFormV1 />
-            <Button className="w-full" variant="outline">
-              Continue with Google
-            </Button>
             <p className="text-muted-foreground text-center text-xs font-medium">
-              Don&apos;t have an account?{" "}
-              <Link className="text-primary font-semibold" href="register">
-                Register
-              </Link>
+              Authorized users only. Contact your administrator for access.
             </p>
           </div>
         </div>
