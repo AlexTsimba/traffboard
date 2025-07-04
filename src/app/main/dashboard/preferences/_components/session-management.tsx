@@ -1,7 +1,8 @@
 "use client";
 
 import { Monitor, Smartphone, Tablet, MapPin, Calendar, Shield, Trash2 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 
 import {
   AlertDialog,
@@ -18,6 +19,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+
+import { revokeSessionAction, revokeAllOtherSessionsAction } from "../_actions/session-actions";
 
 const formatDate = (dateString: string) => {
   return new Intl.DateTimeFormat("en-US", {
@@ -48,8 +51,32 @@ const getRelativeTime = (dateString: string) => {
   return `${diffInWeeks}w ago`;
 };
 
-interface SessionData {
+const parseUserAgent = (userAgent: string | null) => {
+  if (!userAgent) return { browser: "Unknown", os: "Unknown" };
+
+  // Simple user agent parsing (you could use a library like ua-parser-js for more accuracy)
+  let browser = "Unknown";
+  let os = "Unknown";
+
+  // Detect browser
+  if (userAgent.includes("Chrome")) browser = "Chrome";
+  else if (userAgent.includes("Firefox")) browser = "Firefox";
+  else if (userAgent.includes("Safari")) browser = "Safari";
+  else if (userAgent.includes("Edge")) browser = "Edge";
+
+  // Detect OS
+  if (userAgent.includes("Windows")) os = "Windows";
+  else if (userAgent.includes("Mac")) os = "macOS";
+  else if (userAgent.includes("Linux")) os = "Linux";
+  else if (userAgent.includes("Android")) os = "Android";
+  else if (userAgent.includes("iOS")) os = "iOS";
+
+  return { browser, os };
+};
+
+interface Session {
   sessionToken: string;
+  expires: string;
   ipAddress: string | null;
   userAgent: string | null;
   deviceType: string | null;
@@ -59,258 +86,267 @@ interface SessionData {
   city: string | null;
   lastActivity: string;
   createdAt: string;
-  expires: string;
   isCurrent: boolean;
 }
 
-export function SessionManagement() {
-  const [sessions, setSessions] = useState<SessionData[]>([]);
-  const [loading, setLoading] = useState(true);
+interface SessionManagementProps {
+  readonly initialSessions: Session[];
+}
+
+export function SessionManagement({ initialSessions }: SessionManagementProps) {
+  const [isPending, startTransition] = useTransition();
   const [revoking, setRevoking] = useState<string | null>(null);
   const [revokingAll, setRevokingAll] = useState(false);
+
+  const router = useRouter();
   const { toast } = useToast();
 
-  useEffect(() => {
-    const fetchSessions = async () => {
+  const handleRevokeSession = (sessionToken: string) => {
+    setRevoking(sessionToken);
+    startTransition(async () => {
       try {
-        const response = await fetch("/api/account/sessions");
-        if (!response.ok) {
-          throw new Error("Failed to fetch sessions");
+        const result = await revokeSessionAction(sessionToken);
+        
+        if (result.success) {
+          toast({
+            title: "Success",
+            description: result.message,
+          });
+          router.refresh(); // Refresh to show updated session list
+        } else {
+          toast({
+            title: "Error",
+            description: result.error,
+            variant: "destructive",
+          });
         }
-
-        const data = await response.json();
-        setSessions(data.sessions);
-      } catch {
+      } catch (error) {
         toast({
           title: "Error",
-          description: "Failed to load sessions",
+          description: "An unexpected error occurred",
           variant: "destructive",
         });
       } finally {
-        setLoading(false);
+        setRevoking(null);
       }
-    };
-
-    void fetchSessions();
-  }, [toast]);
-
-  const revokeSession = async (sessionToken: string) => {
-    setRevoking(sessionToken);
-    try {
-      const response = await fetch(`/api/account/sessions/${sessionToken}`, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to revoke session");
-      }
-
-      // Remove the revoked session from the list
-      setSessions(sessions.filter((s) => s.sessionToken !== sessionToken));
-
-      toast({
-        title: "Success",
-        description: "Session revoked successfully",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to revoke session",
-        variant: "destructive",
-      });
-    } finally {
-      setRevoking(null);
-    }
+    });
   };
 
-  const revokeAllOtherSessions = async () => {
+  const handleRevokeAllOtherSessions = () => {
     setRevokingAll(true);
-    try {
-      const response = await fetch("/api/account/sessions", {
-        method: "DELETE",
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to revoke sessions");
+    startTransition(async () => {
+      try {
+        const result = await revokeAllOtherSessionsAction();
+        
+        if (result.success) {
+          toast({
+            title: "Success",
+            description: `${result.revokedCount} sessions revoked successfully`,
+          });
+          router.refresh(); // Refresh to show updated session list
+        } else {
+          toast({
+            title: "Error",
+            description: result.error,
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "An unexpected error occurred",
+          variant: "destructive",
+        });
+      } finally {
+        setRevokingAll(false);
       }
-
-      const result = await response.json();
-
-      // Keep only the current session
-      setSessions(sessions.filter((s) => s.isCurrent));
-
-      toast({
-        title: "Success",
-        description: `${result.revokedCount} sessions revoked successfully`,
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to revoke sessions",
-        variant: "destructive",
-      });
-    } finally {
-      setRevokingAll(false);
-    }
+    });
   };
 
   const getDeviceIcon = (deviceType: string | null) => {
     switch (deviceType?.toLowerCase()) {
-      case "mobile": {
+      case "mobile":
         return <Smartphone className="h-5 w-5" />;
-      }
-      case "tablet": {
+      case "tablet":
         return <Tablet className="h-5 w-5" />;
-      }
-      case undefined:
-      case null:
-      default: {
+      default:
         return <Monitor className="h-5 w-5" />;
-      }
     }
   };
 
-  const otherSessions = sessions.filter((s) => !s.isCurrent);
-
-  if (loading) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Shield className="h-5 w-5" />
-            Active Sessions
-          </CardTitle>
-          <CardDescription>Loading...</CardDescription>
-        </CardHeader>
-      </Card>
-    );
-  }
+  const otherSessions = initialSessions.filter((session) => !session.isCurrent);
+  const currentSession = initialSessions.find((session) => session.isCurrent);
 
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Shield className="h-5 w-5" />
-          Active Sessions
+          Session Management
         </CardTitle>
-        <CardDescription>Manage your active sessions across different devices and browsers</CardDescription>
+        <CardDescription>
+          Manage your active sessions across different devices and locations
+        </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-6">
         {/* Current Session */}
-        {sessions
-          .filter((s) => s.isCurrent)
-          .map((session) => (
-            <div key={session.sessionToken} className="flex items-center justify-between rounded-lg border p-4">
-              <div className="flex items-center gap-3">
-                {getDeviceIcon(session.deviceType)}
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium">
-                      {session.browser || "Unknown Browser"} on {session.os || "Unknown OS"}
-                    </span>
-                    <Badge variant="default">Current</Badge>
-                  </div>
-                  <div className="text-muted-foreground text-sm">
-                    <div className="flex items-center gap-1">
-                      <MapPin className="h-3 w-3" />
-                      {session.city && session.country
-                        ? `${session.city}, ${session.country}`
-                        : session.ipAddress || "Unknown location"}
+        {currentSession && (
+          <div>
+            <h3 className="mb-3 text-sm font-medium">Current Session</h3>
+            <div className="rounded-lg border p-4">
+              <div className="flex items-start justify-between">
+                <div className="flex items-start gap-3">
+                  {getDeviceIcon(currentSession.deviceType)}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <p className="font-medium text-sm">
+                        {currentSession.browser || parseUserAgent(currentSession.userAgent).browser} on{" "}
+                        {currentSession.os || parseUserAgent(currentSession.userAgent).os}
+                      </p>
+                      <Badge variant="default" className="text-xs">
+                        Current
+                      </Badge>
                     </div>
-                    <div className="mt-1 flex items-center gap-1">
-                      <Calendar className="h-3 w-3" />
-                      Active {getRelativeTime(session.lastActivity)}
+                    <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground">
+                      {currentSession.ipAddress && (
+                        <span className="flex items-center gap-1">
+                          <MapPin className="h-3 w-3" />
+                          {currentSession.ipAddress}
+                          {currentSession.city && currentSession.country && (
+                            <span className="ml-1">
+                              ({currentSession.city}, {currentSession.country})
+                            </span>
+                          )}
+                        </span>
+                      )}
+                      <span className="flex items-center gap-1">
+                        <Calendar className="h-3 w-3" />
+                        Active {getRelativeTime(currentSession.lastActivity)}
+                      </span>
                     </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Started {formatDate(currentSession.createdAt)}
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
-          ))}
+          </div>
+        )}
 
         {/* Other Sessions */}
         {otherSessions.length > 0 && (
-          <>
-            <div className="flex items-center justify-between">
-              <h4 className="text-sm font-medium">Other Sessions</h4>
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-medium">Other Sessions</h3>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="outline" size="sm" disabled={revokingAll}>
-                    {revokingAll ? "Revoking..." : "Revoke All Others"}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={isPending || revokingAll}
+                  >
+                    {revokingAll ? "Revoking..." : "Revoke All"}
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
                     <AlertDialogTitle>Revoke All Other Sessions</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This will sign you out of all other devices and browsers except this one. You will need to sign in
-                      again on those devices.
+                      This will sign you out of all other devices. You'll need to sign in again on those devices.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={revokeAllOtherSessions}>Revoke All</AlertDialogAction>
+                    <AlertDialogAction
+                      onClick={() => handleRevokeAllOtherSessions()}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      Revoke All
+                    </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
             </div>
-
             <div className="space-y-3">
-              {otherSessions.map((session) => (
-                <div key={session.sessionToken} className="flex items-center justify-between rounded-lg border p-4">
-                  <div className="flex items-center gap-3">
-                    {getDeviceIcon(session.deviceType)}
-                    <div>
-                      <div className="font-medium">
-                        {session.browser || "Unknown Browser"} on {session.os || "Unknown OS"}
-                      </div>
-                      <div className="text-muted-foreground text-sm">
-                        <div className="flex items-center gap-1">
-                          <MapPin className="h-3 w-3" />
-                          {session.city && session.country
-                            ? `${session.city}, ${session.country}`
-                            : session.ipAddress || "Unknown location"}
+              {otherSessions.map((session) => {
+                const { browser, os } = parseUserAgent(session.userAgent);
+                const isRevoking = revoking === session.sessionToken;
+
+                return (
+                  <div key={session.sessionToken} className="rounded-lg border p-4">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start gap-3">
+                        {getDeviceIcon(session.deviceType)}
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm">
+                            {session.browser || browser} on {session.os || os}
+                          </p>
+                          <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground">
+                            {session.ipAddress && (
+                              <span className="flex items-center gap-1">
+                                <MapPin className="h-3 w-3" />
+                                {session.ipAddress}
+                                {session.city && session.country && (
+                                  <span className="ml-1">
+                                    ({session.city}, {session.country})
+                                  </span>
+                                )}
+                              </span>
+                            )}
+                            <span className="flex items-center gap-1">
+                              <Calendar className="h-3 w-3" />
+                              Active {getRelativeTime(session.lastActivity)}
+                            </span>
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Started {formatDate(session.createdAt)}
+                          </p>
                         </div>
-                        <div className="mt-1 flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
-                          Last active {getRelativeTime(session.lastActivity)}
-                        </div>
                       </div>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={isPending || isRevoking}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            {isRevoking ? "Revoking..." : "Revoke"}
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Revoke Session</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This will sign out this device. You'll need to sign in again on that device.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleRevokeSession(session.sessionToken)}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              Revoke Session
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                   </div>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button variant="ghost" size="sm" disabled={revoking === session.sessionToken}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Revoke Session</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          This will sign out this device/browser. You will need to sign in again on that device.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => revokeSession(session.sessionToken)}>
-                          Revoke Session
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </div>
-              ))}
+                );
+              })}
             </div>
-          </>
+          </div>
         )}
 
+        {/* No Other Sessions */}
         {otherSessions.length === 0 && (
-          <div className="text-muted-foreground py-8 text-center">
-            <Shield className="mx-auto mb-4 h-12 w-12 opacity-50" />
-            <p>No other active sessions</p>
-            <p className="text-sm">You are only signed in on this device</p>
+          <div className="text-center py-8 text-muted-foreground">
+            <Shield className="h-12 w-12 mx-auto mb-4 opacity-50" />
+            <p className="text-sm">No other active sessions</p>
+            <p className="text-xs mt-1">You're only signed in on this device</p>
           </div>
         )}
       </CardContent>

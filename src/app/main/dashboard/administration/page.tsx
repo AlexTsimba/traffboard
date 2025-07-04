@@ -6,17 +6,18 @@ import { UserManagement } from "./_components/user-management";
 import { getUsersAction } from "./_actions/user-actions";
 
 interface AdministrationPageProps {
-  readonly searchParams?: {
+  readonly searchParams?: Promise<{
     readonly page?: string;
     readonly search?: string;
     readonly role?: string;
-  };
+  }>;
 }
 
 export default async function AdministrationPage({ searchParams }: AdministrationPageProps) {
-  const page = Number(searchParams?.page) ?? 1;
-  const search = searchParams?.search ?? "";
-  const role = searchParams?.role ?? "";
+  const resolvedSearchParams = await searchParams;
+  const page = Number(resolvedSearchParams?.page) || 1;
+  const search = resolvedSearchParams?.search ?? "";
+  const role = resolvedSearchParams?.role ?? "";
 
   // Load users server-side
   const usersResult = await getUsersAction(page, 10, search, role);

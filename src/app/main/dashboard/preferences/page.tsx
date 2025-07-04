@@ -4,8 +4,12 @@ import { AccountSettings } from "./_components/account-settings";
 import AppearanceSettings from "./_components/appearance-settings";
 import { PasswordChange } from "./_components/password-change";
 import { SecuritySettings } from "./_components/security-settings";
+import { getSessionsAction } from "./_actions/session-actions";
 
-export default function SettingsPage() {
+export default async function SettingsPage() {
+  // Load sessions server-side
+  const sessionsResult = await getSessionsAction();
+
   return (
     <div className="@container/main flex flex-col gap-4">
       <Tabs className="w-full" defaultValue="account">
@@ -24,7 +28,9 @@ export default function SettingsPage() {
           </div>
         </TabsContent>
         <TabsContent className="pt-2" value="security">
-          <SecuritySettings />
+          <SecuritySettings 
+            initialSessions={sessionsResult.success ? sessionsResult.sessions : []}
+          />
         </TabsContent>
         <TabsContent className="pt-2" value="appearance">
           <AppearanceSettings />

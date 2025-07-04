@@ -50,7 +50,7 @@ export async function POST(_request: NextRequest, context: { params: Promise<{ i
 
     // Prevent admin from resetting their own 2FA via this endpoint
     // (they should use the regular user flow)
-    if (id === session.user.id) {
+    if (id === session.user?.id) {
       return NextResponse.json(
         { error: "Cannot reset your own 2FA via admin endpoint. Use account settings instead." },
         { status: 400 },
