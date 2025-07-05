@@ -178,9 +178,10 @@ export function validateTrafficReportRow(row: TrafficReportRow, rowIndex: number
     errors.push(`Row ${rowIndex}: Foreign campaign ID is required`);
   }
 
-  if (!row.traffic_source) {
-    errors.push(`Row ${rowIndex}: Traffic source is required`);
-  }
+  // Traffic source can be empty in real data
+  // if (!row.traffic_source) {
+  //   errors.push(`Row ${rowIndex}: Traffic source is required`);
+  // }
 
   if (!row.device_type) {
     errors.push(`Row ${rowIndex}: Device type is required`);

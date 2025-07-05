@@ -1,37 +1,24 @@
-import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+import { z } from "zod";
 
-import { prisma } from "@/lib/prisma";
-
-import { auth } from "../../../../../auth";
+import { deleteUpload, getUploadById, updateUploadStatus } from "@/lib/data/uploads";
 
 interface RouteContext {
   params: Promise<{ id: string }>;
 }
 
-// Define a type for the PATCH request body
-interface UpdateUploadRequestBody {
-  status?: "pending" | "processing" | "completed" | "failed";
-  recordCount?: number;
-  errorLog?: string[];
-}
+const updateUploadSchema = z.object({
+  status: z.enum(["uploaded", "processing", "completed", "failed"]).optional(),
+  recordCount: z.number().optional(),
+  errorLog: z.string().optional(),
+});
 
 // GET /api/uploads/[id] - Get specific upload details
 export async function GET(_req: NextRequest, { params }: RouteContext) {
   try {
-    const session = await auth();
-    if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const { id } = await params;
-
-    const upload = await prisma.conversionUpload.findFirst({
-      where: {
-        id,
-        uploadedBy: session.user.id, // Ensure user can only see their own uploads
-      },
-    });
+    const upload = await getUploadById(id);
 
     if (!upload) {
       return NextResponse.json({ error: "Upload not found" }, { status: 404 });
@@ -40,6 +27,11 @@ export async function GET(_req: NextRequest, { params }: RouteContext) {
     return NextResponse.json({ upload });
   } catch (error) {
     console.error("Failed to fetch upload:", error);
+
+    if (error instanceof Error && error.message === "Authentication required") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     return NextResponse.json({ error: "Failed to fetch upload" }, { status: 500 });
   }
 }
@@ -47,43 +39,58 @@ export async function GET(_req: NextRequest, { params }: RouteContext) {
 // PATCH /api/uploads/[id] - Update upload status
 export async function PATCH(request: NextRequest, { params }: RouteContext) {
   try {
-    const session = await auth();
-    if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const { id } = await params;
-    // Explicitly type the request body
-    const { status, recordCount, errorLog } = (await request.json()) as UpdateUploadRequestBody;
+    const body = (await request.json()) as unknown;
+    const validatedData = updateUploadSchema.parse(body);
 
-    // Validate status
-    if (status && !["pending", "processing", "completed", "failed"].includes(status)) {
-      return NextResponse.json({ error: "Invalid status" }, { status: 400 });
+    if (validatedData.status) {
+      await updateUploadStatus(id, validatedData.status, {
+        recordCount: validatedData.recordCount,
+        errorLog: validatedData.errorLog,
+      });
     }
 
-    const upload = await prisma.conversionUpload.findFirst({
-      where: {
-        id,
-        uploadedBy: session.user.id,
-      },
-    });
-
-    if (!upload) {
-      return NextResponse.json({ error: "Upload not found" }, { status: 404 });
-    }
-
-    const updatedUpload = await prisma.conversionUpload.update({
-      where: { id },
-      data: {
-        ...(status && { status }),
-        ...(recordCount !== undefined && { recordCount }),
-        ...(errorLog !== undefined && { errorLog: errorLog.join("\n") }),
-      },
-    });
-
+    const updatedUpload = await getUploadById(id);
     return NextResponse.json({ upload: updatedUpload });
   } catch (error) {
     console.error("Failed to update upload:", error);
+
+    if (error instanceof Error) {
+      if (error.message === "Authentication required") {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+      if (error.message === "Upload not found or access denied") {
+        return NextResponse.json({ error: "Upload not found" }, { status: 404 });
+      }
+    }
+
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: "Invalid request data", details: error.errors }, { status: 400 });
+    }
+
     return NextResponse.json({ error: "Failed to update upload" }, { status: 500 });
+  }
+}
+
+// DELETE /api/uploads/[id] - Delete upload
+export async function DELETE(_req: NextRequest, { params }: RouteContext) {
+  try {
+    const { id } = await params;
+    await deleteUpload(id);
+
+    return NextResponse.json({ message: "Upload deleted successfully" });
+  } catch (error) {
+    console.error("Failed to delete upload:", error);
+
+    if (error instanceof Error) {
+      if (error.message === "Authentication required") {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+      if (error.message === "Upload not found or access denied") {
+        return NextResponse.json({ error: "Upload not found" }, { status: 404 });
+      }
+    }
+
+    return NextResponse.json({ error: "Failed to delete upload" }, { status: 500 });
   }
 }

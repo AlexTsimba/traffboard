@@ -1,8 +1,7 @@
-import bcryptjs from "bcryptjs";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
-import { prisma } from "@/lib/prisma";
+import { checkUserRequires2FA } from "@/lib/data/two-factor";
 
 const checkSchema = z.object({
   email: z.string().email(),
@@ -14,35 +13,16 @@ export async function POST(request: Request) {
     const requestBody = (await request.json()) as unknown;
     const { email, password } = checkSchema.parse(requestBody);
 
-    // Find user and check password
-    const user = await prisma.user.findUnique({
-      where: { email },
-      select: {
-        id: true,
-        passwordHash: true,
-        totpSecret: true,
-      },
-    });
+    const result = await checkUserRequires2FA(email, password);
 
-    if (!user?.passwordHash) {
-      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
-    }
-
-    // Verify password
-    const passwordsMatch = await bcryptjs.compare(password, user.passwordHash);
-    if (!passwordsMatch) {
-      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
-    }
-
-    // Check if 2FA is enabled
-    const requires2FA = !!user.totpSecret;
-
-    return NextResponse.json({
-      requires2FA,
-      userId: user.id,
-    });
+    return NextResponse.json(result);
   } catch (error) {
     console.error("2FA check error:", error);
+
+    if (error instanceof Error && error.message === "Invalid credentials") {
+      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+    }
+
     return NextResponse.json({ error: "Authentication failed" }, { status: 500 });
   }
 }

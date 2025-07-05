@@ -131,7 +131,7 @@ model PlayerData {
   firstDepositDate    DateTime?
   partnerId           String
   companyName         String
-  partnersEmail       String?
+  // partnersEmail field REMOVED - not stored in database
   partnerTags         String?
   campaignId          String
   campaignName        String?
@@ -187,10 +187,8 @@ model TrafficReport {
   registrationsCount    Int      @default(0)
   ftdCount              Int      @default(0)
   depositsCount         Int      @default(0)
-  cr                    Decimal  @default(0.00) @db.Decimal(5,2)  // Conversion Rate
-  cftd                  Decimal  @default(0.00) @db.Decimal(5,2)  // Conversion to FTD
-  cd                    Decimal  @default(0.00) @db.Decimal(5,2)  // Conversion to Deposit
-  rftd                  Decimal  @default(0.00) @db.Decimal(5,2)  // Registration to FTD
+  // Conversion rate fields REMOVED - not stored in database:
+  // cr, cftd, cd, rftd - these will be calculated when needed
   
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt

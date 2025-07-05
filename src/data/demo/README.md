@@ -1,13 +1,45 @@
 # Demo Data Files
 
-This directory contains demo data files that match the structure of real TraffBoard CSV uploads, but with fake data for testing and development purposes.
+This directory contains **SAMPLE DATA ONLY** for testing and development purposes. All data is completely fictional and safe for public repositories.
+
+## 🚨 Security Notice
+- **NO REAL DATA** is stored in this directory
+- All partner emails, player IDs, and metrics are **FAKE**
+- Safe for version control and public repositories
 
 ## Available Demo Files
 
-### 1. Player Data (`overall_players_demo.csv`)
-**35 columns** - Individual player records with casino gaming metrics
+### 1. Player Data (`sample_players.csv`)
+**Sample player records** with casino gaming metrics - 5 fictional records
 
-**Structure:**
+**Features:**
+- Fictional player IDs and partner information
+- Sample dates, currencies, and gaming metrics
+- Safe demo data for testing CSV import functionality
+
+### 2. Traffic Data (`sample_traffic.csv`) 
+**Sample traffic reports** with click and conversion data - 8 fictional records
+
+**Features:**
+- Fictional campaign and partner IDs
+- Sample traffic sources and device types
+- Demo conversion metrics for testing
+
+## Data Processing Notes
+
+- **partnersEmail field**: Present in CSV but **excluded from database** during processing
+- **Conversion rate fields (cr, cftd, cd, rftd)**: Present in CSV but **excluded from database** during processing
+- All sample data designed to test the complete CSV processing pipeline safely
+
+## Usage
+
+These files can be used to test:
+- CSV upload functionality
+- Data transformation and validation
+- Database import processes
+- Field exclusion logic
+
+**Perfect for development and testing without any privacy concerns!** ✅
 - Player identification and tracking
 - Partner and campaign information  
 - Financial metrics (deposits, cashouts, casino activity)

@@ -1,0 +1,9 @@
+date,foreign_brand_id,foreign_partner_id,foreign_campaign_id,foreign_landing_id,traffic_source,device_type,user_agent_family,os_family,country,all_clicks,unique_clicks,registrations_count,ftd_count,deposits_count,cr,cftd,cd,rftd
+2024-01-20,BRAND001,DEMO001,CAMP001,LAND001,facebook,Desktop,Chrome,Windows,US,150,120,8,2,3,6.67,1.67,2.00,25.00
+2024-01-20,BRAND001,DEMO001,CAMP001,LAND002,google,Mobile,Safari,iOS,US,200,180,12,3,4,6.00,1.50,2.00,25.00
+2024-01-21,BRAND001,DEMO002,CAMP002,LAND001,instagram,Mobile,Chrome Mobile,Android,CA,175,140,10,2,5,5.71,1.14,2.86,20.00
+2024-01-21,BRAND002,DEMO002,CAMP002,LAND003,organic,Desktop,Firefox,Windows,CA,95,85,6,1,2,6.32,1.05,2.11,16.67
+2024-01-22,BRAND002,DEMO003,CAMP003,LAND002,twitter,Mobile,Safari,iOS,GB,220,190,15,4,6,6.82,1.82,2.73,26.67
+2024-01-22,BRAND001,DEMO003,CAMP003,LAND004,,Tablet,Chrome,Android,AU,80,70,4,1,2,5.00,1.25,2.50,25.00
+2024-01-23,BRAND002,DEMO001,CAMP001,LAND001,youtube,Desktop,Edge,Windows,DE,160,145,9,2,3,5.63,1.25,1.88,22.22
+2024-01-23,BRAND001,DEMO002,CAMP002,LAND002,linkedin,Mobile,Safari,iOS,FR,110,95,7,1,3,6.36,0.91,2.73,14.29

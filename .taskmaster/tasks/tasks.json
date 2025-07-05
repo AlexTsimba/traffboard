@@ -251,7 +251,7 @@
             "title": "Complete DAL Migration for All API Routes",
             "description": "Complete migration of all remaining API routes to Data Access Layer and remove direct Prisma queries outside DAL",
             "details": "AUDIT FINDINGS: Many API routes still use direct Prisma queries instead of DAL\n\nROUTES TO MIGRATE:\n- /api/account/password (partially migrated)\n- /api/account/sessions and /api/account/sessions/[token] \n- /api/process-csv, /api/players, /api/traffic, /api/uploads\n- /api/admin/users and /api/admin/users/[id] (partially migrated)\n\nTASKS:\n1. Audit all direct prisma.* calls outside /src/lib/data/\n2. Create DAL functions for CSV processing, players, traffic, uploads\n3. Update API routes to use DAL functions only\n4. Remove direct database access from API routes\n5. Ensure all database operations go through authentication\n6. Test all affected API functionality\n\nGOAL: 100% DAL coverage for all database operations",
-            "status": "pending",
+            "status": "in-progress",
             "dependencies": [],
             "parentTaskId": 3
           },
@@ -420,7 +420,7 @@
     ],
     "metadata": {
       "created": "2025-07-01T22:28:10.873Z",
-      "updated": "2025-07-05T01:09:29.172Z",
+      "updated": "2025-07-05T05:10:54.076Z",
       "description": "Tasks for master context"
     }
   }

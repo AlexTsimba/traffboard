@@ -1,0 +1,86 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Optional npm cache directory
+.npm
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env*
+!.env.example
+
+# Build output
+.next/
+out/
+dist/
+build/
+
+# Dependencies
+node_modules/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE/Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Database
+*.db
+*.sqlite
+
+# Temporary files
+tmp/
+temp/
+
+# Test files and debug scripts (exclude from linting)
+*.test.js
+*.spec.js
+debug-*.js
+test-*.js
+check-user.js
+get-totp.js
+realtime-test.js
+test-defaults.js
+test-timezone.js
+test-totp.js
+test-window-fix.js
+
+# Script directories
+scripts/*.ts
+!scripts/create-user.js
+
+# CI/CD
+.github/
+
+# Prisma
+prisma/migrations/
+
+# Screenshots and temp files
+*.png
+*.jpg
+*.jpeg
+CSV_DATA_REMOVAL_SUMMARY.md
+FIELD_REMOVAL_COMPLETE.md

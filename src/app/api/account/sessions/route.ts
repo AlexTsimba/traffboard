@@ -1,51 +1,19 @@
 import { NextResponse } from "next/server";
 
-import { prisma } from "@/lib/prisma";
-
-import { auth } from "../../../../../auth";
+import { getUserSessions, revokeAllOtherSessions } from "@/lib/data/sessions";
 
 // GET /api/account/sessions - List current user's active sessions
 export async function GET() {
   try {
-    const session = await auth();
+    const { sessions } = await getUserSessions();
+    return NextResponse.json({ sessions });
+  } catch (error) {
+    console.error("Error fetching sessions:", error);
 
-    if (!session?.user) {
+    if (error instanceof Error && error.message === "Authentication required") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const sessions = await prisma.session.findMany({
-      where: {
-        userId: session.user.id,
-        isActive: true,
-        expires: {
-          gt: new Date(),
-        },
-      },
-      select: {
-        sessionToken: true,
-        ipAddress: true,
-        userAgent: true,
-        deviceType: true,
-        browser: true,
-        os: true,
-        country: true,
-        city: true,
-        lastActivity: true,
-        createdAt: true,
-        expires: true,
-      },
-      orderBy: { lastActivity: "desc" },
-    });
-
-    // Mark first session as current for now (in real implementation, would use session token)
-    const sessionsWithCurrent = sessions.map((s, index) => ({
-      ...s,
-      isCurrent: index === 0,
-    }));
-
-    return NextResponse.json({ sessions: sessionsWithCurrent });
-  } catch (error) {
-    console.error("Error fetching sessions:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
@@ -53,29 +21,19 @@ export async function GET() {
 // DELETE /api/account/sessions - Revoke all other sessions (keep current)
 export async function DELETE() {
   try {
-    const session = await auth();
-
-    if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    // Revoke all sessions for user (in real implementation, would exclude current)
-    const result = await prisma.session.updateMany({
-      where: {
-        userId: session.user.id,
-        isActive: true,
-      },
-      data: {
-        isActive: false,
-      },
-    });
+    const { revokedCount } = await revokeAllOtherSessions();
 
     return NextResponse.json({
-      message: `Revoked ${result.count} sessions`,
-      revokedCount: result.count,
+      message: `Revoked ${revokedCount} sessions`,
+      revokedCount,
     });
   } catch (error) {
     console.error("Error revoking sessions:", error);
+
+    if (error instanceof Error && error.message === "Authentication required") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

@@ -1,33 +1,28 @@
-import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+import { z } from "zod";
 
-import { prisma } from "@/lib/prisma";
+import { createUpload, getUserUploads } from "@/lib/data/uploads";
 
-import { auth } from "../../../../auth";
-
-// Define a type for the POST request body
-interface UploadRequestBody {
-  fileName: string;
-  fileType: string;
-}
+const uploadRequestSchema = z.object({
+  fileName: z.string().min(1),
+  fileType: z.enum(["player", "traffic"]),
+  uploadPath: z.string().min(1),
+  uploadSize: z.number().min(1),
+});
 
 // GET /api/uploads - List user's upload history
-export async function GET(_req: NextRequest) {
+export async function GET() {
   try {
-    const session = await auth();
-    if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const uploads = await prisma.conversionUpload.findMany({
-      where: { uploadedBy: session.user.id },
-      orderBy: { createdAt: "desc" },
-      take: 50, // Limit to last 50 uploads
-    });
-
+    const { uploads } = await getUserUploads();
     return NextResponse.json({ uploads });
   } catch (error) {
     console.error("Failed to fetch uploads:", error);
+
+    if (error instanceof Error && error.message === "Authentication required") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     return NextResponse.json({ error: "Failed to fetch uploads" }, { status: 500 });
   }
 }
@@ -35,31 +30,23 @@ export async function GET(_req: NextRequest) {
 // POST /api/uploads - Create new upload record
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const body = (await request.json()) as unknown;
+    const validatedData = uploadRequestSchema.parse(body);
 
-    // Explicitly type the request body
-    const { fileName, fileType } = (await request.json()) as UploadRequestBody;
-
-    // Validate fileType
-    if (!["players", "traffic"].includes(fileType)) {
-      return NextResponse.json({ error: "Invalid file type. Must be 'players' or 'traffic'" }, { status: 400 });
-    }
-
-    const upload = await prisma.conversionUpload.create({
-      data: {
-        fileName,
-        fileType,
-        uploadedBy: session.user.id,
-        status: "pending",
-      },
-    });
+    const upload = await createUpload(validatedData);
 
     return NextResponse.json({ upload }, { status: 201 });
   } catch (error) {
     console.error("Failed to create upload record:", error);
+
+    if (error instanceof Error && error.message === "Authentication required") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: "Invalid request data", details: error.errors }, { status: 400 });
+    }
+
     return NextResponse.json({ error: "Failed to create upload record" }, { status: 500 });
   }
 }

@@ -32,6 +32,20 @@ export interface UpdateUserData {
   role?: string;
 }
 
+export interface UpdateUserDataAdmin extends UpdateUserData {
+  isActive?: boolean;
+  password?: string;
+}
+
+export interface SafeUserDetailed extends SafeUser {
+  createdByUser?: { name: string | null; email: string } | null;
+  lastModifiedByUser?: { name: string | null; email: string } | null;
+  _count?: {
+    uploads: number;
+    sessions: number;
+  };
+}
+
 /**
  * Get user list with authentication and role checks
  * Only admins can view user lists
@@ -164,12 +178,12 @@ export async function updateUser(userId: string, updateData: UpdateUserData): Pr
   const currentUser = await requireAuth();
 
   // Users can update their own profile (except role), admins can update any user
-  if (currentUser.role !== "admin" && currentUser.id !== userId) {
+  if (currentUser.role !== "superuser" && currentUser.id !== userId) {
     throw new Error("Permission denied");
   }
 
   // Non-admins cannot change roles
-  if (currentUser.role !== "admin" && updateData.role) {
+  if (currentUser.role !== "superuser" && updateData.role) {
     throw new Error("Cannot change role");
   }
 
@@ -268,6 +282,182 @@ export async function getCurrentUserProfile(): Promise<SafeUser> {
   }
 
   return user;
+}
+
+/**
+ * Get user by ID with detailed information for admin view
+ */
+export async function getUserByIdAdmin(userId: string): Promise<SafeUserDetailed | null> {
+  await requireAdmin();
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      isActive: true,
+      lastLoginAt: true,
+      createdAt: true,
+      updatedAt: true,
+      createdByUser: {
+        select: {
+          name: true,
+          email: true,
+        },
+      },
+      lastModifiedByUser: {
+        select: {
+          name: true,
+          email: true,
+        },
+      },
+      _count: {
+        select: {
+          uploads: true,
+          sessions: true,
+        },
+      },
+    },
+  });
+
+  auditLog("users.admin_view", userId, { targetUserId: userId });
+
+  return user;
+}
+
+/**
+ * Update user with admin privileges (including password and isActive)
+ */
+export async function updateUserAdmin(userId: string, updateData: UpdateUserDataAdmin): Promise<SafeUserDetailed> {
+  const currentUser = await requireAdmin();
+
+  // Prevent editing yourself as admin with role changes in some cases
+  if (currentUser.id === userId && updateData.role && updateData.role !== "superuser") {
+    // Check if this is the last superuser
+    const superuserCount = await prisma.user.count({
+      where: { role: "superuser", isActive: true },
+    });
+
+    if (superuserCount <= 1) {
+      throw new Error("Cannot remove superuser role from the last active superuser");
+    }
+  }
+
+  // Check email uniqueness if being changed
+  if (updateData.email) {
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        email: updateData.email,
+        NOT: { id: userId },
+      },
+    });
+
+    if (existingUser) {
+      throw new Error("Email already exists");
+    }
+  }
+
+  // Prepare update data
+  const finalUpdateData: {
+    name?: string;
+    email?: string;
+    role?: string;
+    isActive?: boolean;
+    passwordHash?: string;
+    lastModifiedBy: string;
+  } = {
+    lastModifiedBy: currentUser.id,
+  };
+
+  // Only add defined values
+  if (updateData.name !== undefined) finalUpdateData.name = updateData.name;
+  if (updateData.email !== undefined) finalUpdateData.email = updateData.email;
+  if (updateData.role !== undefined) finalUpdateData.role = updateData.role;
+  if (updateData.isActive !== undefined) finalUpdateData.isActive = updateData.isActive;
+
+  // Hash password if provided
+  if (updateData.password) {
+    const bcrypt = await import("bcryptjs");
+    finalUpdateData.passwordHash = await bcrypt.hash(updateData.password, 12);
+  }
+
+  const user = await prisma.user.update({
+    where: { id: userId },
+    data: finalUpdateData,
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      isActive: true,
+      lastLoginAt: true,
+      createdAt: true,
+      updatedAt: true,
+      lastModifiedByUser: {
+        select: {
+          name: true,
+          email: true,
+        },
+      },
+    },
+  });
+
+  auditLog("users.admin_update", currentUser.id, {
+    targetUserId: userId,
+    changes: updateData,
+  });
+
+  return user;
+}
+
+/**
+ * Deactivate user (soft delete) with admin privileges
+ */
+export async function deactivateUser(userId: string): Promise<void> {
+  const currentUser = await requireAdmin();
+
+  // Prevent self-deletion
+  if (currentUser.id === userId) {
+    throw new Error("Cannot delete own account");
+  }
+
+  // Get user before deletion for checks
+  const userToDeactivate = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { role: true, isActive: true, email: true },
+  });
+
+  if (!userToDeactivate) {
+    throw new Error("User not found");
+  }
+
+  // Prevent deleting the last superuser
+  if (userToDeactivate.role === "superuser" && userToDeactivate.isActive) {
+    const activeSuperuserCount = await prisma.user.count({
+      where: { role: "superuser", isActive: true },
+    });
+
+    if (activeSuperuserCount <= 1) {
+      throw new Error("Cannot delete the last active superuser");
+    }
+  }
+
+  // Soft delete by deactivating
+  await prisma.user.update({
+    where: { id: userId },
+    data: {
+      isActive: false,
+      lastModifiedBy: currentUser.id,
+    },
+  });
+
+  auditLog("users.deactivate", currentUser.id, {
+    targetUserId: userId,
+    targetEmail: userToDeactivate.email,
+    targetRole: userToDeactivate.role,
+  });
 }
 
 /**

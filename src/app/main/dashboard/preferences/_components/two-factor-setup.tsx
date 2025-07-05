@@ -56,13 +56,6 @@ export function TwoFactorSetup({ initialStatus = null }: TwoFactorSetupProps) {
     defaultValues: { code: "" },
   });
 
-  // Remove the useEffect that was causing timing issues
-  // useEffect(() => {
-  //   if (setupData) {
-  //     setupForm.setValue("secret", setupData.secret);
-  //   }
-  // }, [setupData, setupForm]);
-
   // Focus OTP input when setup dialog opens
   useEffect(() => {
     if (setupDialogOpen && setupOtpRef.current) {
@@ -96,8 +89,7 @@ export function TwoFactorSetup({ initialStatus = null }: TwoFactorSetupProps) {
           variant: "destructive",
         });
       }
-    } catch (error) {
-      console.error("Error loading 2FA status:", error);
+    } catch {
       toast({
         title: "Error",
         description: "Failed to load 2FA status",
@@ -124,8 +116,7 @@ export function TwoFactorSetup({ initialStatus = null }: TwoFactorSetupProps) {
             variant: "destructive",
           });
         }
-      } catch (error) {
-        console.error("Error starting 2FA setup:", error);
+      } catch {
         toast({
           title: "Error",
           description: "Failed to start 2FA setup",
@@ -172,8 +163,7 @@ export function TwoFactorSetup({ initialStatus = null }: TwoFactorSetupProps) {
               variant: "destructive",
             });
           }
-        } catch (error) {
-          console.error("Error enabling 2FA:", error);
+        } catch {
           toast({
             title: "Error",
             description: "Failed to enable 2FA",
@@ -211,8 +201,7 @@ export function TwoFactorSetup({ initialStatus = null }: TwoFactorSetupProps) {
               variant: "destructive",
             });
           }
-        } catch (error) {
-          console.error("Error disabling 2FA:", error);
+        } catch {
           toast({
             title: "Error",
             description: "Failed to disable 2FA",

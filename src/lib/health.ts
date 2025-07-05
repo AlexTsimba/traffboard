@@ -9,10 +9,7 @@ export interface DatabaseHealth {
 export async function checkDatabaseHealth(): Promise<DatabaseHealth> {
   try {
     const start = Date.now();
-
-    // Simple query to test connection
     await prisma.$queryRaw`SELECT 1`;
-
     const latency = Date.now() - start;
 
     return {
@@ -20,8 +17,6 @@ export async function checkDatabaseHealth(): Promise<DatabaseHealth> {
       latency,
     };
   } catch (error) {
-    console.error("Database health check failed:", error);
-
     return {
       status: "unhealthy",
       error: error instanceof Error ? error.message : "Unknown database error",

@@ -23,7 +23,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
         <SessionProviderWrapper>
           <ThemeProvider disableTransitionOnChange attribute="class" defaultTheme="light" enableSystem={false}>
             {children}
-            <Toaster />
+            <Toaster position="bottom-right" />
           </ThemeProvider>
         </SessionProviderWrapper>
       </body>

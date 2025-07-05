@@ -35,9 +35,9 @@ export async function requirePageAuth(): Promise<PageAuthResult> {
   return {
     user: {
       id,
-      email: email || "",
-      name: name || null,
-      role: role || "user",
+      email,
+      name: name ?? null,
+      role,
     },
   };
 }
@@ -73,9 +73,9 @@ export async function getPageAuth(): Promise<PageAuthResult["user"] | null> {
 
     return {
       id,
-      email: email || "",
-      name: name || null,
-      role: role || "user",
+      email,
+      name: name ?? null,
+      role,
     };
   } catch {
     return null;

@@ -16,7 +16,7 @@ export interface TransformedPlayerData {
   firstDepositDate: Date | undefined | null;
   partnerId: string;
   companyName: string;
-  partnersEmail: string | null;
+  // partnersEmail: REMOVED during CSV processing for data privacy
   partnerTags: string | null;
   campaignId: string;
   campaignName: string | null;
@@ -63,10 +63,8 @@ export interface TransformedTrafficData {
   registrationsCount: number;
   ftdCount: number;
   depositsCount: number;
-  cr: number;
-  cftd: number;
-  cd: number;
-  rftd: number;
+  // Conversion rate fields REMOVED during CSV processing:
+  // cr, cftd, cd, rftd - these will use default values (0.00) from schema
 }
 
 export function transformPlayerData(row: PlayerDataRow): TransformedPlayerData {
@@ -77,7 +75,7 @@ export function transformPlayerData(row: PlayerDataRow): TransformedPlayerData {
     firstDepositDate: safeParseDate(row["First deposit date"]),
     partnerId: row["Partner ID"],
     companyName: row["Company name"],
-    partnersEmail: row["Partners email"] || null,
+    // partnersEmail: EXCLUDED - removed during CSV processing for privacy
     partnerTags: row["Partner tags"] || null,
     campaignId: row["Campaign ID"],
     campaignName: row["Campaign name"] || null,
@@ -116,7 +114,7 @@ export function transformTrafficData(row: TrafficReportRow): TransformedTrafficD
     foreignPartnerId: row.foreign_partner_id,
     foreignCampaignId: row.foreign_campaign_id,
     foreignLandingId: row.foreign_landing_id || null,
-    trafficSource: row.traffic_source,
+    trafficSource: row.traffic_source || "unknown", // Handle empty traffic source
     deviceType: row.device_type,
     userAgentFamily: row.user_agent_family || null,
     osFamily: row.os_family || null,
@@ -126,10 +124,8 @@ export function transformTrafficData(row: TrafficReportRow): TransformedTrafficD
     registrationsCount: safeParseNumber(row.registrations_count),
     ftdCount: safeParseNumber(row.ftd_count),
     depositsCount: safeParseNumber(row.deposits_count),
-    cr: safeParseDecimal(row.cr),
-    cftd: safeParseDecimal(row.cftd),
-    cd: safeParseDecimal(row.cd),
-    rftd: safeParseDecimal(row.rftd),
+    // Conversion rate fields EXCLUDED - using schema defaults (0.00):
+    // cr: row.cr, cftd: row.cftd, cd: row.cd, rftd: row.rftd
   };
 }
 

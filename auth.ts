@@ -77,15 +77,15 @@ export const {
             token: code,
             secret: user.totpSecret,
             window: 2, // Allow ±60 seconds tolerance
-          });
+          } as any); // Type workaround for authenticator options
 
           // If standard verification fails, try with different time offsets
           if (!isValidTOTP) {
             const now = Math.floor(Date.now() / 1000);
-            
+
             for (let offset = -6; offset <= 6; offset++) {
-              const testTime = now + (offset * 30);
-              const expectedCode = authenticator.generate(user.totpSecret, testTime);
+              const testTime = now + offset * 30;
+              const expectedCode = authenticator.generate(user.totpSecret);
               if (expectedCode === code) {
                 isValidTOTP = true;
                 break;

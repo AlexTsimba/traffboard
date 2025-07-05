@@ -32,7 +32,6 @@ export async function get2FAStatusAction() {
       status,
     };
   } catch (error) {
-    console.error("Error getting 2FA status:", error);
     return {
       success: false,
       error: error instanceof Error ? error.message : "Failed to get 2FA status",
@@ -52,7 +51,6 @@ export async function generate2FASetupAction() {
       setupData,
     };
   } catch (error) {
-    console.error("Error generating 2FA setup:", error);
     return {
       success: false,
       error: error instanceof Error ? error.message : "Failed to generate 2FA setup",
@@ -90,7 +88,6 @@ export async function enable2FAAction(formData: FormData) {
       message: "2FA enabled successfully",
     };
   } catch (error) {
-    console.error("Error enabling 2FA:", error);
     return {
       success: false,
       error: error instanceof Error ? error.message : "Failed to enable 2FA",
@@ -125,7 +122,6 @@ export async function disable2FAAction(formData: FormData) {
       message: "2FA disabled successfully",
     };
   } catch (error) {
-    console.error("Error disabling 2FA:", error);
     return {
       success: false,
       error: error instanceof Error ? error.message : "Failed to disable 2FA",
@@ -156,7 +152,6 @@ export async function admin2FAResetAction(formData: FormData) {
       message: "2FA reset successfully for user",
     };
   } catch (error) {
-    console.error("Error resetting 2FA:", error);
     return {
       success: false,
       error: error instanceof Error ? error.message : "Failed to reset 2FA",

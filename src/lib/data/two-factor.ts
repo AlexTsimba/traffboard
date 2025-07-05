@@ -35,6 +35,47 @@ export interface Safe2FAStatus {
 }
 
 /**
+ * Check if user requires 2FA for login (public function, no auth required)
+ */
+export async function checkUserRequires2FA(
+  email: string,
+  password: string,
+): Promise<{
+  requires2FA: boolean;
+  userId: string;
+}> {
+  // Find user and verify credentials
+  const user = await prisma.user.findUnique({
+    where: { email },
+    select: {
+      id: true,
+      passwordHash: true,
+      totpSecret: true,
+    },
+  });
+
+  if (!user?.passwordHash) {
+    throw new Error("Invalid credentials");
+  }
+
+  // Verify password
+  const passwordsMatch = await bcryptjs.compare(password, user.passwordHash);
+  if (!passwordsMatch) {
+    throw new Error("Invalid credentials");
+  }
+
+  // Check if 2FA is enabled
+  const requires2FA = !!user.totpSecret;
+
+  auditLog("2fa.login_check", user.id, { requires2FA });
+
+  return {
+    requires2FA,
+    userId: user.id,
+  };
+}
+
+/**
  * Get current user's 2FA status
  */
 export async function get2FAStatus(): Promise<Safe2FAStatus> {
@@ -112,30 +153,11 @@ export async function enable2FA(secret: string, code: string): Promise<void> {
   const currentUser = await requireAuth();
 
   // Verify the TOTP code with proper time tolerance
-  let isValid = authenticator.verify({
-    token: code,
-    secret,
-    window: 2, // Allow ±60 seconds tolerance
-  });
-
-  // If standard verification fails, try with different time offsets
-  // This handles timezone and clock sync issues
-  if (!isValid) {
-    const now = Math.floor(Date.now() / 1000);
-
-    for (let offset = -6; offset <= 6; offset++) {
-      const testTime = now + offset * 30; // 30-second windows
-      const expectedCode = authenticator.generate(secret, testTime);
-      if (expectedCode === code) {
-        isValid = true;
-        break;
-      }
-    }
-  }
+  const isValid = authenticator.check(code, secret);
 
   if (!isValid) {
     auditLog("2fa.enable_failed", currentUser.id, { reason: "invalid_code" });
-    throw new Error("Invalid verification code");
+    throw new Error("Invalid verification code. Please check your authenticator app and system clock.");
   }
 
   // Check if user already has 2FA enabled
@@ -195,10 +217,7 @@ export async function disable2FA(password: string, code: string): Promise<void> 
   }
 
   // Verify TOTP code
-  const codeValid = authenticator.verify({
-    token: code,
-    secret: user.totpSecret,
-  });
+  const codeValid = authenticator.check(code, user.totpSecret);
 
   if (!codeValid) {
     auditLog("2fa.disable_failed", currentUser.id, { reason: "invalid_code" });
@@ -221,7 +240,11 @@ export async function disable2FA(password: string, code: string): Promise<void> 
  * Admin function: Reset 2FA for any user
  * Only superusers can use this function
  */
-export async function admin2FAReset(userId: string): Promise<void> {
+export async function admin2FAReset(userId: string): Promise<{
+  userId: string;
+  userName: string | null;
+  userEmail: string;
+}> {
   const admin = await requireAuth();
 
   if (admin.role !== "superuser") {
@@ -231,7 +254,7 @@ export async function admin2FAReset(userId: string): Promise<void> {
   // Check if target user exists and has 2FA enabled
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { id: true, email: true, totpSecret: true },
+    select: { id: true, name: true, email: true, totpSecret: true },
   });
 
   if (!user) {
@@ -240,6 +263,11 @@ export async function admin2FAReset(userId: string): Promise<void> {
 
   if (!user.totpSecret) {
     throw new Error("User does not have 2FA enabled");
+  }
+
+  // Prevent admin from resetting their own 2FA via this endpoint
+  if (userId === admin.id) {
+    throw new Error("Cannot reset your own 2FA via admin endpoint. Use account settings instead.");
   }
 
   // Reset 2FA by removing the secret
@@ -251,10 +279,16 @@ export async function admin2FAReset(userId: string): Promise<void> {
     },
   });
 
-  auditLog("2fa.admin_reset", admin.id, {
+  auditLog("admin_reset", admin.id, {
     targetUserId: userId,
     targetEmail: user.email,
   });
+
+  return {
+    userId: user.id,
+    userName: user.name,
+    userEmail: user.email,
+  };
 }
 
 /**
@@ -267,31 +301,17 @@ export async function verify2FACode(userId: string, code: string): Promise<boole
   });
 
   if (!user?.totpSecret) {
+    // If user has no secret, 2FA is not enabled, so verification "passes" in a sense
+    // The calling context (e.g., middleware) should handle this case
+    return true;
+  }
+
+  const isValid = authenticator.check(code, user.totpSecret);
+
+  if (!isValid) {
+    auditLog("2fa.verify_failed", userId, { reason: "invalid_code" });
     return false;
   }
 
-  // Verify TOTP code with robust time tolerance
-  let isValid = authenticator.verify({
-    token: code,
-    secret: user.totpSecret,
-    window: 2, // Allow ±60 seconds tolerance
-  });
-
-  // If standard verification fails, try with different time offsets
-  if (!isValid) {
-    const now = Math.floor(Date.now() / 1000);
-
-    for (let offset = -6; offset <= 6; offset++) {
-      const testTime = now + offset * 30;
-      const expectedCode = authenticator.generate(user.totpSecret, testTime);
-      if (expectedCode === code) {
-        isValid = true;
-        break;
-      }
-    }
-  }
-
-  auditLog("2fa.verification", userId, { success: isValid });
-
-  return isValid;
+  return true;
 }

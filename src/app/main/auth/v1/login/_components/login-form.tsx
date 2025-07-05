@@ -33,7 +33,7 @@ interface LoginFormV1Props {
   onStepChange?: (step: "login" | "2fa") => void;
 }
 
-export function LoginFormV1({ onStepChange }: LoginFormV1Props) {
+export function LoginFormV1({ onStepChange }: Readonly<LoginFormV1Props>) {
   const router = useRouter();
   const [step, setStep] = useState<"login" | "2fa">("login");
   const [pendingAuth, setPendingAuth] = useState<{ email: string; password: string } | null>(null);

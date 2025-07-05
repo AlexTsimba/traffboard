@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { checkDatabaseHealth } from "@/lib/database";
+import { checkDatabaseHealth } from "@/lib/health";
 
 export async function GET() {
   try {
