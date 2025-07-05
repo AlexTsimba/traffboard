@@ -35,6 +35,8 @@ model User {
   accounts      Account[]
   sessions      Session[]
   uploads       ConversionUpload[]
+  backupCodes   TwoFactorBackupCode[]
+  authAttempts  AuthAttempt[]
   
   // Self-referential relations for audit trail
   createdUsers     User[] @relation("UserCreatedBy")
@@ -197,4 +199,43 @@ model TrafficReport {
   @@index([foreignPartnerId, foreignCampaignId])
   @@index([trafficSource, deviceType])
   @@map("traffic_reports")
+}
+
+// Two-Factor Authentication Models
+
+model TwoFactorBackupCode {
+  id        String   @id @default(cuid())
+  userId    String
+  code      String   // Hashed backup code
+  used      Boolean  @default(false)
+  usedAt    DateTime?
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([userId, used])
+  @@map("two_factor_backup_codes")
+}
+
+model AuthAttempt {
+  id           String   @id @default(cuid())
+  userId       String?  // Can be null for failed login attempts
+  email        String?  // Store email for failed attempts
+  type         String   // "login", "2fa", "backup_code"
+  success      Boolean
+  ipAddress    String?
+  userAgent    String?
+  errorReason  String?  // "invalid_password", "invalid_2fa", "rate_limited"
+  
+  user         User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt    DateTime @default(now())
+  
+  @@index([userId, type, createdAt])
+  @@index([email, type, createdAt])
+  @@index([ipAddress, type, createdAt])
+  @@map("auth_attempts")
 }

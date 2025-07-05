@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 
 // Schema for initial login (email/password)
 const LoginSchema = z.object({
@@ -28,11 +29,16 @@ const TwoFactorSchema = z.object({
 type LoginData = z.infer<typeof LoginSchema>;
 type TwoFactorData = z.infer<typeof TwoFactorSchema>;
 
-export function LoginFormV1() {
+interface LoginFormV1Props {
+  onStepChange?: (step: "login" | "2fa") => void;
+}
+
+export function LoginFormV1({ onStepChange }: LoginFormV1Props) {
   const router = useRouter();
   const [step, setStep] = useState<"login" | "2fa">("login");
   const [pendingAuth, setPendingAuth] = useState<{ email: string; password: string } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const otpRef = useRef<HTMLInputElement>(null);
 
   const loginForm = useForm<LoginData>({
     resolver: zodResolver(LoginSchema),
@@ -49,6 +55,18 @@ export function LoginFormV1() {
       code: "",
     },
   });
+
+  // Focus OTP input when 2FA step loads
+  useEffect(() => {
+    if (step === "2fa" && otpRef.current) {
+      const timeout = setTimeout(() => {
+        otpRef.current?.focus();
+      }, 100);
+      return () => {
+        clearTimeout(timeout);
+      };
+    }
+  }, [step]);
 
   // First step: Verify email/password and check if 2FA is required
   const onLoginSubmit = async (data: LoginData) => {
@@ -75,6 +93,7 @@ export function LoginFormV1() {
         // User has 2FA enabled, show 2FA input
         setPendingAuth({ email: data.email, password: data.password });
         setStep("2fa");
+        onStepChange?.("2fa");
         twoFactorForm.reset();
         toast.info("Two-Factor Authentication Required", {
           description: "Enter the code from your authenticator app.",
@@ -135,58 +154,84 @@ export function LoginFormV1() {
   // Go back to login step from 2FA
   const goBackToLogin = () => {
     setStep("login");
+    onStepChange?.("login");
     setPendingAuth(null);
     twoFactorForm.reset();
   };
 
   if (step === "2fa") {
     return (
-      <Form {...twoFactorForm}>
-        <form
-          className="space-y-4"
-          onSubmit={(e) => {
-            e.preventDefault();
-            void twoFactorForm.handleSubmit(onTwoFactorSubmit)(e);
-          }}
-        >
-          <div className="space-y-2 text-center">
-            <p className="text-muted-foreground text-sm">
-              Authenticating as: <span className="font-medium">{pendingAuth?.email}</span>
-            </p>
+      <div className="space-y-8">
+        {/* Header with 2FA icon and title */}
+        <div className="space-y-4 text-center">
+          <div className="bg-primary/10 mx-auto flex h-16 w-16 items-center justify-center rounded-full">
+            <svg className="text-primary h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+              />
+            </svg>
           </div>
-
-          <FormField
-            control={twoFactorForm.control}
-            name="code"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Authentication Code</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    placeholder="000000"
-                    maxLength={6}
-                    className="text-center text-lg tracking-widest"
-                    autoComplete="one-time-code"
-                    disabled={isSubmitting}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
           <div className="space-y-2">
-            <Button className="w-full" type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Verifying..." : "Verify & Sign In"}
-            </Button>
-
-            <Button type="button" variant="ghost" className="w-full" onClick={goBackToLogin} disabled={isSubmitting}>
-              ← Back to login
-            </Button>
+            <h1 className="text-2xl font-semibold tracking-tight">Two-Factor Authentication</h1>
+            <p className="text-muted-foreground text-sm">Enter the 6-digit code from your authenticator app</p>
           </div>
-        </form>
-      </Form>
+        </div>
+
+        <Form {...twoFactorForm}>
+          <form
+            className="space-y-6"
+            onSubmit={(e) => {
+              e.preventDefault();
+              void twoFactorForm.handleSubmit(onTwoFactorSubmit)(e);
+            }}
+          >
+            <FormField
+              control={twoFactorForm.control}
+              name="code"
+              render={({ field }) => (
+                <FormItem className="space-y-4">
+                  <FormControl>
+                    <div className="flex justify-center">
+                      <InputOTP
+                        maxLength={6}
+                        value={field.value}
+                        onChange={field.onChange}
+                        disabled={isSubmitting}
+                        ref={otpRef}
+                      >
+                        <InputOTPGroup>
+                          <InputOTPSlot index={0} />
+                          <InputOTPSlot index={1} />
+                          <InputOTPSlot index={2} />
+                        </InputOTPGroup>
+                        <InputOTPGroup>
+                          <InputOTPSlot index={3} />
+                          <InputOTPSlot index={4} />
+                          <InputOTPSlot index={5} />
+                        </InputOTPGroup>
+                      </InputOTP>
+                    </div>
+                  </FormControl>
+                  <FormMessage className="text-center" />
+                </FormItem>
+              )}
+            />
+
+            <div className="space-y-3">
+              <Button className="w-full" type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Verifying..." : "Verify & Sign In"}
+              </Button>
+
+              <Button type="button" variant="ghost" className="w-full" onClick={goBackToLogin} disabled={isSubmitting}>
+                ← Back to login
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </div>
     );
   }
   // Regular login form (step 1)

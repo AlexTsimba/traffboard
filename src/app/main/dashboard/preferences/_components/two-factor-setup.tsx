@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Shield, ShieldCheck, Copy, Eye, EyeOff } from "lucide-react";
 import Image from "next/image";
-import { useState, useTransition, useCallback } from "react";
+import { useState, useTransition, useCallback, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -13,6 +13,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { useToast } from "@/hooks/use-toast";
 import type { Safe2FASetup, Safe2FAStatus } from "@/lib/data/two-factor";
 
@@ -24,7 +25,6 @@ import {
 } from "../_actions/two-factor-actions";
 
 const setupSchema = z.object({
-  secret: z.string().min(1, "Secret is required"),
   code: z.string().min(6, "Code must be 6 digits").max(6, "Code must be 6 digits"),
 });
 
@@ -48,12 +48,32 @@ export function TwoFactorSetup({ initialStatus = null }: TwoFactorSetupProps) {
   const [setupDialogOpen, setSetupDialogOpen] = useState(false);
   const [disableDialogOpen, setDisableDialogOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const setupOtpRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   const setupForm = useForm<SetupData>({
     resolver: zodResolver(setupSchema),
-    defaultValues: { secret: "", code: "" },
+    defaultValues: { code: "" },
   });
+
+  // Remove the useEffect that was causing timing issues
+  // useEffect(() => {
+  //   if (setupData) {
+  //     setupForm.setValue("secret", setupData.secret);
+  //   }
+  // }, [setupData, setupForm]);
+
+  // Focus OTP input when setup dialog opens
+  useEffect(() => {
+    if (setupDialogOpen && setupOtpRef.current) {
+      const timeout = setTimeout(() => {
+        setupOtpRef.current?.focus();
+      }, 100);
+      return () => {
+        clearTimeout(timeout);
+      };
+    }
+  }, [setupDialogOpen]);
 
   const disableForm = useForm<DisableData>({
     resolver: zodResolver(disableSchema),
@@ -117,12 +137,20 @@ export function TwoFactorSetup({ initialStatus = null }: TwoFactorSetupProps) {
 
   const handleCompleteSetup = useCallback(
     (data: SetupData) => {
-      if (!setupData) return;
+      if (!setupData) {
+        toast({
+          title: "Error",
+          description: "Setup data not available. Please restart the setup process.",
+          variant: "destructive",
+        });
+        return;
+      }
 
       startTransition(async () => {
         try {
           const formData = new FormData();
-          formData.append("secret", data.secret);
+          // Use the secret from setupData, not from form data
+          formData.append("secret", setupData.secret);
           formData.append("code", data.code);
 
           const result = await enable2FAAction(formData);
@@ -303,9 +331,27 @@ export function TwoFactorSetup({ initialStatus = null }: TwoFactorSetupProps) {
                         <FormItem>
                           <FormLabel>Verification Code</FormLabel>
                           <FormControl>
-                            <Input placeholder="Enter 6-digit code" {...field} disabled={isPending} maxLength={6} />
+                            <div className="flex justify-center">
+                              <InputOTP
+                                maxLength={6}
+                                value={field.value}
+                                onChange={field.onChange}
+                                disabled={isPending}
+                              >
+                                <InputOTPGroup>
+                                  <InputOTPSlot index={0} />
+                                  <InputOTPSlot index={1} />
+                                  <InputOTPSlot index={2} />
+                                </InputOTPGroup>
+                                <InputOTPGroup>
+                                  <InputOTPSlot index={3} />
+                                  <InputOTPSlot index={4} />
+                                  <InputOTPSlot index={5} />
+                                </InputOTPGroup>
+                              </InputOTP>
+                            </div>
                           </FormControl>
-                          <FormMessage />
+                          <FormMessage className="text-center" />
                         </FormItem>
                       )}
                     />
@@ -390,26 +436,33 @@ export function TwoFactorSetup({ initialStatus = null }: TwoFactorSetupProps) {
                   >
                     <FormField
                       control={setupForm.control}
-                      name="secret"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <Input type="hidden" {...field} value={setupData.secret} />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={setupForm.control}
                       name="code"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Verification Code</FormLabel>
                           <FormControl>
-                            <Input placeholder="Enter 6-digit code" {...field} disabled={isPending} maxLength={6} />
+                            <div className="flex justify-center">
+                              <InputOTP
+                                maxLength={6}
+                                value={field.value}
+                                onChange={field.onChange}
+                                disabled={isPending}
+                                ref={setupOtpRef}
+                              >
+                                <InputOTPGroup>
+                                  <InputOTPSlot index={0} />
+                                  <InputOTPSlot index={1} />
+                                  <InputOTPSlot index={2} />
+                                </InputOTPGroup>
+                                <InputOTPGroup>
+                                  <InputOTPSlot index={3} />
+                                  <InputOTPSlot index={4} />
+                                  <InputOTPSlot index={5} />
+                                </InputOTPGroup>
+                              </InputOTP>
+                            </div>
                           </FormControl>
-                          <FormMessage />
+                          <FormMessage className="text-center" />
                         </FormItem>
                       )}
                     />
