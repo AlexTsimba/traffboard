@@ -84,27 +84,33 @@ export async function getCurrentUser(): Promise<AuthenticatedUser | null> {
 }
 
 /**
- * Audit log for security events
+ * Audit log for security events - persisted to database
  */
-export function auditLog(action: string, userId?: string, details?: Record<string, unknown>): void {
+export async function auditLog(
+  action: string,
+  userId?: string,
+  details?: Record<string, unknown>
+): Promise<void> {
   try {
-    // In a real app, this would go to a dedicated audit log table
+    // Log to database for persistence
+    await prisma.auditLog.create({
+      data: {
+        action,
+        userId,
+        details: details ? JSON.stringify(details) : null,
+        // NOTE: IP address and user agent from request context can be added later
+        ipAddress: null,
+        userAgent: null,
+      },
+    });
+
+    // Also log to console for development
     console.log("AUDIT:", {
       timestamp: new Date().toISOString(),
       action,
       userId,
       details,
     });
-
-    // FUTURE: Implement proper audit logging to database
-    // await prisma.auditLog.create({
-    //   data: {
-    //     action,
-    //     userId,
-    //     details: JSON.stringify(details),
-    //     createdAt: new Date(),
-    //   },
-    // });
   } catch (error) {
     console.error("Failed to write audit log:", error);
   }

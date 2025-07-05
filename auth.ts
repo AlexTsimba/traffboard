@@ -23,7 +23,6 @@ export const {
   signOut,
 } = NextAuth({
   ...authConfig,
-  adapter: PrismaAdapter(prisma),
   session: { strategy: "jwt" },
   providers: [
     Credentials({
@@ -99,6 +98,12 @@ export const {
           }
         }
 
+        // Update last login timestamp
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { lastLoginAt: new Date() },
+        });
+
         // Authentication successful (either no 2FA or valid 2FA)
         return {
           id: user.id,
@@ -111,6 +116,7 @@ export const {
   ],
   callbacks: {
     async jwt({ token, user }) {
+      // Initial sign in
       if (user) {
         token.id = user.id;
         token.role = user.role;
@@ -118,11 +124,10 @@ export const {
       return token;
     },
     async session({ session, token }) {
-      if (token.id) {
-        session.user.id = token.id;
-      }
-      if (token.role) {
-        session.user.role = token.role;
+      // Send properties to the client
+      if (token) {
+        session.user.id = token.id as string;
+        session.user.role = token.role as string;
       }
       return session;
     },

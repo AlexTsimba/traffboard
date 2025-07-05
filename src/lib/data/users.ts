@@ -1,5 +1,6 @@
 import "server-only";
 
+// import { withDatabaseErrorHandler } from "../errors/database-errors"; // Currently unused
 import { prisma } from "../prisma";
 
 import { auditLog, requireAdmin, requireAuth, type AuthenticatedUser } from "./auth";
@@ -90,7 +91,7 @@ export async function getUsers(
     prisma.user.count({ where }),
   ]);
 
-  auditLog("users.list", currentUser.id, { page, limit, search });
+  void auditLog("users.list", currentUser.id, { page, limit, search });
 
   return { users, totalCount, currentUser };
 }
@@ -119,7 +120,7 @@ export async function getUserById(userId: string): Promise<SafeUser | null> {
     },
   });
 
-  auditLog("users.view", currentUser.id, { targetUserId: userId });
+  void auditLog("users.view", currentUser.id, { targetUserId: userId });
 
   return user;
 }
@@ -163,7 +164,7 @@ export async function createUser(userData: CreateUserData): Promise<SafeUser> {
     },
   });
 
-  auditLog("users.create", currentUser.id, {
+  void auditLog("users.create", currentUser.id, {
     targetUserId: user.id,
     targetEmail: user.email,
     role: user.role,
@@ -218,7 +219,7 @@ export async function updateUser(userId: string, updateData: UpdateUserData): Pr
     },
   });
 
-  auditLog("users.update", currentUser.id, {
+  void auditLog("users.update", currentUser.id, {
     targetUserId: userId,
     changes: updateData,
   });
@@ -251,7 +252,7 @@ export async function deleteUser(userId: string): Promise<void> {
     where: { id: userId },
   });
 
-  auditLog("users.delete", currentUser.id, {
+  void auditLog("users.delete", currentUser.id, {
     targetUserId: userId,
     targetEmail: userToDelete.email,
     targetRole: userToDelete.role,
@@ -322,7 +323,7 @@ export async function getUserByIdAdmin(userId: string): Promise<SafeUserDetailed
     },
   });
 
-  auditLog("users.admin_view", userId, { targetUserId: userId });
+  void auditLog("users.admin_view", userId, { targetUserId: userId });
 
   return user;
 }
@@ -404,7 +405,7 @@ export async function updateUserAdmin(userId: string, updateData: UpdateUserData
     },
   });
 
-  auditLog("users.admin_update", currentUser.id, {
+  void auditLog("users.admin_update", currentUser.id, {
     targetUserId: userId,
     changes: updateData,
   });
@@ -453,7 +454,7 @@ export async function deactivateUser(userId: string): Promise<void> {
     },
   });
 
-  auditLog("users.deactivate", currentUser.id, {
+  void auditLog("users.deactivate", currentUser.id, {
     targetUserId: userId,
     targetEmail: userToDeactivate.email,
     targetRole: userToDeactivate.role,
@@ -481,7 +482,7 @@ export async function updateUserPassword(currentPassword: string, newPassword: s
   const isValid = await bcrypt.compare(currentPassword, user.passwordHash);
 
   if (!isValid) {
-    auditLog("users.password_change_failed", currentUser.id, {
+    void auditLog("users.password_change_failed", currentUser.id, {
       reason: "invalid_current_password",
     });
     throw new Error("Current password is incorrect");
@@ -499,5 +500,5 @@ export async function updateUserPassword(currentPassword: string, newPassword: s
     },
   });
 
-  auditLog("users.password_changed", currentUser.id);
+  void auditLog("users.password_changed", currentUser.id);
 }

@@ -1,3 +1,7 @@
+// DEPRECATED: Sessions moved to JWT-only strategy
+// This file is kept for reference but should not be used
+
+/* eslint-disable @typescript-eslint/no-unused-vars, sonarjs/no-duplicate-string */
 import "server-only";
 
 import { prisma } from "../prisma";
@@ -36,6 +40,9 @@ export async function getUserSessions(): Promise<{
     where: {
       userId: currentUser.id,
       isActive: true,
+      expires: {
+        gt: new Date(),
+      },
     },
     select: {
       sessionToken: true,
@@ -54,13 +61,12 @@ export async function getUserSessions(): Promise<{
     orderBy: { lastActivity: "desc" },
   });
 
-  // Mark the first session as current (approximation)
   const safeSessions: SafeSession[] = sessions.map((session, index) => ({
     ...session,
     isCurrent: index === 0,
   }));
 
-  auditLog("sessions.list", currentUser.id);
+  void auditLog("sessions.list", currentUser.id);
 
   return { sessions: safeSessions, currentUser };
 }
@@ -71,7 +77,6 @@ export async function getUserSessions(): Promise<{
 export async function revokeSession(sessionToken: string): Promise<void> {
   const currentUser = await requireAuth();
 
-  // Check if session belongs to current user
   const session = await prisma.session.findFirst({
     where: {
       sessionToken,
@@ -83,14 +88,13 @@ export async function revokeSession(sessionToken: string): Promise<void> {
     throw new Error("Session not found or access denied");
   }
 
-  // Soft delete - mark as inactive
   await prisma.session.update({
     where: { sessionToken },
     data: { isActive: false },
   });
 
-  auditLog("sessions.revoke", currentUser.id, {
-    sessionToken: sessionToken.slice(0, 8) + "...", // Log partial token for security
+  void auditLog("sessions.revoke", currentUser.id, {
+    sessionToken: sessionToken.slice(0, 8) + "...",
   });
 }
 
@@ -100,8 +104,6 @@ export async function revokeSession(sessionToken: string): Promise<void> {
 export async function revokeAllOtherSessions(): Promise<{ revokedCount: number }> {
   const currentUser = await requireAuth();
 
-  // In a real implementation, we'd identify the current session and exclude it
-  // For now, we'll revoke all sessions (user will need to login again)
   const result = await prisma.session.updateMany({
     where: {
       userId: currentUser.id,
@@ -110,7 +112,7 @@ export async function revokeAllOtherSessions(): Promise<{ revokedCount: number }
     data: { isActive: false },
   });
 
-  auditLog("sessions.revoke_all", currentUser.id, {
+  void auditLog("sessions.revoke_all", currentUser.id, {
     revokedCount: result.count,
   });
 

@@ -1,6 +1,5 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { requirePageAuth } from "@/lib/auth/page-protection";
-import { getUserSessions } from "@/lib/data/sessions";
 import { get2FAStatus } from "@/lib/data/two-factor";
 import { getCurrentUserProfile } from "@/lib/data/users";
 
@@ -13,10 +12,10 @@ export default async function SettingsPage() {
   // SECURITY: Page-level authentication check
   await requirePageAuth();
 
-  // Load user profile, sessions, and 2FA status using secure Data Access Layer
-  const [userProfile, sessionsData, twoFactorStatus] = await Promise.all([
+  // Load user profile and 2FA status using secure Data Access Layer
+  // Sessions removed - using JWT-only authentication
+  const [userProfile, twoFactorStatus] = await Promise.all([
     getCurrentUserProfile(),
-    getUserSessions(),
     get2FAStatus().catch(() => null), // Gracefully handle 2FA status errors
   ]);
 
@@ -38,7 +37,7 @@ export default async function SettingsPage() {
           </div>
         </TabsContent>
         <TabsContent className="pt-2" value="security">
-          <SecuritySettings initialSessions={sessionsData.sessions} initial2FAStatus={twoFactorStatus} />
+          <SecuritySettings initial2FAStatus={twoFactorStatus} />
         </TabsContent>
         <TabsContent className="pt-2" value="appearance">
           <AppearanceSettings />

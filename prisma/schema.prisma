@@ -33,10 +33,11 @@ model User {
   lastLoginAt   DateTime? // Track last login time
   
   accounts      Account[]
-  sessions      Session[]
+  // sessions      Session[] // Removed - using JWT sessions only
   uploads       ConversionUpload[]
   backupCodes   TwoFactorBackupCode[]
   authAttempts  AuthAttempt[]
+  auditLogs     AuditLog[]
   
   // Self-referential relations for audit trail
   createdUsers     User[] @relation("UserCreatedBy")
@@ -72,28 +73,30 @@ model Account {
   @@map("accounts")
 }
 
-model Session {
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
- 
-  // Session metadata for tracking
-  ipAddress    String?
-  userAgent    String?
-  deviceType   String?  // mobile, desktop, tablet
-  browser      String?
-  os           String?
-  country      String?
-  city         String?
-  isActive     Boolean  @default(true)
-  lastActivity DateTime @default(now())
- 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
-  @@map("sessions")
-}
+// DEPRECATED: Sessions moved to JWT-only strategy
+// Commenting out Session model - using JWT tokens only
+// model Session {
+//   sessionToken String   @unique
+//   userId       String
+//   expires      DateTime
+//   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+//  
+//   // Session metadata for tracking
+//   ipAddress    String?
+//   userAgent    String?
+//   deviceType   String?  // mobile, desktop, tablet
+//   browser      String?
+//   os           String?
+//   country      String?
+//   city         String?
+//   isActive     Boolean  @default(true)
+//   lastActivity DateTime @default(now())
+//  
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+//   
+//   @@map("sessions")
+// }
 
 model VerificationToken {
   identifier String
@@ -236,4 +239,21 @@ model AuthAttempt {
   @@index([email, type, createdAt])
   @@index([ipAddress, type, createdAt])
   @@map("auth_attempts")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?  // User who performed the action (null for system actions)
+  action    String   // Action performed (e.g., "user.create", "profile.update")
+  details   String?  // JSON string with action details
+  ipAddress String?
+  userAgent String?
+  
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  createdAt DateTime @default(now())
+  
+  @@index([userId, action, createdAt])
+  @@index([action, createdAt])
+  @@map("audit_logs")
 }
