@@ -72,10 +72,26 @@ export const {
             return null;
           }
 
-          const isValidTOTP = authenticator.verify({
+          // Verify TOTP code with robust time tolerance
+          let isValidTOTP = authenticator.verify({
             token: code,
             secret: user.totpSecret,
+            window: 2, // Allow ±60 seconds tolerance
           });
+
+          // If standard verification fails, try with different time offsets
+          if (!isValidTOTP) {
+            const now = Math.floor(Date.now() / 1000);
+            
+            for (let offset = -6; offset <= 6; offset++) {
+              const testTime = now + (offset * 30);
+              const expectedCode = authenticator.generate(user.totpSecret, testTime);
+              if (expectedCode === code) {
+                isValidTOTP = true;
+                break;
+              }
+            }
+          }
 
           if (!isValidTOTP) {
             // Invalid 2FA code

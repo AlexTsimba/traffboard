@@ -69,9 +69,12 @@ export async function enable2FAAction(formData: FormData) {
     const secret = formData.get("secret");
     const code = formData.get("code");
 
+    const secretStr = typeof secret === "string" ? secret : "";
+    const codeStr = typeof code === "string" ? code : "";
+
     const rawData = {
-      secret: typeof secret === "string" ? secret : "",
-      code: typeof code === "string" ? code : "",
+      secret: secretStr,
+      code: codeStr,
     };
 
     const validatedData = enable2FASchema.parse(rawData);

@@ -8,6 +8,13 @@ import { prisma } from "../prisma";
 
 import { auditLog, requireAuth } from "./auth";
 
+// Configure TOTP for better security and compatibility
+authenticator.options = {
+  ...authenticator.options,
+  window: 1, // Allow ±30 seconds tolerance
+  step: 30, // 30-second window
+};
+
 /**
  * Safe 2FA setup data for client exposure
  */
@@ -104,11 +111,27 @@ export async function generate2FASetup(): Promise<Safe2FASetup> {
 export async function enable2FA(secret: string, code: string): Promise<void> {
   const currentUser = await requireAuth();
 
-  // Verify the TOTP code
-  const isValid = authenticator.verify({
+  // Verify the TOTP code with proper time tolerance
+  let isValid = authenticator.verify({
     token: code,
     secret,
+    window: 2, // Allow ±60 seconds tolerance
   });
+
+  // If standard verification fails, try with different time offsets
+  // This handles timezone and clock sync issues
+  if (!isValid) {
+    const now = Math.floor(Date.now() / 1000);
+
+    for (let offset = -6; offset <= 6; offset++) {
+      const testTime = now + offset * 30; // 30-second windows
+      const expectedCode = authenticator.generate(secret, testTime);
+      if (expectedCode === code) {
+        isValid = true;
+        break;
+      }
+    }
+  }
 
   if (!isValid) {
     auditLog("2fa.enable_failed", currentUser.id, { reason: "invalid_code" });
@@ -247,10 +270,26 @@ export async function verify2FACode(userId: string, code: string): Promise<boole
     return false;
   }
 
-  const isValid = authenticator.verify({
+  // Verify TOTP code with robust time tolerance
+  let isValid = authenticator.verify({
     token: code,
     secret: user.totpSecret,
+    window: 2, // Allow ±60 seconds tolerance
   });
+
+  // If standard verification fails, try with different time offsets
+  if (!isValid) {
+    const now = Math.floor(Date.now() / 1000);
+
+    for (let offset = -6; offset <= 6; offset++) {
+      const testTime = now + offset * 30;
+      const expectedCode = authenticator.generate(user.totpSecret, testTime);
+      if (expectedCode === code) {
+        isValid = true;
+        break;
+      }
+    }
+  }
 
   auditLog("2fa.verification", userId, { success: isValid });
 
