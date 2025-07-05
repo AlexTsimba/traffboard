@@ -7,8 +7,8 @@ import type { DataProcessingResult } from "../data-transformers";
 import { processPlayerDataCSV, processTrafficDataCSV } from "../data-transformers";
 
 import { auditLog, requireAuth } from "./auth";
+import { createConversionsFromImport } from "./conversions";
 import { createPlayersFromImport } from "./players";
-import { createTrafficFromImport } from "./traffic";
 import { getUploadById, updateUploadStatus } from "./uploads";
 
 export type ProcessingStatus = "processing" | "completed" | "failed";
@@ -51,11 +51,11 @@ export async function processCSVByUploadId(uploadId: string): Promise<{
           ? await createPlayersFromImport(result.data as Parameters<typeof createPlayersFromImport>[0])
           : { count: 0 };
     } else {
-      // Assume traffic data
+      // Assume conversion data
       result = processTrafficDataCSV(csvContent);
       importResult =
         result.data.length > 0
-          ? await createTrafficFromImport(result.data as Parameters<typeof createTrafficFromImport>[0])
+          ? await createConversionsFromImport(result.data as Parameters<typeof createConversionsFromImport>[0])
           : { count: 0 };
     }
 
@@ -66,7 +66,7 @@ export async function processCSVByUploadId(uploadId: string): Promise<{
         errorLog: result.errors.join("\n"),
       });
 
-      auditLog("csv.process_with_errors", currentUser.id, {
+      void auditLog("csv.process_with_errors", currentUser.id, {
         uploadId,
         recordCount: importResult.count,
         errorCount: result.errors.length,
@@ -84,7 +84,7 @@ export async function processCSVByUploadId(uploadId: string): Promise<{
       recordCount: importResult.count,
     });
 
-    auditLog("csv.process_success", currentUser.id, {
+    void auditLog("csv.process_success", currentUser.id, {
       uploadId,
       recordCount: importResult.count,
     });
@@ -100,7 +100,7 @@ export async function processCSVByUploadId(uploadId: string): Promise<{
       errorLog: error instanceof Error ? error.message : "Unknown error occurred",
     });
 
-    auditLog("csv.process_failed", currentUser.id, {
+    void auditLog("csv.process_failed", currentUser.id, {
       uploadId,
       error: error instanceof Error ? error.message : "Unknown error",
     });
@@ -114,7 +114,7 @@ export async function processCSVByUploadId(uploadId: string): Promise<{
  */
 export async function validateCSVContent(
   csvContent: string,
-  fileType: "player" | "traffic",
+  fileType: "player" | "conversion",
 ): Promise<{
   isValid: boolean;
   errors: string[];
@@ -156,7 +156,7 @@ export async function getCSVProcessingStats(): Promise<{
   // Note: This would ideally use dedicated audit/processing log tables
   // For now, we'll use basic counts from uploads table
 
-  auditLog("csv.stats_viewed", currentUser.id);
+  void auditLog("csv.stats_viewed", currentUser.id);
 
   // Return placeholder stats - in real implementation, would query processing logs
   return {

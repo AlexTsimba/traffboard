@@ -112,7 +112,7 @@ model VerificationToken {
 model ConversionUpload {
   id          String   @id @default(cuid())
   fileName    String
-  fileType    String   // "players" | "traffic"
+  fileType    String   // "players" | "conversions"
   status      String   @default("pending") // pending | processing | completed | failed
   uploadedBy  String
   recordCount Int?
@@ -173,7 +173,7 @@ model PlayerData {
   @@map("player_data")
 }
 
-model TrafficReport {
+model Conversion {
   id                    String   @id @default(cuid())
   date                  DateTime
   foreignBrandId        String
@@ -199,7 +199,7 @@ model TrafficReport {
   @@index([date])
   @@index([foreignPartnerId, foreignCampaignId])
   @@index([trafficSource, deviceType])
-  @@map("traffic_reports")
+  @@map("conversions")
 }
 
 // Two-Factor Authentication Models
