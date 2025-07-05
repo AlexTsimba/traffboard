@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { requireAdminPageAuth } from "@/lib/auth/page-protection";
 import { getUsers } from "@/lib/data/users";
 
+import { SystemStatus } from "./_components/system-status";
 import { UserManagement } from "./_components/user-management";
 
 interface AdministrationPageProps {
@@ -40,9 +41,10 @@ export default async function AdministrationPage({ searchParams }: Administratio
       </div>
 
       <Tabs className="w-full" defaultValue="data">
-        <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
+        <TabsList className="grid w-full grid-cols-3 lg:w-[600px]">
           <TabsTrigger value="data">Data Management</TabsTrigger>
           <TabsTrigger value="users">User Management</TabsTrigger>
+          <TabsTrigger value="system">System Status</TabsTrigger>
         </TabsList>
 
         <TabsContent className="space-y-6" value="data">
@@ -97,6 +99,22 @@ export default async function AdministrationPage({ searchParams }: Administratio
                 initialSearch={search}
                 initialRole=""
               />
+            </Suspense>
+          </div>
+        </TabsContent>
+
+        <TabsContent className="space-y-6" value="system">
+          <div className="rounded-lg border p-6">
+            <h3 className="mb-4 text-lg font-semibold">System Status</h3>
+            <p className="text-muted-foreground mb-6 text-sm">Monitor database connectivity and system health</p>
+            <Suspense
+              fallback={
+                <div className="text-muted-foreground flex h-32 items-center justify-center">
+                  Loading system status...
+                </div>
+              }
+            >
+              <SystemStatus />
             </Suspense>
           </div>
         </TabsContent>
