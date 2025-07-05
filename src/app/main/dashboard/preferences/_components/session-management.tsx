@@ -2,7 +2,7 @@
 
 import { Monitor, Smartphone, Tablet, MapPin, Calendar, Shield, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect, useCallback } from "react";
 
 import {
   AlertDialog,
@@ -33,10 +33,27 @@ const formatDate = (date: Date | string) => {
   }).format(date instanceof Date ? date : new Date(date));
 };
 
-const getRelativeTime = (date: Date | string) => {
-  const now = Date.now();
+// Stable time source to prevent rerender cascades
+const useStableTime = () => {
+  const [currentTime, setCurrentTime] = useState(Date.now());
+
+  useEffect(() => {
+    // Update every minute to keep relative times current
+    const interval = setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 60_000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+
+  return currentTime;
+};
+
+const createGetRelativeTime = (currentTime: number) => (date: Date | string) => {
   const dateTime = date instanceof Date ? date.getTime() : new Date(date).getTime();
-  const diffInMs = now - dateTime;
+  const diffInMs = currentTime - dateTime;
   const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
 
   if (diffInMinutes < 1) return "Just now";
@@ -86,6 +103,14 @@ export function SessionManagement({ initialSessions }: SessionManagementProps) {
 
   const router = useRouter();
   const { toast } = useToast();
+  // Use stable time source to prevent rerender cascades
+  const currentTime = useStableTime();
+  const getRelativeTime = useCallback(
+    (date: Date | string) => {
+      return createGetRelativeTime(currentTime)(date);
+    },
+    [currentTime],
+  );
 
   const handleRevokeSession = (sessionToken: string) => {
     setRevoking(sessionToken);

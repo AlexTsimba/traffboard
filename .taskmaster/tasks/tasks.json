@@ -356,11 +356,71 @@
         ],
         "priority": "high",
         "subtasks": []
+      },
+      {
+        "id": 10,
+        "title": "Critical 2FA Bug Fix: TOTP Verification and Session Cascade Refactor",
+        "description": "Fix critical issues in the 2FA (TOTP) authentication flow and session management to ensure secure, stable, and fully testable two-factor login. Major progress has been made: session rerender cascades, type safety, and page protection issues are resolved. The remaining focus is on TOTP security improvements, robust verification, and comprehensive testing.",
+        "status": "pending",
+        "dependencies": [
+          2,
+          9
+        ],
+        "priority": "high",
+        "details": "1. **TOTP Verification Security**: Ensure the TOTP verification logic in auth.ts strictly follows RFC 6238, using a secure comparison method and a robust TOTP library (such as 'otplib'). Confirm that secrets are securely generated, stored, and retrieved from the database (via Prisma models), and that each user has a unique, randomly generated secret[1][4].\n2. **API Endpoint Expansion**: Implement or verify dedicated API endpoints for TOTP setup (secret generation, QR code), status check, and verification. Ensure endpoints are type-safe and validated using Zod, with proper request/response typing.\n3. **Comprehensive Testing**: Expand unit and integration tests for all backend and frontend 2FA logic, including edge cases (expired/invalid codes, replay attempts, session hijacking attempts). Ensure tests cover TOTP code generation, storage, verification, and time drift scenarios.\n4. **UI Feedback and Enforcement**: Ensure the UI provides clear, actionable feedback for each 2FA step (setup, verification, error states). 2FA must be enforced during login for users with TOTP enabled, and disabling/enabling 2FA should only be possible after successful verification.\n5. **Documentation and Developer Guidance**: Document the full 2FA flow, including API contracts, security considerations, and developer guidance for future maintenance.\n\n**Note:** SessionManagement rerender cascade, type safety, and page protection issues have already been fixed and verified. Focus remaining work on TOTP security, test coverage, and documentation.",
+        "testStrategy": "- Write unit tests for TOTP code generation, storage, and verification logic, including time drift and invalid code scenarios.\n- Add integration tests covering the full 2FA setup and login flow: secret generation, QR code display, code entry, and enforcement during login.\n- Simulate rapid session updates to confirm that the refactored SessionManagement no longer causes rerender cascades or database query storms (already verified).\n- Manually test the UI for all 2FA states (setup, verification, error, disable) and verify correct feedback and security enforcement.\n- Perform security review: attempt replay, brute-force, and session hijacking attacks to ensure the 2FA flow is robust.\n- Validate that all changes are compatible with the Prisma-based database and NextAuth.js v5 authentication setup.\n- Confirm type safety and Zod validation for all new and existing API endpoints.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Verify and harden TOTP verification logic per RFC 6238",
+            "description": "Audit and update the TOTP verification implementation to ensure strict RFC 6238 compliance, secure comparison, and unique, securely stored secrets for each user.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Expand and validate TOTP-related API endpoints",
+            "description": "Implement or verify endpoints for TOTP setup (secret generation, QR code), status check, and verification. Ensure all endpoints use Zod validation and proper TypeScript typing.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Expand unit and integration test coverage for 2FA",
+            "description": "Add comprehensive tests for TOTP code generation, storage, verification, and edge cases (expired/invalid codes, replay, session hijacking). Ensure coverage for both backend and frontend flows.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Enhance UI feedback and enforce 2FA during login",
+            "description": "Ensure the UI provides clear feedback for all 2FA states and that 2FA is enforced during login for users with TOTP enabled. Restrict disabling/enabling 2FA to after successful verification.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Document 2FA flow and developer guidance",
+            "description": "Write and publish documentation covering the 2FA flow, API contracts, security considerations, and developer guidance for future maintenance.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          }
+        ]
       }
     ],
     "metadata": {
       "created": "2025-07-01T22:28:10.873Z",
-      "updated": "2025-07-04T21:17:12.186Z",
+      "updated": "2025-07-05T01:09:29.172Z",
       "description": "Tasks for master context"
     }
   }

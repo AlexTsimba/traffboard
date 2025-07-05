@@ -25,16 +25,19 @@ export interface PageAuthResult {
 export async function requirePageAuth(): Promise<PageAuthResult> {
   const session = await auth();
 
-  if (!session?.user?.id) {
+  if (!session?.user) {
     redirect("/main/auth/v1/login");
   }
 
+  // At this point, session.user is guaranteed to exist and have the required fields
+  const { id, email, name, role } = session.user;
+
   return {
     user: {
-      id: session.user.id,
-      email: session.user.email || "",
-      name: session.user.name || null,
-      role: session.user.role || "user",
+      id,
+      email: email || "",
+      name: name || null,
+      role: role || "user",
     },
   };
 }
@@ -61,15 +64,18 @@ export async function getPageAuth(): Promise<PageAuthResult["user"] | null> {
   try {
     const session = await auth();
 
-    if (!session?.user?.id) {
+    if (!session?.user) {
       return null;
     }
 
+    // At this point, session.user is guaranteed to exist and have the required fields
+    const { id, email, name, role } = session.user;
+
     return {
-      id: session.user.id,
-      email: session.user.email || "",
-      name: session.user.name || null,
-      role: session.user.role || "user",
+      id,
+      email: email || "",
+      name: name || null,
+      role: role || "user",
     };
   } catch {
     return null;

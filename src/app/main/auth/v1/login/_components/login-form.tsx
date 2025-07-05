@@ -68,7 +68,8 @@ export function LoginFormV1() {
         return;
       }
 
-      const { requires2FA } = await checkResponse.json();
+      const checkData = (await checkResponse.json()) as { requires2FA: boolean };
+      const { requires2FA } = checkData;
 
       if (requires2FA) {
         // User has 2FA enabled, show 2FA input
@@ -112,7 +113,7 @@ export function LoginFormV1() {
       ...(twoFactorCode && { code: twoFactorCode }),
     });
 
-    if (result?.error) {
+    if (result.error) {
       toast.error("Authentication Failed", {
         description: twoFactorCode
           ? "Invalid authentication code. Please try again."

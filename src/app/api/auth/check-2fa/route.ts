@@ -11,8 +11,8 @@ const checkSchema = z.object({
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const { email, password } = checkSchema.parse(body);
+    const requestBody = (await request.json()) as unknown;
+    const { email, password } = checkSchema.parse(requestBody);
 
     // Find user and check password
     const user = await prisma.user.findUnique({

@@ -22,7 +22,7 @@ export interface AuthenticatedUser {
 export async function requireAuth(): Promise<AuthenticatedUser> {
   const session = await auth();
 
-  if (!session?.user?.id) {
+  if (!session?.user) {
     throw new Error("Authentication required");
   }
 

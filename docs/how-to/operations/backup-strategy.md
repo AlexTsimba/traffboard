@@ -241,6 +241,7 @@ echo "Testing file backup restore..."
    ```
 
 2. **Configure GitHub Actions secrets**
+
    - `DO_API_TOKEN`: DigitalOcean API token
    - `SPACES_ACCESS_KEY`: DigitalOcean Spaces access key
    - `SPACES_SECRET_KEY`: DigitalOcean Spaces secret key

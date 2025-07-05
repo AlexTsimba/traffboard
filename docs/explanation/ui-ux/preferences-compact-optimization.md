@@ -9,6 +9,7 @@ Optimized the preferences page layout to fit comfortably on laptop screens witho
 ### 📏 **Reduced Vertical Space**
 
 1. **Page Header:**
+
    - Removed description text: "Customize your TraffBoard experience..."
    - Reduced title from `text-3xl` to `text-2xl`
    - Reduced spacing from `space-y-2` to `space-y-1`

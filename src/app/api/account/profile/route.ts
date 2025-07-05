@@ -1,8 +1,17 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import { z } from "zod";
 
 import { requireAuth } from "@/lib/data/auth";
 import { getCurrentUserProfile, updateUser } from "@/lib/data/users";
+
+// Type-safe request body schema
+const updateProfileSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Valid email is required"),
+});
+
+type UpdateProfileRequest = z.infer<typeof updateProfileSchema>;
 
 /**
  * SECURE API Route: Get current user's profile
@@ -34,17 +43,20 @@ export async function PATCH(request: NextRequest) {
     // Get current user
     const currentUser = await requireAuth();
 
-    // Parse and validate request body
-    const body = await request.json();
+    // Parse and validate request body with type safety
+    const requestBody = (await request.json()) as unknown;
+    const validationResult = updateProfileSchema.safeParse(requestBody);
 
-    if (!body.name || !body.email) {
-      return NextResponse.json({ error: "Name and email are required" }, { status: 400 });
+    if (!validationResult.success) {
+      return NextResponse.json({ error: "Invalid input", details: validationResult.error.errors }, { status: 400 });
     }
+
+    const { name, email }: UpdateProfileRequest = validationResult.data;
 
     // Use secure Data Access Layer (handles validation and auth)
     const updatedUser = await updateUser(currentUser.id, {
-      name: body.name,
-      email: body.email,
+      name,
+      email,
     });
 
     return NextResponse.json({

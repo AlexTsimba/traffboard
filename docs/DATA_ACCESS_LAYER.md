@@ -44,16 +44,16 @@ src/lib/data/
 
 ```typescript
 // Basic authentication requirement
-export async function requireAuth(): Promise<AuthenticatedUser>
+export async function requireAuth(): Promise<AuthenticatedUser>;
 
 // Admin-only operations
-export async function requireAdmin(): Promise<AuthenticatedUser>
+export async function requireAdmin(): Promise<AuthenticatedUser>;
 
 // Permission checking
-export async function hasPermission(permission: string): Promise<boolean>
+export async function hasPermission(permission: string): Promise<boolean>;
 
 // Security logging
-export function auditLog(action: string, userId?: string, details?: Record<string, unknown>): void
+export function auditLog(action: string, userId?: string, details?: Record<string, unknown>): void;
 ```
 
 ## How to Use the DAL
@@ -61,10 +61,11 @@ export function auditLog(action: string, userId?: string, details?: Record<strin
 ### 1. Always Use Authentication Functions
 
 **✅ CORRECT:**
+
 ```typescript
 export async function createUser(userData: CreateUserData): Promise<SafeUser> {
   const currentUser = await requireAdmin(); // ✅ Authentication check
-  
+
   // ... rest of function
   auditLog("users.create", currentUser.id, { targetEmail: user.email });
   return user;
@@ -72,6 +73,7 @@ export async function createUser(userData: CreateUserData): Promise<SafeUser> {
 ```
 
 **❌ WRONG:**
+
 ```typescript
 export async function createUser(userData: CreateUserData) {
   // ❌ No authentication check
@@ -83,6 +85,7 @@ export async function createUser(userData: CreateUserData) {
 ### 2. Use Safe Data Types (DTOs)
 
 **✅ CORRECT:**
+
 ```typescript
 export interface SafeUser {
   id: string;
@@ -94,6 +97,7 @@ export interface SafeUser {
 ```
 
 **❌ WRONG:**
+
 ```typescript
 // ❌ Exposing full database object
 return await prisma.user.findMany(); // Contains passwordHash, etc.
@@ -102,6 +106,7 @@ return await prisma.user.findMany(); // Contains passwordHash, etc.
 ### 3. Server Actions Pattern
 
 **✅ CORRECT:**
+
 ```typescript
 "use server";
 
@@ -118,7 +123,7 @@ export async function createUserAction(formData: FormData) {
 
     const user = await createUser(validatedData); // ✅ Uses DAL
     revalidatePath("/administration");
-    
+
     return { success: true, user };
   } catch (error) {
     return { success: false, error: error.message };
@@ -127,6 +132,7 @@ export async function createUserAction(formData: FormData) {
 ```
 
 **❌ WRONG:**
+
 ```typescript
 // ❌ Direct database access in API route
 export async function POST(request: Request) {
@@ -141,11 +147,13 @@ export async function POST(request: Request) {
 ### ✅ Fully Implemented
 
 - **Authentication Operations** (`auth.ts`)
+
   - User authentication and authorization
   - Role checking and permissions
   - Security audit logging
 
 - **User Management** (`users.ts`)
+
   - User CRUD operations
   - Profile management
   - Password changes
@@ -172,6 +180,7 @@ export async function POST(request: Request) {
 When migrating an API route to DAL:
 
 1. **✅ Create DAL Function**
+
    ```typescript
    export async function getAnalyticsData(): Promise<AnalyticsData[]> {
      const user = await requireAuth();
@@ -180,6 +189,7 @@ When migrating an API route to DAL:
    ```
 
 2. **✅ Create Server Action**
+
    ```typescript
    "use server";
    export async function getAnalyticsAction() {
@@ -188,12 +198,14 @@ When migrating an API route to DAL:
    ```
 
 3. **✅ Update Component**
+
    ```typescript
    // Replace fetch() with Server Action
    const data = await getAnalyticsAction();
    ```
 
 4. **✅ Remove API Route**
+
    ```bash
    rm src/app/api/analytics/route.ts
    ```
@@ -255,7 +267,7 @@ const mockRequireAuth = requireAuth as jest.MockedFunction<typeof requireAuth>;
 
 test("createUser requires authentication", async () => {
   mockRequireAuth.mockRejectedValue(new Error("Authentication required"));
-  
+
   await expect(createUser(userData)).rejects.toThrow("Authentication required");
 });
 ```
@@ -277,12 +289,12 @@ export async function adminOnlyFunction(): Promise<Result> {
 ```typescript
 export async function getUserProfile(userId: string): Promise<SafeUser> {
   const currentUser = await requireAuth();
-  
+
   // Users can access their own profile, admins can access any
   if (currentUser.role !== "superuser" && currentUser.id !== userId) {
     throw new Error("Permission denied");
   }
-  
+
   // ... implementation
 }
 ```
@@ -292,7 +304,7 @@ export async function getUserProfile(userId: string): Promise<SafeUser> {
 ```typescript
 export async function bulkUpdateUsers(updates: UserUpdate[]): Promise<void> {
   const admin = await requireAdmin();
-  
+
   for (const update of updates) {
     // ... individual update
     auditLog("users.bulk_update", admin.id, { targetUserId: update.id });
@@ -313,16 +325,19 @@ export async function bulkUpdateUsers(updates: UserUpdate[]): Promise<void> {
 ### Common Issues
 
 **"Authentication required" errors:**
+
 - Ensure Server Actions/API routes call DAL functions
 - Check that session is properly established
 - Verify JWT token includes user.id
 
 **"Admin access required" errors:**
+
 - Confirm user role is "superuser"
 - Check role assignment in database
 - Verify requireAdmin() vs requireAuth() usage
 
 **Audit logs not appearing:**
+
 - Check console output (current implementation)
 - Future: Check audit log database table
 
