@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Shield, ShieldCheck, Copy, Eye, EyeOff } from "lucide-react";
 import Image from "next/image";
-import { useState, useEffect, useTransition } from "react";
+import { useState, useTransition, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -36,10 +36,14 @@ const disableSchema = z.object({
 type SetupData = z.infer<typeof setupSchema>;
 type DisableData = z.infer<typeof disableSchema>;
 
-export function TwoFactorSetup() {
-  const [status, setStatus] = useState<Safe2FAStatus | null>(null);
+interface TwoFactorSetupProps {
+  readonly initialStatus?: Safe2FAStatus | null;
+}
+
+export function TwoFactorSetup({ initialStatus = null }: TwoFactorSetupProps) {
+  const [status, setStatus] = useState<Safe2FAStatus | null>(initialStatus);
   const [setupData, setSetupData] = useState<Safe2FASetup | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!initialStatus);
   const [isPending, startTransition] = useTransition();
   const [setupDialogOpen, setSetupDialogOpen] = useState(false);
   const [disableDialogOpen, setDisableDialogOpen] = useState(false);
@@ -56,36 +60,35 @@ export function TwoFactorSetup() {
     defaultValues: { password: "", code: "" },
   });
 
-  // Load 2FA status on component mount
-  useEffect(() => {
-    const loadStatus = async () => {
-      try {
-        const result = await get2FAStatusAction();
-        if (result.success && result.status) {
-          setStatus(result.status);
-        } else {
-          toast({
-            title: "Error",
-            description: result.error ?? "Failed to load 2FA status",
-            variant: "destructive",
-          });
-        }
-      } catch (error) {
-        console.error("Error loading 2FA status:", error);
+  // Load 2FA status only if not provided as prop
+  const loadStatus = useCallback(async () => {
+    if (status || !loading) return; // Prevent multiple calls
+
+    try {
+      setLoading(true);
+      const result = await get2FAStatusAction();
+      if (result.success && result.status) {
+        setStatus(result.status);
+      } else {
         toast({
           title: "Error",
-          description: "Failed to load 2FA status",
+          description: result.error ?? "Failed to load 2FA status",
           variant: "destructive",
         });
-      } finally {
-        setLoading(false);
       }
-    };
+    } catch (error) {
+      console.error("Error loading 2FA status:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load 2FA status",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [status, loading, toast]);
 
-    void loadStatus();
-  }, [toast]);
-
-  const handleStartSetup = () => {
+  const handleStartSetup = useCallback(() => {
     startTransition(async () => {
       try {
         const result = await generate2FASetupAction();
@@ -110,94 +113,104 @@ export function TwoFactorSetup() {
         });
       }
     });
-  };
+  }, [setupForm, toast]);
 
-  const handleCompleteSetup = (data: SetupData) => {
-    if (!setupData) return;
+  const handleCompleteSetup = useCallback(
+    (data: SetupData) => {
+      if (!setupData) return;
 
-    startTransition(async () => {
-      try {
-        // Create FormData for Server Action
-        const formData = new FormData();
-        formData.append("secret", data.secret);
-        formData.append("code", data.code);
+      startTransition(async () => {
+        try {
+          const formData = new FormData();
+          formData.append("secret", data.secret);
+          formData.append("code", data.code);
 
-        const result = await enable2FAAction(formData);
+          const result = await enable2FAAction(formData);
 
-        if (result.success) {
-          toast({
-            title: "Success",
-            description: "2FA has been enabled successfully",
-          });
+          if (result.success) {
+            toast({
+              title: "Success",
+              description: "2FA has been enabled successfully",
+            });
 
-          // Update status and close dialog
-          setStatus((prev) => (prev ? { ...prev, isEnabled: true } : null));
-          setSetupDialogOpen(false);
-          setSetupData(null);
-          setupForm.reset();
-        } else {
+            setStatus((prev) => (prev ? { ...prev, isEnabled: true } : null));
+            setSetupDialogOpen(false);
+            setSetupData(null);
+            setupForm.reset();
+          } else {
+            toast({
+              title: "Error",
+              description: result.error ?? "Failed to enable 2FA",
+              variant: "destructive",
+            });
+          }
+        } catch (error) {
+          console.error("Error enabling 2FA:", error);
           toast({
             title: "Error",
-            description: result.error ?? "Failed to enable 2FA",
+            description: "Failed to enable 2FA",
             variant: "destructive",
           });
         }
-      } catch (error) {
-        console.error("Error enabling 2FA:", error);
-        toast({
-          title: "Error",
-          description: "Failed to enable 2FA",
-          variant: "destructive",
-        });
-      }
-    });
-  };
+      });
+    },
+    [setupData, setupForm, toast],
+  );
 
-  const handleDisable2FA = (data: DisableData) => {
-    startTransition(async () => {
-      try {
-        // Create FormData for Server Action
-        const formData = new FormData();
-        formData.append("password", data.password);
-        formData.append("code", data.code);
+  const handleDisable2FA = useCallback(
+    (data: DisableData) => {
+      startTransition(async () => {
+        try {
+          const formData = new FormData();
+          formData.append("password", data.password);
+          formData.append("code", data.code);
 
-        const result = await disable2FAAction(formData);
+          const result = await disable2FAAction(formData);
 
-        if (result.success) {
-          toast({
-            title: "Success",
-            description: "2FA has been disabled successfully",
-          });
+          if (result.success) {
+            toast({
+              title: "Success",
+              description: "2FA has been disabled successfully",
+            });
 
-          // Update status and close dialog
-          setStatus((prev) => (prev ? { ...prev, isEnabled: false } : null));
-          setDisableDialogOpen(false);
-          disableForm.reset();
-        } else {
+            setStatus((prev) => (prev ? { ...prev, isEnabled: false } : null));
+            setDisableDialogOpen(false);
+            disableForm.reset();
+          } else {
+            toast({
+              title: "Error",
+              description: result.error ?? "Failed to disable 2FA",
+              variant: "destructive",
+            });
+          }
+        } catch (error) {
+          console.error("Error disabling 2FA:", error);
           toast({
             title: "Error",
-            description: result.error ?? "Failed to disable 2FA",
+            description: "Failed to disable 2FA",
             variant: "destructive",
           });
         }
-      } catch (error) {
-        console.error("Error disabling 2FA:", error);
-        toast({
-          title: "Error",
-          description: "Failed to disable 2FA",
-          variant: "destructive",
-        });
-      }
-    });
-  };
+      });
+    },
+    [disableForm, toast],
+  );
 
-  const copyToClipboard = (text: string) => {
-    void navigator.clipboard.writeText(text);
-    toast({
-      title: "Copied",
-      description: "Secret copied to clipboard",
-    });
-  };
+  const copyToClipboard = useCallback(
+    (text: string) => {
+      void navigator.clipboard.writeText(text);
+      toast({
+        title: "Copied",
+        description: "Secret copied to clipboard",
+      });
+    },
+    [toast],
+  );
+
+  // Load status on mount only if needed
+  if (!status && !loading) {
+    void loadStatus();
+  }
 
   if (loading) {
     return (
@@ -317,12 +330,7 @@ export function TwoFactorSetup() {
               </DialogContent>
             </Dialog>
           ) : (
-            <Button
-              onClick={() => {
-                handleStartSetup();
-              }}
-              disabled={isPending}
-            >
+            <Button onClick={handleStartSetup} disabled={isPending}>
               {isPending ? "Setting up..." : "Enable 2FA"}
             </Button>
           )}

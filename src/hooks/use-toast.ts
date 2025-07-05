@@ -1,5 +1,5 @@
 // Simple toast hook - basic implementation for now
-import { useState } from "react";
+import { useState, useCallback } from "react";
 
 interface Toast {
   title: string;
@@ -10,7 +10,7 @@ interface Toast {
 export function useToast() {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
-  const toast = (toast: Toast) => {
+  const toast = useCallback((toast: Toast) => {
     // For now, just log to console - in a real app this would show a toast UI
     console.log("Toast:", toast);
     setToasts((prev) => [...prev, toast]);
@@ -19,7 +19,7 @@ export function useToast() {
     setTimeout(() => {
       setToasts((prev) => prev.slice(1));
     }, 3000);
-  };
+  }, []);
 
   return { toast, toasts };
 }
