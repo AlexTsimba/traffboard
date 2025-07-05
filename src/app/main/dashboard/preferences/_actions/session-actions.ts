@@ -59,7 +59,7 @@ export async function revokeSessionAction(sessionToken: string) {
 export async function revokeAllOtherSessionsAction() {
   try {
     // Use secure Data Access Layer (handles auth automatically)
-    const { revokedCount } = await revokeAllOtherSessions();
+    const revokedCount = await revokeAllOtherSessions();
 
     // Revalidate preferences page
     revalidatePath("/main/dashboard/preferences");

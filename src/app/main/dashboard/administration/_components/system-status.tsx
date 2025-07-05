@@ -48,16 +48,18 @@ function StatusIcon({ status }: { readonly status: string }) {
   }
 }
 
-function StatusBadge({ status }: { readonly status: string }) {
-  const variants = {
-    healthy: "default",
-    ok: "default",
-    degraded: "secondary",
-    unhealthy: "destructive",
-    error: "destructive",
-  } as const;
+type StatusType = "healthy" | "ok" | "degraded" | "unhealthy" | "error";
 
-  const variant = variants[status as keyof typeof variants] || "outline";
+function StatusBadge({ status }: { readonly status: string }) {
+  const variants = new Map<StatusType, "default" | "secondary" | "destructive">([
+    ["healthy", "default"],
+    ["ok", "default"],
+    ["degraded", "secondary"],
+    ["unhealthy", "destructive"],
+    ["error", "destructive"],
+  ]);
+
+  const variant = variants.get(status as StatusType) ?? "outline";
 
   return (
     <Badge variant={variant} className="capitalize">
@@ -95,7 +97,7 @@ export function SystemStatus() {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
-      const data: HealthCheck = await response.json();
+      const data = (await response.json()) as HealthCheck;
       setHealthData(data);
       setLastUpdated(new Date());
     } catch (error_) {

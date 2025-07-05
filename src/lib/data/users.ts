@@ -43,7 +43,7 @@ export interface SafeUserDetailed extends SafeUser {
   lastModifiedByUser?: { name: string | null; email: string } | null;
   _count?: {
     uploads: number;
-    sessions: number;
+    // sessions: number; // Removed - JWT sessions don't exist in DB
   };
 }
 
@@ -317,7 +317,7 @@ export async function getUserByIdAdmin(userId: string): Promise<SafeUserDetailed
       _count: {
         select: {
           uploads: true,
-          sessions: true,
+          // sessions: true, // Removed - JWT sessions don't exist in DB
         },
       },
     },

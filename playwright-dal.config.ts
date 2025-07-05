@@ -49,38 +49,3 @@ export default defineConfig({
     timeout: 120_000,
   },
 });
-    actionTimeout: 15_000,
-    navigationTimeout: 30_000,
-  },
-
-  projects: [
-    {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
-    },
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-    },
-  ],
-
-  // Local dev server configuration
-  webServer: process.env.CI ? undefined : {
-    command: 'npm run dev',
-    port: 3000,
-    reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
-  },
-
-  reporter: [
-    ['html', { outputFolder: 'playwright-report-dal' }],
-    ['list'],
-    ['json', { outputFile: 'test-results-dal.json' }],
-  ],
-
-  outputDir: 'test-results-dal/',
-});

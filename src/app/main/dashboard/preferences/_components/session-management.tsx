@@ -21,8 +21,8 @@ export function SessionManagement() {
           <AlertDescription>
             <strong>Session management is no longer available.</strong>
             <br />
-            TraffBoard now uses secure JWT tokens for authentication. Sessions are automatically managed and
-            cannot be individually revoked. Your security is maintained through token expiration and secure authentication.
+            TraffBoard now uses secure JWT tokens for authentication. Sessions are automatically managed and cannot be
+            individually revoked. Your security is maintained through token expiration and secure authentication.
           </AlertDescription>
         </Alert>
 

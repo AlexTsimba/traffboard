@@ -86,11 +86,7 @@ export async function getCurrentUser(): Promise<AuthenticatedUser | null> {
 /**
  * Audit log for security events - persisted to database
  */
-export async function auditLog(
-  action: string,
-  userId?: string,
-  details?: Record<string, unknown>
-): Promise<void> {
+export async function auditLog(action: string, userId?: string, details?: Record<string, unknown>): Promise<void> {
   try {
     // Log to database for persistence
     await prisma.auditLog.create({

@@ -1,29 +1,20 @@
-import { prisma } from "@/lib/prisma";
+import { NextResponse } from "next/server";
 
-export async function GET() {
+export function GET() {
   try {
-    const allSessions = await prisma.session.findMany({
-      include: {
-        user: {
-          select: { email: true }
-        }
-      }
-    });
-    
-    return Response.json({ 
-      totalSessions: allSessions.length,
-      sessions: allSessions.map(s => ({
-        sessionToken: s.sessionToken.slice(0, 8) + "...",
-        userId: s.userId,
-        userEmail: s.user.email,
-        expires: s.expires,
-        isActive: s.isActive,
-        lastActivity: s.lastActivity
-      }))
+    // Sessions are now JWT-only, no database sessions to display
+    return NextResponse.json({
+      message: "Sessions moved to JWT-only strategy",
+      totalSessions: 0,
+      sessions: [],
+      note: "JWT sessions are stateless and not stored in database",
     });
   } catch (error) {
-    return Response.json({ 
-      error: error instanceof Error ? error.message : "Unknown error" 
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 },
+    );
   }
 }
