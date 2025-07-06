@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -13,6 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import { toastUtils } from "@/lib/toast-utils";
 
 // Schema for initial login (email/password)
 const LoginSchema = z.object({
@@ -80,9 +80,7 @@ export function LoginFormV1({ onStepChange }: Readonly<LoginFormV1Props>) {
       });
 
       if (!checkResponse.ok) {
-        toast.error("Authentication Failed", {
-          description: "Invalid credentials. Please check your email and password.",
-        });
+        toastUtils.auth.loginFailed();
         return;
       }
 
@@ -95,17 +93,13 @@ export function LoginFormV1({ onStepChange }: Readonly<LoginFormV1Props>) {
         setStep("2fa");
         onStepChange?.("2fa");
         twoFactorForm.reset();
-        toast.info("Two-Factor Authentication Required", {
-          description: "Enter the code from your authenticator app.",
-        });
+        toastUtils.auth.twoFactorRequired();
       } else {
         // No 2FA required, complete login
         await completeLogin(data.email, data.password);
       }
     } catch {
-      toast.error("Authentication Failed", {
-        description: "An error occurred during authentication.",
-      });
+      toastUtils.auth.loginFailed("An error occurred during authentication.");
     } finally {
       setIsSubmitting(false);
     }
@@ -133,20 +127,17 @@ export function LoginFormV1({ onStepChange }: Readonly<LoginFormV1Props>) {
     });
 
     if (result.error) {
-      toast.error("Authentication Failed", {
-        description: twoFactorCode
-          ? "Invalid authentication code. Please try again."
-          : "Invalid credentials. Please check your email and password.",
-      });
+      const errorDescription = twoFactorCode
+        ? "Invalid authentication code. Please try again."
+        : "Invalid credentials. Please check your email and password.";
+      toastUtils.auth.loginFailed(errorDescription);
 
       if (twoFactorCode) {
         // Reset 2FA form but stay on 2FA step
         twoFactorForm.reset();
       }
     } else {
-      toast.success("Authentication Successful", {
-        description: "Welcome to TraffBoard Analytics Dashboard",
-      });
+      toastUtils.auth.loginSuccess("Welcome to TraffBoard Analytics Dashboard");
       router.push("/main/dashboard");
     }
   };

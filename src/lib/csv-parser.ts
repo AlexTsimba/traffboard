@@ -46,7 +46,7 @@ export interface PlayerDataRow {
   "Casino wins sum": string;
 }
 
-export interface TrafficReportRow {
+export interface ConversionRow {
   date: string;
   foreign_brand_id: string;
   foreign_partner_id: string;
@@ -162,7 +162,7 @@ export function validatePlayerDataRow(row: PlayerDataRow, rowIndex: number): str
   return errors;
 }
 
-export function validateTrafficReportRow(row: TrafficReportRow, rowIndex: number): string[] {
+export function validateConversionRow(row: ConversionRow, rowIndex: number): string[] {
   const errors: string[] = [];
 
   // Required fields validation
@@ -210,7 +210,7 @@ export function validateTrafficReportRow(row: TrafficReportRow, rowIndex: number
   ];
 
   for (const field of numericFields) {
-    if (row[field as keyof TrafficReportRow] && !isValidNumber(row[field as keyof TrafficReportRow])) {
+    if (row[field as keyof ConversionRow] && !isValidNumber(row[field as keyof ConversionRow])) {
       errors.push(`Row ${rowIndex}: Invalid number format for ${field}`);
     }
   }

@@ -119,7 +119,7 @@ export async function getTrafficReports(
   }
 
   const [reports, totalCount] = await Promise.all([
-    prisma.trafficReport.findMany({
+    prisma.conversion.findMany({
       where,
       select: {
         id: true,
@@ -146,13 +146,13 @@ export async function getTrafficReports(
       skip: (page - 1) * limit,
       take: limit,
     }),
-    prisma.trafficReport.count({ where }),
+    prisma.conversion.count({ where }),
   ]);
 
   // Remove Decimal conversion since fields no longer exist
   const reportsFormatted = reports;
 
-  auditLog("traffic.list", currentUser.id, { page, limit, filters });
+  await auditLog("traffic.list", currentUser.id, { page, limit, filters });
 
   return { reports: reportsFormatted, totalCount, currentUser };
 }
@@ -163,7 +163,7 @@ export async function getTrafficReports(
 export async function getTrafficReportById(reportId: string): Promise<SafeTrafficData | null> {
   const currentUser = await requireAuth();
 
-  const report = await prisma.trafficReport.findUnique({
+  const report = await prisma.conversion.findUnique({
     where: { id: reportId },
     select: {
       id: true,
@@ -194,7 +194,7 @@ export async function getTrafficReportById(reportId: string): Promise<SafeTraffi
   // Remove Decimal conversion since fields no longer exist
   const reportFormatted = report;
 
-  auditLog("traffic.view", currentUser.id, { reportId });
+  await auditLog("traffic.view", currentUser.id, { reportId });
 
   return reportFormatted;
 }
@@ -220,7 +220,7 @@ export async function getTrafficStats(): Promise<{
 
   const [aggregateStats, topPartners, topCampaigns, topCountries, topTrafficSources, topDeviceTypes] =
     await Promise.all([
-      prisma.trafficReport.aggregate({
+      prisma.conversion.aggregate({
         _sum: {
           allClicks: true,
           uniqueClicks: true,
@@ -230,7 +230,7 @@ export async function getTrafficStats(): Promise<{
         },
       }),
       // Removed conversionStats aggregate since cr, cftd, cd, rftd fields no longer exist
-      prisma.trafficReport.groupBy({
+      prisma.conversion.groupBy({
         by: ["foreignPartnerId"],
         _sum: {
           allClicks: true,
@@ -239,7 +239,7 @@ export async function getTrafficStats(): Promise<{
         orderBy: { _sum: { allClicks: "desc" } },
         take: 10,
       }),
-      prisma.trafficReport.groupBy({
+      prisma.conversion.groupBy({
         by: ["foreignCampaignId"],
         _sum: {
           allClicks: true,
@@ -248,19 +248,19 @@ export async function getTrafficStats(): Promise<{
         orderBy: { _sum: { allClicks: "desc" } },
         take: 10,
       }),
-      prisma.trafficReport.groupBy({
+      prisma.conversion.groupBy({
         by: ["country"],
         _sum: { allClicks: true },
         orderBy: { _sum: { allClicks: "desc" } },
         take: 10,
       }),
-      prisma.trafficReport.groupBy({
+      prisma.conversion.groupBy({
         by: ["trafficSource"],
         _sum: { allClicks: true },
         orderBy: { _sum: { allClicks: "desc" } },
         take: 10,
       }),
-      prisma.trafficReport.groupBy({
+      prisma.conversion.groupBy({
         by: ["deviceType"],
         _sum: { allClicks: true },
         orderBy: { _sum: { allClicks: "desc" } },
@@ -268,7 +268,7 @@ export async function getTrafficStats(): Promise<{
       }),
     ]);
 
-  auditLog("traffic.stats", currentUser.id);
+  await auditLog("traffic.stats", currentUser.id);
 
   return {
     totalAllClicks: aggregateStats._sum.allClicks ?? 0,
@@ -332,12 +332,12 @@ export async function createTrafficFromImport(
   const currentUser = await requireAuth();
 
   // No need to add conversion rate defaults - fields don't exist in schema
-  const result = await prisma.trafficReport.createMany({
+  const result = await prisma.conversion.createMany({
     data: trafficData,
     skipDuplicates: true,
   });
 
-  auditLog("traffic.bulk_import", currentUser.id, {
+  await auditLog("traffic.bulk_import", currentUser.id, {
     importedCount: result.count,
     totalRecords: trafficData.length,
     note: "conversion rate fields not stored in database",

@@ -1,4 +1,4 @@
-import type { PlayerDataRow, TrafficReportRow } from "./csv-parser";
+import type { PlayerDataRow, ConversionRow } from "./csv-parser";
 import {
   parseCSV,
   safeParseBoolean,
@@ -6,7 +6,7 @@ import {
   safeParseDecimal,
   safeParseNumber,
   validatePlayerDataRow,
-  validateTrafficReportRow,
+  validateConversionRow,
 } from "./csv-parser";
 
 export interface TransformedPlayerData {
@@ -107,7 +107,7 @@ export function transformPlayerData(row: PlayerDataRow): TransformedPlayerData {
   };
 }
 
-export function transformTrafficData(row: TrafficReportRow): TransformedTrafficData {
+export function transformTrafficData(row: ConversionRow): TransformedTrafficData {
   return {
     date: safeParseDate(row.date) ?? new Date(),
     foreignBrandId: row.foreign_brand_id,
@@ -168,12 +168,12 @@ export function processPlayerDataCSV(csvContent: string): DataProcessingResult<T
 }
 
 export function processTrafficDataCSV(csvContent: string): DataProcessingResult<TransformedTrafficData> {
-  const parseResult = parseCSV<TrafficReportRow>(csvContent);
+  const parseResult = parseCSV<ConversionRow>(csvContent);
   const errors: string[] = [...parseResult.errors];
   const validData: TransformedTrafficData[] = [];
 
   for (const [index, row] of parseResult.data.entries()) {
-    const validationErrors = validateTrafficReportRow(row, index + 1);
+    const validationErrors = validateConversionRow(row, index + 1);
     if (validationErrors.length > 0) {
       errors.push(...validationErrors);
     } else {

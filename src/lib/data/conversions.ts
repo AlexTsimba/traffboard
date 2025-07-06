@@ -341,7 +341,7 @@ export async function createConversionsFromImport(
     for (const conversionRecord of batch) {
       await prisma.conversion.upsert({
         where: {
-          date_foreignBrandId_foreignPartnerId_foreignCampaignId_trafficSource_deviceType_country: {
+          conversion_unique: {
             date: conversionRecord.date,
             foreignBrandId: conversionRecord.foreignBrandId,
             foreignPartnerId: conversionRecord.foreignPartnerId,

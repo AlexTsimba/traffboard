@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { toastUtils } from "@/lib/toast-utils";
 
 const getTypeColor = (type: "player" | "conversion"): string => {
   return type === "player" ? "bg-blue-100 text-blue-800" : "bg-green-100 text-green-800";
@@ -71,18 +72,27 @@ export function CsvUpload({
 
       for (const file of fileList) {
         if (files.length + newFiles.length >= maxFiles) {
+          toastUtils.csv.maxFilesExceeded(maxFiles);
           onError?.(`Maximum ${maxFiles} files allowed`);
           break;
         }
 
         const validation = validateFile(file);
         if (!validation.isValid) {
+          if (validation.error?.includes("size")) {
+            toastUtils.csv.fileTooBig(file.name, "10MB");
+          } else if (validation.error?.includes("CSV")) {
+            toastUtils.csv.invalidFormat(file.name);
+          } else {
+            toastUtils.error(validation.error ?? "Invalid file");
+          }
           onError?.(validation.error ?? "Invalid file");
           continue;
         }
 
         const fileType = detectFileType(file.name);
         if (!allowedTypes.includes(fileType)) {
+          toastUtils.error(`File type "${fileType}" not allowed for ${file.name}`);
           onError?.(`File type "${fileType}" not allowed`);
           continue;
         }
@@ -134,82 +144,176 @@ export function CsvUpload({
     [handleFiles],
   );
 
+  // Helper function to update file status
+  const updateFileStatus = useCallback((fileId: string, updates: Partial<UploadFile>) => {
+    setFiles((prev) => prev.map((f) => (f.id === fileId ? { ...f, ...updates } : f)));
+  }, []);
+
+  // Helper function to create upload record
+  const createUploadRecord = useCallback(async (file: File, type: string) => {
+    const response = await fetch("/api/uploads", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({
+        fileName: file.name,
+        fileType: type,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to create upload record");
+    }
+
+    const { upload } = (await response.json()) as { upload: { id: string } };
+    return upload.id;
+  }, []);
+
+  // Helper function to upload file physically
+  const uploadFilePhysically = useCallback(async (uploadId: string, file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await fetch(`/api/uploads/${uploadId}/file`, {
+      method: "POST",
+      credentials: "include",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to upload file");
+    }
+  }, []);
+
+  // Helper function to process CSV
+  const processCsvFile = useCallback(async (uploadId: string) => {
+    const response = await fetch("/api/process-csv", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ uploadId }),
+    });
+
+    const result = (await response.json()) as {
+      message: string;
+      processedCount?: number;
+      errors?: string[];
+    };
+
+    if (!response.ok) {
+      const errorMessage = result.message || "Processing failed";
+      let errorDetails = "Technical error occurred";
+
+      if (result.errors) {
+        const firstThreeErrors = result.errors.slice(0, 3).join(", ");
+        const remainingCount = result.errors.length - 3;
+        const hasMoreErrors = remainingCount > 0;
+
+        errorDetails = hasMoreErrors
+          ? `Validation errors: ${firstThreeErrors} (and ${remainingCount} more)`
+          : `Validation errors: ${firstThreeErrors}`;
+      }
+
+      throw new Error(`${errorMessage}. ${errorDetails}`);
+    }
+
+    return { response, result };
+  }, []);
+
+  // Helper function to categorize errors
+  const getCategorizedError = useCallback((errorMessage: string) => {
+    if (errorMessage.includes("Date is required")) {
+      return "❌ File validation failed: Missing required date fields. Please check your CSV format.";
+    } else if (errorMessage.includes("Authentication required")) {
+      return "🔒 Session expired. Please refresh the page and try again.";
+    } else if (errorMessage.includes("Unknown argument")) {
+      return "⚙️ System error: Database constraint issue. Please contact support.";
+    } else if (errorMessage.includes("validation errors")) {
+      return `📋 ${errorMessage}`;
+    }
+    return errorMessage;
+  }, []);
+
   const uploadFile = useCallback(
     async (uploadFile: UploadFile) => {
+      const uploadToastId = toastUtils.csv.uploadStarted(uploadFile.file.name);
+
       try {
-        // Update status to uploading
-        setFiles((prev) => prev.map((f) => (f.id === uploadFile.id ? { ...f, status: "uploading", progress: 10 } : f)));
+        // Start uploading
+        updateFileStatus(uploadFile.id, { status: "uploading", progress: 10 });
 
         // Create upload record
-        const uploadResponse = await fetch("/api/uploads", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            fileName: uploadFile.file.name,
-            fileType: uploadFile.type,
-          }),
-        });
+        const uploadId = await createUploadRecord(uploadFile.file, uploadFile.type);
+        updateFileStatus(uploadFile.id, { uploadId, progress: 30 });
 
-        if (!uploadResponse.ok) {
-          throw new Error("Failed to create upload record");
-        }
+        // Upload file physically
+        await uploadFilePhysically(uploadId, uploadFile.file);
+        updateFileStatus(uploadFile.id, { progress: 60 });
 
-        const { upload } = (await uploadResponse.json()) as { upload: { id: string } };
-
-        // Update progress
-        setFiles((prev) => prev.map((f) => (f.id === uploadFile.id ? { ...f, uploadId: upload.id, progress: 50 } : f)));
-
-        // Simulate file upload (in real implementation, upload to storage)
+        // Wait for session stability
         await new Promise((resolve) => setTimeout(resolve, 1000));
 
-        // Update to processing
-        setFiles((prev) =>
-          prev.map((f) => (f.id === uploadFile.id ? { ...f, status: "processing", progress: 70 } : f)),
-        );
+        // Start processing
+        updateFileStatus(uploadFile.id, { status: "processing", progress: 80 });
+        toastUtils.update(uploadToastId, `⚙️ Processing CSV: ${uploadFile.file.name}`, "info");
 
         // Process CSV
-        const processResponse = await fetch("/api/process-csv", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ uploadId: upload.id }),
-        });
+        const { response: processResponse, result: processResult } = await processCsvFile(uploadId);
 
-        const processResult = (await processResponse.json()) as {
-          message: string;
-          processedCount?: number;
-          errors?: string[];
-        };
+        // Handle partial success with validation errors
+        if (processResponse.status === 207 && processResult.errors && processResult.errors.length > 0) {
+          const partialMessage = `Processed ${processResult.processedCount ?? 0} records with ${processResult.errors.length} validation errors`;
 
-        if (!processResponse.ok) {
-          throw new Error(processResult.message || "Processing failed");
+          toastUtils.csv.validationErrors(
+            uploadFile.file.name,
+            processResult.errors.length,
+            processResult.processedCount ?? 0,
+          );
+
+          updateFileStatus(uploadFile.id, {
+            status: "completed",
+            progress: 100,
+            processedCount: processResult.processedCount,
+            error: `${partialMessage}. Check logs for details.`,
+          });
+
+          onUploadComplete?.(uploadId, processResult.processedCount ?? 0);
+          return;
         }
 
-        // Update to completed
-        setFiles((prev) =>
-          prev.map((f) =>
-            f.id === uploadFile.id
-              ? {
-                  ...f,
-                  status: "completed",
-                  progress: 100,
-                  processedCount: processResult.processedCount,
-                }
-              : f,
-          ),
-        );
+        // Complete success
+        updateFileStatus(uploadFile.id, {
+          status: "completed",
+          progress: 100,
+          processedCount: processResult.processedCount,
+        });
 
-        onUploadComplete?.(upload.id, processResult.processedCount ?? 0);
+        toastUtils.csv.uploadCompleted(uploadFile.file.name, processResult.processedCount ?? 0);
+        onUploadComplete?.(uploadId, processResult.processedCount ?? 0);
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : "Upload failed";
+        const userFriendlyMessage = getCategorizedError(errorMessage);
 
-        setFiles((prev) =>
-          prev.map((f) => (f.id === uploadFile.id ? { ...f, status: "error", error: errorMessage } : f)),
-        );
+        // Show error toast (prefer positive condition)
+        if (errorMessage.includes("Authentication required")) {
+          toastUtils.csv.sessionExpired();
+        } else {
+          toastUtils.csv.uploadFailed(uploadFile.file.name, userFriendlyMessage);
+        }
 
-        onError?.(errorMessage);
+        updateFileStatus(uploadFile.id, { status: "error", error: userFriendlyMessage });
+        onError?.(userFriendlyMessage);
       }
     },
-    [onUploadComplete, onError],
+    [
+      updateFileStatus,
+      createUploadRecord,
+      uploadFilePhysically,
+      processCsvFile,
+      getCategorizedError,
+      onUploadComplete,
+      onError,
+    ],
   );
 
   const removeFile = useCallback((fileId: string) => {

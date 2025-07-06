@@ -46,7 +46,7 @@ export default function ConversionsPage() {
                 onUploadComplete={handleUploadComplete}
                 onError={handleUploadError}
                 maxFiles={3}
-                allowedTypes={["traffic"]}
+                allowedTypes={["conversion"]}
               />
             </DialogContent>
           </Dialog>
@@ -63,31 +63,6 @@ export default function ConversionsPage() {
           </div>
         </div>
       </div>
-
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="rounded-lg border p-6">
-          <h3 className="mb-2 text-lg font-semibold">Top Converting Sources</h3>
-          <p className="text-muted-foreground">Data will appear after CSV upload</p>
-        </div>
-        <div className="rounded-lg border p-6">
-          <h3 className="mb-2 text-lg font-semibold">Conversion Trends</h3>
-          <p className="text-muted-foreground">Charts will appear after CSV upload</p>
-        </div>
-      </div>
-
-      {/* Demographics Section */}
-      {/*
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="rounded-lg border p-6 flex flex-col items-center">
-          <h3 className="mb-4 text-lg font-semibold">Age Distribution</h3>
-          <DemographicsAgeChart />
-        </div>
-        <div className="rounded-lg border p-6 flex flex-col items-center">
-          <h3 className="mb-4 text-lg font-semibold">Gender Distribution</h3>
-          <DemographicsGenderChart />
-        </div>
-      </div>
-      */}
     </div>
   );
 }

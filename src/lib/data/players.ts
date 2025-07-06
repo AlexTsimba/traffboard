@@ -414,7 +414,7 @@ export async function createPlayersFromImport(
     for (const playerData of batch) {
       await prisma.playerData.upsert({
         where: {
-          playerId_date: {
+          player_unique: {
             playerId: playerData.playerId,
             date: playerData.date,
           },

@@ -49,7 +49,7 @@ export async function getUserUploads(): Promise<{
     orderBy: { createdAt: "desc" },
   });
 
-  auditLog("uploads.list", currentUser.id);
+  await auditLog("uploads.list", currentUser.id);
 
   return { uploads, currentUser };
 }
@@ -78,7 +78,7 @@ export async function getUploadById(uploadId: string): Promise<SafeUpload | null
     },
   });
 
-  auditLog("uploads.view", currentUser.id, { uploadId });
+  await auditLog("uploads.view", currentUser.id, { uploadId });
 
   return upload;
 }
@@ -108,7 +108,7 @@ export async function createUpload(uploadData: CreateUploadData): Promise<SafeUp
     },
   });
 
-  auditLog("uploads.create", currentUser.id, {
+  await auditLog("uploads.create", currentUser.id, {
     uploadId: upload.id,
     fileName: uploadData.fileName,
     fileType: uploadData.fileType,
@@ -138,7 +138,7 @@ export async function updateUploadStatus(
     },
   });
 
-  auditLog("uploads.update_status", currentUser.id, {
+  await auditLog("uploads.update_status", currentUser.id, {
     uploadId,
     status,
     metadata,
@@ -166,7 +166,7 @@ export async function deleteUpload(uploadId: string): Promise<void> {
     where: { id: uploadId },
   });
 
-  auditLog("uploads.delete", currentUser.id, {
+  await auditLog("uploads.delete", currentUser.id, {
     uploadId,
     fileName: upload.fileName,
   });
@@ -203,7 +203,7 @@ export async function getUserUploadStats(): Promise<{
   const successfulUploads = totalStats.find((item) => item.status === "completed")?._count.status ?? 0;
   const failedUploads = totalStats.find((item) => item.status === "failed")?._count.status ?? 0;
 
-  auditLog("uploads.stats", currentUser.id);
+  await auditLog("uploads.stats", currentUser.id);
 
   return {
     totalUploads,

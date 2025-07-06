@@ -67,7 +67,7 @@ export async function checkUserRequires2FA(
   // Check if 2FA is enabled
   const requires2FA = !!user.totpSecret;
 
-  auditLog("2fa.login_check", user.id, { requires2FA });
+  await auditLog("2fa.login_check", user.id, { requires2FA });
 
   return {
     requires2FA,
@@ -93,7 +93,7 @@ export async function get2FAStatus(): Promise<Safe2FAStatus> {
     throw new Error("User not found");
   }
 
-  auditLog("2fa.status_check", currentUser.id);
+  await auditLog("2fa.status_check", currentUser.id);
 
   return {
     isEnabled: !!user.totpSecret,
@@ -135,7 +135,7 @@ export async function generate2FASetup(): Promise<Safe2FASetup> {
   // Generate QR code as data URL
   const qrCode = await qrcode.toDataURL(qrUri);
 
-  auditLog("2fa.setup_generated", currentUser.id);
+  await auditLog("2fa.setup_generated", currentUser.id);
 
   return {
     secret,
@@ -156,7 +156,7 @@ export async function enable2FA(secret: string, code: string): Promise<void> {
   const isValid = authenticator.check(code, secret);
 
   if (!isValid) {
-    auditLog("2fa.enable_failed", currentUser.id, { reason: "invalid_code" });
+    await auditLog("2fa.enable_failed", currentUser.id, { reason: "invalid_code" });
     throw new Error("Invalid verification code. Please check your authenticator app and system clock.");
   }
 
@@ -183,7 +183,7 @@ export async function enable2FA(secret: string, code: string): Promise<void> {
     },
   });
 
-  auditLog("2fa.enabled", currentUser.id);
+  await auditLog("2fa.enabled", currentUser.id);
 }
 
 /**
@@ -212,7 +212,7 @@ export async function disable2FA(password: string, code: string): Promise<void> 
   // Verify password
   const passwordValid = await bcryptjs.compare(password, user.passwordHash);
   if (!passwordValid) {
-    auditLog("2fa.disable_failed", currentUser.id, { reason: "invalid_password" });
+    await auditLog("2fa.disable_failed", currentUser.id, { reason: "invalid_password" });
     throw new Error("Invalid password");
   }
 
@@ -220,7 +220,7 @@ export async function disable2FA(password: string, code: string): Promise<void> 
   const codeValid = authenticator.check(code, user.totpSecret);
 
   if (!codeValid) {
-    auditLog("2fa.disable_failed", currentUser.id, { reason: "invalid_code" });
+    await auditLog("2fa.disable_failed", currentUser.id, { reason: "invalid_code" });
     throw new Error("Invalid verification code");
   }
 
@@ -233,7 +233,7 @@ export async function disable2FA(password: string, code: string): Promise<void> 
     },
   });
 
-  auditLog("2fa.disabled", currentUser.id);
+  await auditLog("2fa.disabled", currentUser.id);
 }
 
 /**
@@ -279,7 +279,7 @@ export async function admin2FAReset(userId: string): Promise<{
     },
   });
 
-  auditLog("admin_reset", admin.id, {
+  await auditLog("admin_reset", admin.id, {
     targetUserId: userId,
     targetEmail: user.email,
   });
@@ -309,7 +309,7 @@ export async function verify2FACode(userId: string, code: string): Promise<boole
   const isValid = authenticator.check(code, user.totpSecret);
 
   if (!isValid) {
-    auditLog("2fa.verify_failed", userId, { reason: "invalid_code" });
+    await auditLog("2fa.verify_failed", userId, { reason: "invalid_code" });
     return false;
   }
 

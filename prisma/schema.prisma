@@ -113,7 +113,7 @@ model ConversionUpload {
   id          String   @id @default(cuid())
   fileName    String
   fileType    String   // "players" | "conversions"
-  status      String   @default("pending") // pending | processing | completed | failed
+  status      String   @default("pending") // pending | uploaded | processing | completed | failed
   uploadedBy  String
   recordCount Int?
   errorLog    String?
@@ -167,7 +167,7 @@ model PlayerData {
   createdAt           DateTime  @default(now())
   updatedAt           DateTime  @updatedAt
   
-  @@unique([playerId, date])
+  @@unique([playerId, date], name: "player_unique")
   @@index([playerId, date])
   @@index([partnerId, campaignId])
   @@index([date])
@@ -197,7 +197,7 @@ model Conversion {
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
   
-  @@unique([date, foreignBrandId, foreignPartnerId, foreignCampaignId, trafficSource, deviceType, country])
+  @@unique([date, foreignBrandId, foreignPartnerId, foreignCampaignId, trafficSource, deviceType, country], name: "conversion_unique")
   @@index([date])
   @@index([foreignPartnerId, foreignCampaignId])
   @@index([trafficSource, deviceType])

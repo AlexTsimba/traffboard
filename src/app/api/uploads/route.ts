@@ -28,23 +28,35 @@ export async function GET() {
 // POST /api/uploads - Create new upload record
 export async function POST(request: NextRequest) {
   try {
+    console.log("[Upload API] Creating upload record...");
     const body = (await request.json()) as unknown;
+    console.log("[Upload API] Request body:", body);
+
     const validatedData = uploadRequestSchema.parse(body);
+    console.log("[Upload API] Validated data:", validatedData);
 
     const upload = await createUpload(validatedData);
+    console.log("[Upload API] Upload created:", upload);
 
     return NextResponse.json({ upload }, { status: 201 });
   } catch (error) {
-    console.error("Failed to create upload record:", error);
+    console.error("[Upload API] Failed to create upload record:", error);
 
     if (error instanceof Error && error.message === "Authentication required") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     if (error instanceof z.ZodError) {
+      console.error("[Upload API] Validation error:", error.errors);
       return NextResponse.json({ error: "Invalid request data", details: error.errors }, { status: 400 });
     }
 
-    return NextResponse.json({ error: "Failed to create upload record" }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: "Failed to create upload record",
+        details: error instanceof Error ? error.message : String(error),
+      },
+      { status: 500 },
+    );
   }
 }

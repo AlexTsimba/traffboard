@@ -22,23 +22,30 @@ export async function processCSVByUploadId(uploadId: string): Promise<{
   errors?: string[];
   message: string;
 }> {
+  console.log("[CSV Processing] Starting for uploadId:", uploadId);
   const currentUser = await requireAuth();
+  console.log("[CSV Processing] User authenticated:", currentUser.id);
 
   // Get upload record with ownership check
   const upload = await getUploadById(uploadId);
+  console.log("[CSV Processing] Upload record:", upload);
   if (!upload) {
     throw new Error("Upload not found or access denied");
   }
 
   try {
     // Update status to processing
+    console.log("[CSV Processing] Updating status to processing...");
     await updateUploadStatus(uploadId, "processing");
 
     // Read CSV file
     const filePath = path.join(process.cwd(), "public", "uploads", upload.fileName);
+    console.log("[CSV Processing] Reading file from:", filePath);
     // eslint-disable-next-line security/detect-non-literal-fs-filename
     const fileBuffer = await fs.readFile(filePath);
     const csvContent = fileBuffer.toString("utf8");
+    console.log("[CSV Processing] File content length:", csvContent.length);
+    console.log("[CSV Processing] File type:", upload.fileType);
 
     let result: DataProcessingResult<unknown>;
     let importResult: { count: number };
