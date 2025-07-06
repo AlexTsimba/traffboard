@@ -147,13 +147,11 @@ export async function POST(request: Request) {
 ### ✅ Fully Implemented
 
 - **Authentication Operations** (`auth.ts`)
-
   - User authentication and authorization
   - Role checking and permissions
   - Security audit logging
 
 - **User Management** (`users.ts`)
-
   - User CRUD operations
   - Profile management
   - Password changes

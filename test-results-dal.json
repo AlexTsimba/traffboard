@@ -21,10 +21,7 @@
           "outputFolder": "playwright-report-dal"
         }
       ],
-      [
-        "list",
-        null
-      ],
+      ["list", null],
       [
         "json",
         {
@@ -49,9 +46,7 @@
         "name": "chromium",
         "testDir": "/Users/simba/Documents/Projects/TraffBoard_old/e2e/dal",
         "testIgnore": [],
-        "testMatch": [
-          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
-        ],
+        "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
         "timeout": 15000
       },
       {
@@ -65,9 +60,7 @@
         "name": "firefox",
         "testDir": "/Users/simba/Documents/Projects/TraffBoard_old/e2e/dal",
         "testIgnore": [],
-        "testMatch": [
-          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
-        ],
+        "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
         "timeout": 15000
       },
       {
@@ -81,9 +74,7 @@
         "name": "webkit",
         "testDir": "/Users/simba/Documents/Projects/TraffBoard_old/e2e/dal",
         "testIgnore": [],
-        "testMatch": [
-          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
-        ],
+        "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
         "timeout": 15000
       }
     ],

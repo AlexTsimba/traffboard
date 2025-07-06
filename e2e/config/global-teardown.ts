@@ -1,7 +1,7 @@
-import { teardownTestDatabase } from '../fixtures/database-helpers';
+import { teardownTestDatabase } from "../fixtures/database-helpers";
 
 async function globalTeardown() {
-  console.log('Cleaning up test database...');
+  console.log("Cleaning up test database...");
   await teardownTestDatabase();
 }
 

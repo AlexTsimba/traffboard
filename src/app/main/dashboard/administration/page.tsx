@@ -1,10 +1,10 @@
 import { Suspense } from "react";
 
-import { CsvUpload } from "@/components/csv-upload";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { requireAdminPageAuth } from "@/lib/auth/page-protection";
 import { getUsers } from "@/lib/data/users";
 
+import { CsvUploadClient } from "./_components/csv-upload-client";
 import { DataManagementSummary } from "./_components/data-management-summary";
 import { SystemStatus } from "./_components/system-status";
 import { UserManagement } from "./_components/user-management";
@@ -52,16 +52,7 @@ export default async function AdministrationPage({ searchParams }: Administratio
         <TabsContent className="space-y-6" value="data">
           <div className="rounded-lg border p-6">
             <h3 className="mb-4 text-lg font-semibold">CSV Data Import</h3>
-            <CsvUpload
-              maxFiles={5}
-              allowedTypes={["player", "conversion"]}
-              onUploadComplete={(uploadId, count) => {
-                console.log(`Upload ${uploadId} completed with ${count} records`);
-              }}
-              onError={(error) => {
-                console.error("Upload error:", error);
-              }}
-            />
+            <CsvUploadClient />
           </div>
 
           <div className="rounded-lg border p-6">

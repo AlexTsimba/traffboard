@@ -1,7 +1,7 @@
-import { setupTestDatabase } from '../fixtures/database-helpers';
+import { setupTestDatabase } from "../fixtures/database-helpers";
 
 async function globalSetup() {
-  console.log('Setting up test database...');
+  console.log("Setting up test database...");
   await setupTestDatabase();
 }
 

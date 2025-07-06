@@ -19,9 +19,9 @@ test("admin can create, login, and delete a user via UI", async ({ page }) => {
     await page.waitForURL(/dashboard/, { timeout: 5000 });
   } catch (e) {
     // Сохраняем скриншот и текст страницы для диагностики
-    await page.screenshot({ path: 'login-fail-admin.png', fullPage: true });
-    const bodyText = await page.textContent('body');
-    console.log('LOGIN FAIL ADMIN PAGE TEXT:', bodyText);
+    await page.screenshot({ path: "login-fail-admin.png", fullPage: true });
+    const bodyText = await page.textContent("body");
+    console.log("LOGIN FAIL ADMIN PAGE TEXT:", bodyText);
     throw e;
   }
 
@@ -60,7 +60,7 @@ test("admin can create, login, and delete a user via UI", async ({ page }) => {
   await page.fill('input[name="email"]', "admin@traffboard.com");
   await page.fill('input[name="password"]', "admin123");
   await page.click('button[type="submit"]');
-  await page.goto('/main/dashboard/administration');
+  await page.goto("/main/dashboard/administration");
 
   // 10. Найти пользователя и удалить через UI
   await page.click(`tr:has-text("${email}") button[aria-haspopup="menu"]`);

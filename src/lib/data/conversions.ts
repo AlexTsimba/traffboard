@@ -304,7 +304,7 @@ export async function getConversionStats(): Promise<{
 }
 
 /**
- * Bulk create conversion data (for CSV imports)
+ * Bulk create conversion data (for CSV imports) with replace strategy for deduplication
  * Note: Conversion rate fields (cr, cftd, cd, rftd) are excluded during CSV processing
  * and will use schema default values (0.00)
  */
@@ -331,17 +331,39 @@ export async function createConversionsFromImport(
 ): Promise<{ count: number }> {
   const currentUser = await requireAuth();
 
-  // No need to add conversion rate defaults - fields don't exist in schema
-  const result = await prisma.conversion.createMany({
-    data: conversionData,
-    skipDuplicates: true,
-  });
+  // Use upsert to replace existing records (deduplication strategy)
+  let processedCount = 0;
+  const batchSize = 500;
+
+  for (let i = 0; i < conversionData.length; i += batchSize) {
+    const batch = conversionData.slice(i, i + batchSize);
+
+    for (const conversionRecord of batch) {
+      await prisma.conversion.upsert({
+        where: {
+          date_foreignBrandId_foreignPartnerId_foreignCampaignId_trafficSource_deviceType_country: {
+            date: conversionRecord.date,
+            foreignBrandId: conversionRecord.foreignBrandId,
+            foreignPartnerId: conversionRecord.foreignPartnerId,
+            foreignCampaignId: conversionRecord.foreignCampaignId,
+            trafficSource: conversionRecord.trafficSource,
+            deviceType: conversionRecord.deviceType,
+            country: conversionRecord.country,
+          },
+        },
+        update: conversionRecord,
+        create: conversionRecord,
+      });
+      processedCount++;
+    }
+  }
 
   void auditLog("conversions.bulk_import", currentUser.id, {
-    importedCount: result.count,
+    importedCount: processedCount,
     totalRecords: conversionData.length,
+    strategy: "replace",
     note: "conversion rate fields not stored in database",
   });
 
-  return { count: result.count };
+  return { count: processedCount };
 }

@@ -6,9 +6,7 @@ import { createUpload, getUserUploads } from "@/lib/data/uploads";
 
 const uploadRequestSchema = z.object({
   fileName: z.string().min(1),
-  fileType: z.enum(["player", "traffic"]),
-  uploadPath: z.string().min(1),
-  uploadSize: z.number().min(1),
+  fileType: z.enum(["player", "conversion"]),
 });
 
 // GET /api/uploads - List user's upload history

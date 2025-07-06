@@ -1,5 +1,5 @@
-import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcryptjs';
+import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
@@ -8,7 +8,7 @@ export interface TestUser {
   email: string;
   password: string;
   name: string;
-  role: 'user' | 'superuser';
+  role: "user" | "superuser";
 }
 
 /**
@@ -17,16 +17,16 @@ export interface TestUser {
 export async function ensureTestUsers(): Promise<void> {
   const testUsers = [
     {
-      email: 'admin@traffboard.com',
-      password: 'admin123',
-      name: 'Test Admin',
-      role: 'superuser' as const,
+      email: "admin@traffboard.com",
+      password: "admin123",
+      name: "Test Admin",
+      role: "superuser" as const,
     },
     {
-      email: 'user@traffboard.com',
-      password: 'user123', 
-      name: 'Test User',
-      role: 'user' as const,
+      email: "user@traffboard.com",
+      password: "user123",
+      name: "Test User",
+      role: "user" as const,
     },
   ];
 
@@ -37,7 +37,7 @@ export async function ensureTestUsers(): Promise<void> {
 
     if (!existingUser) {
       const passwordHash = await bcrypt.hash(userData.password, 12);
-      
+
       await prisma.user.create({
         data: {
           name: userData.name,
@@ -47,7 +47,7 @@ export async function ensureTestUsers(): Promise<void> {
           isActive: true,
         },
       });
-      
+
       console.log(`Created test user: ${userData.email}`);
     }
   }
@@ -61,7 +61,7 @@ export async function cleanupTestUsers(): Promise<void> {
   await prisma.user.deleteMany({
     where: {
       email: {
-        startsWith: 'temp@',
+        startsWith: "temp@",
       },
     },
   });
@@ -70,9 +70,9 @@ export async function cleanupTestUsers(): Promise<void> {
 /**
  * Create a temporary test user for testing
  */
-export async function createTempUser(userData: Omit<TestUser, 'id'>): Promise<TestUser> {
+export async function createTempUser(userData: Omit<TestUser, "id">): Promise<TestUser> {
   const passwordHash = await bcrypt.hash(userData.password, 12);
-  
+
   const user = await prisma.user.create({
     data: {
       name: userData.name,

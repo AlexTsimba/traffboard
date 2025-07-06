@@ -209,7 +209,7 @@ export async function getPlayers(
     casinoWinsSum: Number(player.casinoWinsSum),
   }));
 
-  auditLog("players.list", currentUser.id, { page, limit, filters });
+  void auditLog("players.list", currentUser.id, { page, limit, filters });
 
   return { players: playersFormatted, totalCount, currentUser };
 }
@@ -279,7 +279,7 @@ export async function getPlayerById(playerId: string): Promise<SafePlayerData | 
     casinoWinsSum: Number(player.casinoWinsSum),
   };
 
-  auditLog("players.view", currentUser.id, { playerId });
+  void auditLog("players.view", currentUser.id, { playerId });
 
   return playerFormatted;
 }
@@ -337,7 +337,7 @@ export async function getPlayerStats(): Promise<{
     }),
   ]);
 
-  auditLog("players.stats", currentUser.id);
+  void auditLog("players.stats", currentUser.id);
 
   return {
     totalPlayers,
@@ -360,7 +360,7 @@ export async function getPlayerStats(): Promise<{
 }
 
 /**
- * Bulk create player data (for CSV imports)
+ * Bulk create player data (for CSV imports) with replace strategy for deduplication
  * Note: partnersEmail is excluded during CSV processing for data privacy
  */
 export async function createPlayersFromImport(
@@ -404,17 +404,34 @@ export async function createPlayersFromImport(
 ): Promise<{ count: number }> {
   const currentUser = await requireAuth();
 
-  // No need to transform data - partnersEmail field doesn't exist in schema
-  const result = await prisma.playerData.createMany({
-    data: playersData,
-    skipDuplicates: true,
-  });
+  // Use upsert to replace existing records (deduplication strategy)
+  let processedCount = 0;
+  const batchSize = 500;
 
-  auditLog("players.bulk_import", currentUser.id, {
-    importedCount: result.count,
+  for (let i = 0; i < playersData.length; i += batchSize) {
+    const batch = playersData.slice(i, i + batchSize);
+
+    for (const playerData of batch) {
+      await prisma.playerData.upsert({
+        where: {
+          playerId_date: {
+            playerId: playerData.playerId,
+            date: playerData.date,
+          },
+        },
+        update: playerData,
+        create: playerData,
+      });
+      processedCount++;
+    }
+  }
+
+  void auditLog("players.bulk_import", currentUser.id, {
+    importedCount: processedCount,
     totalRecords: playersData.length,
+    strategy: "replace",
     note: "partnersEmail field not stored in database",
   });
 
-  return { count: result.count };
+  return { count: processedCount };
 }

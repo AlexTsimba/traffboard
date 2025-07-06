@@ -9,14 +9,14 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 
-const getTypeColor = (type: "player" | "traffic"): string => {
+const getTypeColor = (type: "player" | "conversion"): string => {
   return type === "player" ? "bg-blue-100 text-blue-800" : "bg-green-100 text-green-800";
 };
 
 interface UploadFile {
   file: File;
   id: string;
-  type: "player" | "traffic";
+  type: "player" | "conversion";
   progress: number;
   status: "pending" | "uploading" | "processing" | "completed" | "error";
   error?: string;
@@ -28,14 +28,14 @@ interface CsvUploadProps {
   readonly onUploadComplete?: (uploadId: string, processedCount: number) => void;
   readonly onError?: (error: string) => void;
   readonly maxFiles?: number;
-  readonly allowedTypes?: ("player" | "traffic")[];
+  readonly allowedTypes?: ("player" | "conversion")[];
 }
 
 export function CsvUpload({
   onUploadComplete,
   onError,
   maxFiles = 5,
-  allowedTypes = ["player", "traffic"],
+  allowedTypes = ["player", "conversion"],
 }: CsvUploadProps) {
   const [files, setFiles] = useState<UploadFile[]>([]);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -57,12 +57,12 @@ export function CsvUpload({
     return { isValid: true };
   }, []);
 
-  const detectFileType = useCallback((fileName: string): "player" | "traffic" => {
+  const detectFileType = useCallback((fileName: string): "player" | "conversion" => {
     const name = fileName.toLowerCase();
-    if (name.includes("player") || name.includes("user") || name.includes("member")) {
+    if (name.includes("player") || name.includes("user") || name.includes("member") || name.includes("overall")) {
       return "player";
     }
-    return "traffic";
+    return "conversion";
   }, []);
 
   const handleFiles = useCallback(
@@ -147,8 +147,6 @@ export function CsvUpload({
           body: JSON.stringify({
             fileName: uploadFile.file.name,
             fileType: uploadFile.type,
-            uploadPath: `/uploads/${uploadFile.file.name}`,
-            uploadSize: uploadFile.file.size,
           }),
         });
 
