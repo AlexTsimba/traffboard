@@ -47,7 +47,7 @@ export interface TransformedPlayerData {
   casinoWinsSum: number;
 }
 
-export interface TransformedTrafficData {
+export interface TransformedConversionData {
   date: Date;
   foreignBrandId: string;
   foreignPartnerId: string;
@@ -107,7 +107,7 @@ export function transformPlayerData(row: PlayerDataRow): TransformedPlayerData {
   };
 }
 
-export function transformTrafficData(row: ConversionRow): TransformedTrafficData {
+export function transformConversionData(row: ConversionRow): TransformedConversionData {
   return {
     date: safeParseDate(row.date) ?? new Date(),
     foreignBrandId: row.foreign_brand_id,
@@ -167,10 +167,10 @@ export function processPlayerDataCSV(csvContent: string): DataProcessingResult<T
   };
 }
 
-export function processTrafficDataCSV(csvContent: string): DataProcessingResult<TransformedTrafficData> {
+export function processConversionDataCSV(csvContent: string): DataProcessingResult<TransformedConversionData> {
   const parseResult = parseCSV<ConversionRow>(csvContent);
   const errors: string[] = [...parseResult.errors];
-  const validData: TransformedTrafficData[] = [];
+  const validData: TransformedConversionData[] = [];
 
   for (const [index, row] of parseResult.data.entries()) {
     const validationErrors = validateConversionRow(row, index + 1);
@@ -178,7 +178,7 @@ export function processTrafficDataCSV(csvContent: string): DataProcessingResult<
       errors.push(...validationErrors);
     } else {
       try {
-        const transformed = transformTrafficData(row);
+        const transformed = transformConversionData(row);
         validData.push(transformed);
       } catch (error) {
         errors.push(

@@ -4,7 +4,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 
 import type { DataProcessingResult } from "../data-transformers";
-import { processPlayerDataCSV, processTrafficDataCSV } from "../data-transformers";
+import { processPlayerDataCSV, processConversionDataCSV } from "../data-transformers";
 
 import { auditLog, requireAuth } from "./auth";
 import { createConversionsFromImport } from "./conversions";
@@ -59,7 +59,7 @@ export async function processCSVByUploadId(uploadId: string): Promise<{
           : { count: 0 };
     } else {
       // Assume conversion data
-      result = processTrafficDataCSV(csvContent);
+      result = processConversionDataCSV(csvContent);
       importResult =
         result.data.length > 0
           ? await createConversionsFromImport(result.data as Parameters<typeof createConversionsFromImport>[0])
@@ -132,7 +132,7 @@ export async function validateCSVContent(
 
   try {
     const result: DataProcessingResult<unknown> =
-      fileType === "player" ? processPlayerDataCSV(csvContent) : processTrafficDataCSV(csvContent);
+      fileType === "player" ? processPlayerDataCSV(csvContent) : processConversionDataCSV(csvContent);
 
     return {
       isValid: result.errors.length === 0,

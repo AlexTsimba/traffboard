@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 
-import { processTrafficDataCSV } from "../../data-transformers";
+import { processConversionDataCSV } from "../../data-transformers";
 import { prisma } from "../../prisma";
 
 const VALID_CSV = `date,foreign_brand_id,foreign_partner_id,foreign_campaign_id,foreign_landing_id,traffic_source,device_type,user_agent_family,os_family,country,all_clicks,unique_clicks,registrations_count,ftd_count,deposits_count
@@ -24,7 +24,7 @@ describe.skip("CSV Import & Validation (TraffBoard conversions)", () => {
   });
 
   it("should import only valid rows and report errors for invalid ones", () => {
-    const result = processTrafficDataCSV(MIXED_CSV);
+    const result = processConversionDataCSV(MIXED_CSV);
     expect(result.success).toBe(false);
     expect(result.processedCount).toBe(1);
     expect(result.errorCount).toBeGreaterThan(0);
@@ -40,7 +40,7 @@ describe.skip("CSV Import & Validation (TraffBoard conversions)", () => {
   });
 
   it("should reject all rows if all are invalid", () => {
-    const result = processTrafficDataCSV(INVALID_CSV);
+    const result = processConversionDataCSV(INVALID_CSV);
     expect(result.success).toBe(false);
     expect(result.processedCount).toBe(0);
     expect(result.errorCount).toBeGreaterThan(0);
@@ -48,7 +48,7 @@ describe.skip("CSV Import & Validation (TraffBoard conversions)", () => {
   });
 
   it("should import all rows if all are valid", () => {
-    const result = processTrafficDataCSV(VALID_CSV);
+    const result = processConversionDataCSV(VALID_CSV);
     expect(result.success).toBe(true);
     expect(result.processedCount).toBe(1);
     expect(result.errorCount).toBe(0);

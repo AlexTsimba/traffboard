@@ -439,11 +439,90 @@
             "testStrategy": ""
           }
         ]
+      },
+      {
+        "id": 8,
+        "title": "Critical Repository Refactoring for Cohort Analysis Foundation",
+        "description": "Refactor the TraffBoard repository to address architectural blockers for cohort analysis, including API endpoint consolidation, legacy code removal, database schema cleanup, and foundational architecture preparation. The repository must use consistent 'conversion' terminology throughout all code, interfaces, and endpoints, with all legacy 'traffic' references fully eliminated.",
+        "status": "pending",
+        "dependencies": [
+          1,
+          3
+        ],
+        "priority": "high",
+        "details": "Conduct a comprehensive audit of the TraffBoard codebase to identify and document all remaining legacy modules, redundant API endpoints, and outdated database schema elements that could impede cohort analysis development. Ensure all API endpoints related to reporting and cohort data are consolidated and standardized, following RESTful naming conventions and consistent request/response formats[1][4]. Remove any remaining obsolete or deprecated code, libraries, and configuration files, with careful regression testing to avoid breaking existing functionality. Review and refactor the database schema to eliminate unused tables, columns, and relationships, and to optimize for cohort-based queries (e.g., adding necessary indexes, normalizing tables for cohort metrics). Prepare the foundational architecture by modularizing core services, establishing clear boundaries for data access layers, and documenting new interfaces and data contracts. Ensure all changes are backward compatible with ongoing work in Tasks 1-7, and provide migration scripts and documentation for seamless team adoption. All 'traffic' terminology and legacy code must remain fully removed, with 'conversion' naming standardized across the codebase.",
+        "testStrategy": "1. Run the full test suite before and after refactoring to ensure no regressions or breaking changes. 2. Use API contract testing tools (e.g., Postman, Swagger) to verify endpoint consolidation, RESTful naming, and response consistency[1][4]. 3. Validate that all legacy code and schema elements targeted for removal are fully eliminated and that no references remain. 4. Benchmark key cohort-related queries before and after schema cleanup to confirm performance improvements. 5. Review migration scripts and documentation with the team to ensure clarity and ease of adoption. 6. Confirm that all code, interfaces, and endpoints use 'conversion' terminology exclusively, with no residual 'traffic' references.",
+        "subtasks": [
+          {
+            "id": 2,
+            "title": "Database Schema Cleanup and Cohort Optimization",
+            "description": "Audit and refactor the database schema to remove any remaining unused tables, columns, or relationships related to legacy 'traffic' data. Normalize tables and add necessary indexes to optimize for cohort-based queries. Ensure all schema elements use 'conversion' terminology.",
+            "status": "pending",
+            "dependencies": [
+              1
+            ],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Legacy Code and Configuration Removal",
+            "description": "Identify and remove any remaining obsolete or deprecated code, libraries, and configuration files that reference 'traffic' or are no longer relevant after the API consolidation. Confirm that all code and documentation use 'conversion' naming exclusively.",
+            "status": "pending",
+            "dependencies": [
+              1
+            ],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "API Endpoint Standardization and Documentation",
+            "description": "Review all reporting and cohort-related API endpoints to ensure they follow RESTful naming conventions, use consistent 'conversion' terminology, and provide standardized request/response formats. Update or create API documentation to reflect these changes.",
+            "status": "pending",
+            "dependencies": [
+              1
+            ],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Foundational Architecture Preparation",
+            "description": "Modularize core services, establish clear boundaries for data access layers, and document new interfaces and data contracts. Ensure all foundational architecture is ready for cohort analysis and is free of legacy 'traffic' dependencies.",
+            "status": "pending",
+            "dependencies": [
+              2,
+              3,
+              4
+            ],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 1,
+            "title": "API Structure Consolidation",
+            "description": "Remove legacy /api/traffic/ endpoint and traffic.ts data layer, ensuring all imports and references point to the current /api/conversions/ and conversions.ts. This critical cleanup prevents naming conflicts and confusion during cohort analysis development. Delete obsolete files, update all import statements, and verify no broken references remain.",
+            "details": "",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 8
+          },
+          {
+            "id": 6,
+            "title": "E2E Testing Infrastructure Setup",
+            "description": "Setup comprehensive E2E testing infrastructure with Playwright for authentication flows. Create test database setup, CI integration, and documentation for testing patterns and troubleshooting common issues like Next.js dev tools interference.",
+            "details": "- Setup isolated test database for E2E tests\n- Create login/logout authentication test with proper selectors\n- Configure Playwright for both local and CI environments  \n- Document testing patterns and troubleshooting guide\n- Integrate E2E tests into GitHub Actions CI pipeline",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 8
+          }
+        ]
       }
     ],
     "metadata": {
       "created": "2025-07-01T22:28:10.873Z",
-      "updated": "2025-07-07T05:47:05.014Z",
+      "updated": "2025-07-07T10:14:15.828Z",
       "description": "Tasks for master context"
     }
   }

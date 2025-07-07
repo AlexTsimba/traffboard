@@ -33,7 +33,6 @@ model User {
   lastLoginAt   DateTime? // Track last login time
   
   accounts      Account[]
-  // sessions      Session[] // Removed - using JWT sessions only
   uploads       ConversionUpload[]
   backupCodes   TwoFactorBackupCode[]
   authAttempts  AuthAttempt[]
@@ -72,31 +71,6 @@ model Account {
   @@id([provider, providerAccountId])
   @@map("accounts")
 }
-
-// DEPRECATED: Sessions moved to JWT-only strategy
-// Commenting out Session model - using JWT tokens only
-// model Session {
-//   sessionToken String   @unique
-//   userId       String
-//   expires      DateTime
-//   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-//  
-//   // Session metadata for tracking
-//   ipAddress    String?
-//   userAgent    String?
-//   deviceType   String?  // mobile, desktop, tablet
-//   browser      String?
-//   os           String?
-//   country      String?
-//   city         String?
-//   isActive     Boolean  @default(true)
-//   lastActivity DateTime @default(now())
-//  
-//   createdAt DateTime @default(now())
-//   updatedAt DateTime @updatedAt
-//   
-//   @@map("sessions")
-// }
 
 model VerificationToken {
   identifier String
