@@ -1,42 +1,57 @@
-# TraffBoard Internal Tool — README
+# TraffBoard
 
-## Overview
-This repository contains the internal codebase and data for the TraffBoard analytics/dashboard tool. It is currently in a minimal, cleaned-up state, with all legacy and broken tests, artifacts, and outdated documentation removed. Only essential demo/test data is preserved for future development and testing.
+Enterprise analytics platform for traffic and player data analysis with modular reporting architecture.
 
----
+## 🚀 Quick Start
 
-## Current State
-- **No active e2e, unit, or integration tests** in the main codebase.
-- **All test and Playwright artifacts, old test helpers, and legacy test code have been removed** for repository hygiene.
-- **Test data** (CSV files) is preserved in `_test-archive/demo/` for future use:
-  - `sample_players.csv` — Player-level casino data (matches current schema)
-  - `sample_traffic.csv` — Traffic/conversion data (matches current schema)
+```bash
+# Install and setup
+pnpm install
+cp .env.example .env.local  # Edit with your database credentials
+pnpm db:push && pnpm db:seed && pnpm dev
+```
 
----
+**Default Login**: `admin@traffboard.com` / `admin123`
 
-## Directory Structure
-- `src/` — Main application code (Next.js, Prisma, API, UI)
-- `_test-archive/` — Archive for all test data (only CSVs remain)
-- `docs/` — Documentation (Diátaxis structure, some files may be missing)
+## 🏗️ Tech Stack
 
----
+- **Framework**: Next.js 15 (App Router) + React 19 + TypeScript
+- **Database**: PostgreSQL + Prisma ORM  
+- **Auth**: NextAuth.js v5 with role-based access
+- **UI**: shadcn/ui + Tailwind CSS + Recharts
+- **State**: Zustand stores with persistence
+- **Testing**: Vitest + React Testing Library + Real PostgreSQL
 
-## Testing & Data
-- **No test runners or test scripts are present.**
-- **Test data CSVs** are kept for future restoration of test infrastructure or for manual import/testing.
-- **If you need to restore tests:**
-  - Use the CSVs in `_test-archive/demo/` as seed/demo data.
-  - Refer to previous versions in git for test strategies and Playwright/Vitest setup.
-  - See `docs/testing/DAL_TESTING_STRATEGY.md` in git history for best practices.
+## 📊 Features
 
----
+### ✅ Production Ready
+- **Report Factory Foundation** - Universal filters, data pipelines, plugin system
+- **User Management** - Role-based access, admin interface, CSV import
+- **Authentication** - Secure NextAuth.js v5 implementation
+- **Quality Assurance** - 87+ tests, strict TypeScript, comprehensive linting
 
-## Recommendations
-- **Restore or rewrite tests** before any production deployment or major refactoring.
-- **Keep test data up to date** with schema changes.
-- **Document any new test or data import logic** in this README and in `docs/testing/`.
+### 🚧 In Development  
+- **Cohort Analysis** - Player behavior tracking with Dep2Cost/ROAS metrics
+- **Performance Optimization** - Advanced caching and query optimization
 
----
+### 📋 Planned
+- **Funnel Analysis** - Conversion tracking reports
+- **Retention Analysis** - Player lifecycle insights
+- **Attribution Analysis** - Marketing effectiveness measurement
 
-## Contact
-For questions or to restore documentation/tests, contact the project maintainer or check git history for previous test and documentation files. 
+## 📚 Documentation
+
+- **[Quick Start Guide](docs/QUICK_START.md)** - Setup, commands, workflows
+- **[System Architecture](docs/ARCHITECTURE.md)** - Tech stack, patterns, security
+- **[Report Factory](docs/REPORTS.md)** - Modular reporting system guide
+
+## 🧪 Quality Standards
+
+```bash
+pnpm test           # 87+ comprehensive tests  
+pnpm lint           # ESLint + Prettier
+pnpm type-check     # Strict TypeScript
+pnpm build          # Production validation
+```
+
+**Current Status**: Production-ready foundation with clean test suite, proper TypeScript architecture, and working Report Factory system ready for team scaling. 

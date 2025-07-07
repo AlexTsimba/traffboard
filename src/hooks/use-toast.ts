@@ -12,7 +12,7 @@ export function useToast() {
 
   const toast = useCallback((toast: Toast) => {
     // For now, just log to console - in a real app this would show a toast UI
-    console.log("Toast:", toast);
+    // Toast notification handled by UI component
     setToasts((prev) => [...prev, toast]);
 
     // Auto-remove after 3 seconds

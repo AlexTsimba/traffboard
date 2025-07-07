@@ -516,13 +516,31 @@
             "status": "done",
             "dependencies": [],
             "parentTaskId": 8
+          },
+          {
+            "id": 7,
+            "title": "Report Factory Foundation Architecture Implementation",
+            "description": "Create the foundational directory structure and base architecture for the Report Factory system. This includes creating missing directories (src/components/reports/, src/lib/reports/, src/stores/), implementing core TypeScript interfaces (src/types/reports.ts), and establishing the base plugin architecture. This foundation is critical for Task 1 and all subsequent cohort analysis work.",
+            "details": "",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 8
+          },
+          {
+            "id": 8,
+            "title": "Comprehensive Testing Suite for Report Factory Foundation",
+            "description": "Create comprehensive unit and integration tests for the Report Factory Foundation architecture using Vitest and Playwright. This includes testing TypeScript interfaces, React context providers, filter system components, plugin architecture, data pipeline functionality, and state management. Tests must validate component functionality, type safety, error handling, performance, and integration between different parts of the system. Focus on critical paths: filter modal workflows, plugin registration/unregistration, data pipeline transformations, and Zustand store mutations.",
+            "details": "",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 8
           }
         ]
       }
     ],
     "metadata": {
       "created": "2025-07-01T22:28:10.873Z",
-      "updated": "2025-07-07T10:14:15.828Z",
+      "updated": "2025-07-07T15:08:17.644Z",
       "description": "Tasks for master context"
     }
   }

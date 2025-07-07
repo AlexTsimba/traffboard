@@ -10,6 +10,9 @@ export default defineConfig({
     // Test environment
     environment: "jsdom",
 
+    // Setup files
+    setupFiles: ["./vitest.setup.ts"],
+
     // Global test functions (describe, it, expect)
     globals: true,
 
