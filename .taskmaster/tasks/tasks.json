@@ -3,314 +3,447 @@
     "tasks": [
       {
         "id": 1,
-        "title": "Fix Critical Deployment Blockers",
-        "description": "Address three critical deployment blockers: repair the health check API endpoint returning incorrect status codes, fix the broken test suite, and create a .env.example file for deployment configuration.",
-        "details": "This task involves addressing three critical issues blocking deployment:\n\n1. Health Check API Endpoint:\n   - Identify why the health check endpoint is returning 500 status codes instead of appropriate 200 (healthy) or 503 (unhealthy) codes\n   - Debug the API route handler for the health check endpoint\n   - Check for unhandled exceptions or incorrect status code assignments\n   - Ensure proper dependency checking in the health check logic\n   - Update the endpoint to correctly reflect system health status\n\n2. Broken Test Suite:\n   - Analyze the 18/19 failing tests to identify patterns or common issues\n   - Fix test environment configuration if needed\n   - Update outdated test assertions or mocks\n   - Repair broken test fixtures or dependencies\n   - Ensure all tests pass consistently in the CI environment\n\n3. Environment Configuration:\n   - Create a .env.example file that documents all required environment variables\n   - Include comments explaining each variable's purpose and format\n   - Provide sample values where appropriate (avoiding sensitive data)\n   - Ensure the example matches the current application requirements\n   - Document any environment-specific configurations needed for different deployment targets\n\nThe implementation should prioritize maintaining backward compatibility while fixing these issues.",
-        "testStrategy": "To verify this task has been completed successfully:\n\n1. Health Check API Endpoint:\n   - Manually test the health check endpoint in development environment\n   - Verify it returns 200 when all systems are operational\n   - Simulate dependency failures to confirm it returns 503 when appropriate\n   - Check logs to ensure no unhandled exceptions\n   - Write or update automated tests for the health check endpoint\n\n2. Test Suite:\n   - Run the complete test suite locally to verify all 19/19 tests pass\n   - Execute tests in the CI environment to confirm they pass consistently\n   - Review test coverage to ensure critical paths are tested\n   - Document any test modifications for the team\n\n3. Environment Configuration:\n   - Validate the .env.example file includes all required variables\n   - Attempt a fresh deployment using only the .env.example as a guide\n   - Have another team member review the .env.example for completeness\n   - Verify no sensitive information is included in the example file\n\nFinal verification should include a complete deployment to a staging environment to confirm all blockers have been resolved.",
-        "status": "done",
+        "title": "Report Factory Foundation Architecture",
+        "description": "Design and implement a universal report framework foundation with reusable components, a flexible filter system (including modal dialog functionality), a robust data pipeline, and export capabilities. This foundation must support cohort analysis and all future report types. Emphasize TypeScript interfaces, React context providers, and a plugin architecture to ensure extensibility and maintainability. The filter system must include a square filter button in the top-right of reports, a centered modal dialog with SUBMIT and CLEAR buttons, and a horizontal chips display showing active filters above the table. All filter-related interfaces and components must reflect these UI and interaction requirements.",
+        "status": "pending",
         "dependencies": [],
-        "priority": "high",
+        "priority": "medium",
+        "details": "Establish a modular architecture for the report factory, focusing on separation of concerns and extensibility. Develop core reusable UI components (tables, filters, export buttons) using TypeScript interfaces for strong typing and contract enforcement. Define clear interfaces and plugin points for integrating new data sources and report types. Implement a filter system that supports dynamic parameterization, allowing users to adjust report queries and context areas in real time. The filter system must include a square filter button in the top-right of reports, a centered modal dialog with SUBMIT and CLEAR buttons, and a horizontal chips display showing active filters above the table. Architect a data pipeline that can ingest, transform, and deliver data to report components, supporting hierarchy-aware data and both static/dynamic layouts. Integrate export functionality (e.g., CSV, Excel, PDF) at the framework level. Use React context providers to manage global state and configuration for reports, filters, and plugins. Ensure the design accommodates future enhancements such as additional export formats, custom layouts, advanced filtering, and new report plugins. Document the architecture, component APIs, extension points, and plugin integration for future developers.",
+        "testStrategy": "1. Create sample reports using the framework to verify component reusability, layout flexibility, and plugin integration. 2. Test the filter system by applying various parameter combinations, using the modal dialog, SUBMIT/CLEAR buttons, and confirming correct data rendering, context updates, and chip display. 3. Validate the data pipeline with multiple data sources, hierarchical data structures, and plugin-based data transformations. 4. Export reports in all supported formats and confirm data integrity and formatting. 5. Conduct code reviews and architecture walkthroughs to ensure modularity, extensibility, and plugin compatibility. 6. Review documentation for completeness, clarity, and accuracy regarding TypeScript interfaces, React context, plugin usage, and filter modal/chip UI.",
         "subtasks": [
           {
             "id": 1,
-            "title": "Fix health check API endpoint",
-            "description": "Fix src/app/api/health/route.ts to return proper HTTP status codes (200 for healthy, 503 for unhealthy) instead of 500 errors",
-            "details": "",
-            "status": "done",
+            "title": "Define TypeScript interfaces for core report components",
+            "description": "Create TypeScript interfaces for tables, filters (including modal dialog, filter button, and chips display), export buttons, and data pipeline contracts to ensure type safety and extensibility.",
+            "status": "pending",
             "dependencies": [],
-            "parentTaskId": 1
+            "details": "Update filter-related interfaces to support modal dialog state, SUBMIT/CLEAR actions, and chip display for active filters.",
+            "testStrategy": "Verify that interfaces cover modal dialog props/state, filter button interactions, and chip rendering for active filters."
           },
           {
             "id": 2,
-            "title": "Fix failing test suite",
-            "description": "Fix the 18 failing tests in src/__tests__/ by updating test mocks, fixing imports, and ensuring test database setup works correctly",
-            "details": "",
-            "status": "done",
+            "title": "Implement React context providers for global report state",
+            "description": "Set up React context providers to manage global state for reports, filters (including modal dialog state), and plugin configuration.",
+            "status": "pending",
             "dependencies": [],
-            "parentTaskId": 1
+            "details": "Ensure context providers can manage modal open/close state, active filter values, and chip display updates.",
+            "testStrategy": "Test context updates for opening/closing modal, submitting/clearing filters, and updating chips."
           },
           {
             "id": 3,
-            "title": "Create .env.example file",
-            "description": "Create .env.example file with all required environment variables for deployment (DATABASE_URL, NEXTAUTH_SECRET, etc.)",
-            "details": "",
-            "status": "done",
+            "title": "Design plugin architecture for extensible report types and data sources",
+            "description": "Establish a plugin system that allows new report types, data sources, and export formats to be added without modifying the core framework.",
+            "status": "pending",
             "dependencies": [],
-            "parentTaskId": 1
+            "details": "",
+            "testStrategy": ""
           },
           {
             "id": 4,
-            "title": "Add basic error handling",
-            "description": "Add try-catch blocks and proper error responses to critical API endpoints that currently return 500 errors",
-            "details": "",
-            "status": "done",
+            "title": "Develop reusable UI components using TypeScript and React",
+            "description": "Build core UI components (tables, filters with modal dialog and chips, export buttons) as reusable, strongly-typed React components.",
+            "status": "pending",
             "dependencies": [],
-            "parentTaskId": 1
+            "details": "Implement a square filter button in the top-right of reports, a modal dialog for filter selection with SUBMIT/CLEAR buttons, and a horizontal chips display above the table for active filters.",
+            "testStrategy": "Render the filter button, open/close modal, submit/clear filters, and verify chips display updates as expected."
           },
           {
             "id": 5,
-            "title": "Create DAL Testing Framework Documentation",
-            "description": "Create comprehensive documentation for TraffBoard DAL testing strategy using Playwright instead of mocking",
-            "details": "Create docs/testing/DAL_TESTING_STRATEGY.md with testing principles, approach, and implementation guidelines for testing Data Access Layer without mocking Prisma/NextAuth.js stack",
-            "status": "done",
+            "title": "Implement dynamic filter system with real-time parameterization",
+            "description": "Create a filter system that supports dynamic parameters and context areas, enabling real-time updates to report queries. The system must use a modal dialog for filter selection and display active filters as chips.",
+            "status": "pending",
             "dependencies": [],
-            "parentTaskId": 1
+            "details": "Ensure the filter system includes modal dialog logic, SUBMIT/CLEAR actions, and chip management for active filters.",
+            "testStrategy": "Test dynamic parameter changes via modal, confirm real-time updates to report data, and verify chip display reflects current filters."
           },
           {
             "id": 6,
-            "title": "Implement DAL Authentication Tests",
-            "description": "Implement comprehensive Playwright tests for TraffBoard DAL authentication functions (requireAuth, requireAdmin, auditLog)",
-            "details": "Create tests for auth.ts DAL functions using Playwright APIRequestContext and E2E tests to verify authentication, authorization, and audit logging functionality without mocking",
-            "status": "done",
+            "title": "Architect data pipeline with plugin support",
+            "description": "Design and implement a data pipeline that can ingest, transform, and deliver data to report components, supporting plugins for custom data processing.",
+            "status": "pending",
             "dependencies": [],
-            "parentTaskId": 1
+            "details": "",
+            "testStrategy": ""
           },
           {
             "id": 7,
-            "title": "Implement DAL User Management Tests",
-            "description": "Implement comprehensive Playwright tests for TraffBoard DAL user management functions (CRUD operations, password changes, user profiles)",
-            "details": "Create tests for users.ts DAL functions using hybrid UI+API approach: test admin user creation through UI, verify database state through API, test password changes and profile updates",
-            "status": "done",
+            "title": "Integrate export functionality at the framework level",
+            "description": "Provide export capabilities (CSV, Excel, PDF) as part of the core framework, with plugin support for future formats.",
+            "status": "pending",
             "dependencies": [],
-            "parentTaskId": 1
+            "details": "",
+            "testStrategy": ""
           },
           {
             "id": 8,
-            "title": "Implement DAL Two-Factor Authentication Tests",
-            "description": "Implement comprehensive Playwright tests for TraffBoard DAL 2FA functions (TOTP setup, verification, admin reset)",
-            "details": "Create tests for two-factor.ts DAL functions: test QR code generation, TOTP verification with real authenticator simulation, admin 2FA reset API-only functionality, backup codes",
-            "status": "done",
+            "title": "Document architecture, APIs, and plugin extension points",
+            "description": "Produce comprehensive documentation covering the architecture, TypeScript interfaces, React context usage, plugin integration, and filter modal/chip UI.",
+            "status": "pending",
             "dependencies": [],
-            "parentTaskId": 1
-          },
-          {
-            "id": 9,
-            "title": "Implement DAL Session Management Tests",
-            "description": "Implement comprehensive Playwright tests for TraffBoard DAL session management functions (getUserSessions, revokeSession, revokeAllOtherSessions)",
-            "details": "Create tests for sessions.ts DAL functions: test session listing UI, session revocation across browsers, session metadata tracking, cross-browser verification of logout enforcement",
-            "status": "done",
-            "dependencies": [],
-            "parentTaskId": 1
-          },
-          {
-            "id": 10,
-            "title": "Configure CI/CD Integration for DAL Tests",
-            "description": "Set up CI/CD integration and verification for all DAL Playwright tests to ensure they work reliably in GitHub Actions",
-            "details": "Configure GitHub Actions workflow to run Playwright DAL tests, ensure Docker PostgreSQL setup works in CI, verify all tests pass consistently, add proper test artifacts and reporting",
-            "status": "done",
-            "dependencies": [],
-            "parentTaskId": 1
+            "details": "Include documentation for modal dialog filter workflow, filter button, and chips display.",
+            "testStrategy": "Review documentation for completeness and clarity on new filter system UI and interaction patterns."
           }
         ]
       },
       {
         "id": 2,
-        "title": "Connect Dashboard to Real Data",
-        "description": "Replace all mock/static data in dashboard components (SectionCards, ChartAreaInteractive, DataTable) with real data from database using existing API endpoints and backend functions.",
-        "details": "This task involves transitioning from static mock data to real database data across all dashboard components:\n\n1. SectionCards Component:\n   - Identify all instances where mock data is currently used\n   - Create or utilize existing API service functions to fetch real data\n   - Implement proper data fetching with loading states and error handling\n   - Update component props and interfaces to accommodate real data structure\n   - Ensure data transformation logic is in place if API response format differs from component requirements\n\n2. ChartAreaInteractive Component:\n   - Replace hardcoded chart data with dynamic data from API endpoints\n   - Implement data refresh mechanisms (polling or event-based updates if needed)\n   - Add appropriate loading indicators during data fetching\n   - Handle edge cases like empty datasets or malformed responses\n   - Ensure chart scales and axes adjust appropriately to real data ranges\n\n3. DataTable Component:\n   - Connect table data source to appropriate API endpoints\n   - Implement pagination, sorting, and filtering against real data\n   - Update column definitions to match actual data structure\n   - Add loading states during data fetching operations\n   - Implement error handling for failed API requests\n\n4. General Implementation Notes:\n   - Use existing API client/service layer for all data fetching\n   - Implement proper state management for loading, error, and data states\n   - Add appropriate error boundaries to prevent entire dashboard failure if one component fails\n   - Consider implementing data caching strategies to improve performance\n   - Ensure all components handle authentication/authorization requirements for data access",
-        "testStrategy": "To verify this task has been completed successfully:\n\n1. Functional Testing:\n   - Verify each dashboard component displays actual data from the database\n   - Compare displayed data with direct database queries to confirm accuracy\n   - Test all interactive features (sorting, filtering, pagination) with real data\n   - Verify charts render correctly with various data scenarios (empty, partial, complete datasets)\n\n2. Performance Testing:\n   - Measure and document load times before and after implementation\n   - Verify dashboard performance with large datasets\n   - Test responsiveness during data loading and refreshing\n\n3. Error Handling:\n   - Simulate API failures and verify appropriate error states are displayed\n   - Test with invalid/malformed data to ensure robust error handling\n   - Verify authentication failures are handled gracefully\n\n4. Integration Testing:\n   - Verify all components update correctly when database data changes\n   - Test dashboard behavior during API latency or slow responses\n   - Ensure no console errors occur during normal operation\n\n5. Cross-browser Testing:\n   - Verify data loading and display works correctly across supported browsers",
-        "status": "done",
-        "dependencies": [1],
-        "priority": "high",
+        "title": "Cohort Analysis Data Engine: PostgreSQL-Arquero Pipeline",
+        "description": "Develop a data engine that leverages a PostgreSQL-Arquero pipeline for efficient cohort calculations, including breakpoint mapping, metric processing (DEP2COST, ROAS, AVG DEPOSIT SUM, RETENTION RATE), and performance optimization. The engine must support DAY_BREAKPOINTS=[1,3,5,7,14,17,21,24,27,30] and WEEK_BREAKPOINTS=[7,14,21,28,35,42], with week mode starting Monday and viewing Sunday. Retention rate must be calculated as active_players/initial_cohort_size*100.",
+        "status": "pending",
+        "dependencies": [
+          1
+        ],
+        "priority": "medium",
+        "details": "Implement a robust data pipeline connecting PostgreSQL with Arquero for cohort analysis. Establish a secure and reusable PostgreSQL integration, managing credentials and connection parameters according to best practices[1][3][4]. Design optimized SQL queries using window functions to extract raw event/user data, focusing on cohort-defining attributes and time-based breakpoints. Support DAY_BREAKPOINTS=[1,3,5,7,14,17,21,24,27,30] and WEEK_BREAKPOINTS=[7,14,21,28,35,42], ensuring week mode starts Monday and views Sunday. Use PostgreSQL pipeline mode to batch and asynchronously process multiple queries, reducing network latency and improving throughput—manage error handling and synchronization points to avoid pipeline aborts[2]. Transform and aggregate the extracted data in Arquero, mapping breakpoints (e.g., signup dates, feature adoption) and calculating cohort metrics: DEP2COST, ROAS, AVG DEPOSIT SUM, and RETENTION RATE (calculated as active_players/initial_cohort_size*100). Optimize the pipeline for large datasets by minimizing round-trips, leveraging parallelism where possible, and tuning memory usage. Provide clear interfaces for metric definitions and breakpoint configuration to support extensibility. Integrate with the report factory foundation to ensure compatibility with the broader reporting framework.",
+        "testStrategy": "1. Validate the PostgreSQL-Arquero pipeline by running end-to-end cohort analyses on sample datasets, confirming correct extraction, transformation, and aggregation for all specified breakpoints and metrics. 2. Benchmark pipeline performance with varying data volumes, measuring latency and throughput improvements from pipelining and SQL optimization. 3. Test error handling by injecting faults and verifying that pipeline aborts and synchronization behave as expected. 4. Confirm that breakpoint mapping (including week mode logic) and metric calculations (DEP2COST, ROAS, AVG DEPOSIT SUM, RETENTION RATE) produce accurate and reproducible results, with retention rate calculated as active_players/initial_cohort_size*100. 5. Ensure seamless integration with the report factory by generating reports using the processed cohort data.",
         "subtasks": [
           {
             "id": 1,
-            "title": "Replace mock data in SectionCards",
-            "description": "Connect SectionCards component to real data from database using existing API endpoints instead of hardcoded mock values",
-            "details": "",
-            "status": "done",
+            "title": "Establish Secure PostgreSQL Integration",
+            "description": "Set up a secure, reusable PostgreSQL connection with proper credential management and parameterization.",
+            "status": "pending",
             "dependencies": [],
-            "parentTaskId": 2
+            "details": "",
+            "testStrategy": ""
           },
           {
             "id": 2,
-            "title": "Connect ChartAreaInteractive to real data",
-            "description": "Replace static chart data with real traffic/player data from database using existing data transformation functions",
-            "details": "",
-            "status": "done",
+            "title": "Design SQL Extraction with Window Functions and Breakpoints",
+            "description": "Develop optimized SQL queries using window functions to extract cohort-defining attributes and support DAY_BREAKPOINTS and WEEK_BREAKPOINTS. Ensure week mode starts Monday and views Sunday.",
+            "status": "pending",
             "dependencies": [],
-            "parentTaskId": 2
+            "details": "",
+            "testStrategy": ""
           },
           {
             "id": 3,
-            "title": "Connect DataTable to real data",
-            "description": "Replace data.json with real database queries in DataTable component using existing API endpoints",
-            "details": "",
-            "status": "done",
+            "title": "Implement PostgreSQL Pipeline Mode for Batch Processing",
+            "description": "Utilize PostgreSQL pipeline mode to batch and asynchronously process multiple queries, handling errors and synchronization points to avoid pipeline aborts.",
+            "status": "pending",
             "dependencies": [],
-            "parentTaskId": 2
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Arquero Transformation and Metric Calculation",
+            "description": "Transform and aggregate extracted data in Arquero, mapping breakpoints and calculating DEP2COST, ROAS, AVG DEPOSIT SUM, and RETENTION RATE metrics. Implement retention rate as active_players/initial_cohort_size*100.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Performance Optimization for Large Datasets",
+            "description": "Optimize the pipeline for large datasets by minimizing round-trips, leveraging parallelism, and tuning memory usage.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "Interface for Metric Definitions and Breakpoint Configuration",
+            "description": "Provide clear interfaces for defining metrics and configuring breakpoints to support extensibility. Ensure metric definitions reflect DEP2COST, ROAS, AVG DEPOSIT SUM, and RETENTION RATE.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 7,
+            "title": "Integration with Report Factory",
+            "description": "Ensure compatibility and seamless integration with the report factory foundation for downstream reporting.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
           }
         ]
       },
       {
         "id": 3,
-        "title": "Implement Functional CSV Upload UI",
-        "description": "Connect existing upload components in the administration page to working API endpoints, add progress indicators, error handling, and success feedback for CSV file processing.",
-        "details": "This task involves enhancing the CSV upload functionality in the administration interface:\n\n1. API Integration:\n   - Connect the existing upload component to the appropriate API endpoints\n   - Implement proper file validation before upload (file type, size limits, format checking)\n   - Create service functions to handle the upload process and communication with backend\n   - Ensure proper authentication headers are included in API requests\n\n2. User Feedback Implementation:\n   - Add a progress indicator showing upload status (percentage or spinner)\n   - Implement error handling with user-friendly error messages for different failure scenarios:\n     - File format errors\n     - Size limit exceeded\n     - Server-side processing errors\n     - Network connectivity issues\n   - Create success feedback mechanism (toast notification, success message, etc.)\n   - Add visual cues for upload states (idle, uploading, success, error)\n\n3. Error Recovery:\n   - Implement retry functionality for failed uploads\n   - Provide clear guidance to users on how to resolve common upload issues\n   - Add logging for debugging upload failures\n\n4. UI/UX Considerations:\n   - Ensure the upload component remains responsive during file processing\n   - Disable appropriate UI elements during active uploads\n   - Implement proper focus management after upload completion\n   - Add keyboard accessibility for the entire upload workflow\n\n5. Testing Considerations:\n   - Test with various file sizes and formats\n   - Verify all error scenarios are properly handled\n   - Ensure the UI remains responsive during uploads",
-        "testStrategy": "To verify this task has been completed successfully:\n\n1. Functional Testing:\n   - Verify CSV files can be selected and uploaded through the UI\n   - Confirm progress indicators accurately reflect upload status\n   - Test with valid CSV files to ensure successful processing\n   - Test with invalid files (wrong format, corrupted, too large) to verify error handling\n   - Verify appropriate success messages appear after successful uploads\n   - Check that uploaded data appears correctly in the system after processing\n\n2. UI/UX Testing:\n   - Verify the upload component remains responsive during file processing\n   - Confirm that appropriate UI elements are disabled during active uploads\n   - Test keyboard navigation through the entire upload workflow\n   - Verify focus management after upload completion\n   - Check that all states (idle, uploading, success, error) have appropriate visual indicators\n\n3. Error Handling Testing:\n   - Simulate network failures during upload to verify error handling\n   - Test with malformed CSV files to ensure proper validation and error messages\n   - Verify retry functionality works correctly for failed uploads\n   - Check that error messages are clear and provide actionable guidance\n\n4. Performance Testing:\n   - Test with various file sizes to ensure the UI remains responsive\n   - Verify large files are handled appropriately with accurate progress indication\n\n5. Cross-browser Testing:\n   - Verify functionality works consistently across supported browsers",
+        "title": "Universal UI Component Library for Reports",
+        "description": "Develop a universal, reusable UI component library using shadcn/ui patterns for all report types, focusing on composable filters, data tables (TanStack Table), charts (Recharts), responsive layouts, loading states, error handling, and theming support.",
         "status": "pending",
-        "dependencies": [1],
-        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "priority": "medium",
+        "details": "Leverage shadcn/ui's open code and compositional approach to build a robust set of accessible, customizable React components tailored for reporting needs. Audit requirements for universal report filters, data tables (using TanStack Table), chart containers (using Recharts), responsive layout primitives, loading indicators, and error boundaries. Use shadcn/ui's headless and composable philosophy to create base components that are easily extensible and support theming. Implement filters with flexible input types, tables with sorting and pagination, chart wrappers compatible with Recharts, and ensure all components handle loading and error states gracefully. All components must be responsive, accessible, and themeable. Document usage patterns, variants, and provide Figma assets for design consistency. Integrate with the report factory architecture to ensure seamless data and state flow between components and the underlying data pipeline.",
+        "testStrategy": "1. Render each component in isolation and within composed report layouts, verifying visual consistency, responsiveness, and theming across devices. 2. Test filter, table (TanStack Table), and chart (Recharts) components with mock and real data, ensuring correct data binding, interactivity, accessibility (keyboard navigation, ARIA roles), and proper handling of loading and error states. 3. Validate integration with the report factory by generating sample reports using the new components. 4. Review Figma assets for design fidelity and ensure documentation covers usage, customization, and error/loading state handling.",
         "subtasks": [
           {
             "id": 1,
-            "title": "Connect upload UI to API",
-            "description": "Connect existing upload components to /api/process-csv endpoint with proper form handling and file validation",
-            "details": "",
-            "status": "pending",
+            "title": "NextAuth.js Base Configuration",
+            "description": "Set up the foundational NextAuth.js configuration for authentication in the Next.js application.",
             "dependencies": [],
-            "parentTaskId": 3
+            "details": "Implement NextAuth.js in the /app/api/auth/[...nextauth]/route.ts file. Configure at least one provider (e.g., Google, GitHub) and set up session management. Ensure environment variables for provider credentials are securely managed. Use advanced initialization to allow for custom logic if needed. Security considerations: Secure environment variables, use HTTPS, and validate provider configurations. Testing: Write integration tests for login/logout flows, and verify session persistence and provider callback handling.",
+            "status": "pending",
+            "testStrategy": ""
           },
           {
             "id": 2,
-            "title": "Add upload progress indicators",
-            "description": "Implement progress bars, loading states, and upload status feedback for CSV file processing",
-            "details": "",
+            "title": "Custom Drizzle Adapter Implementation",
+            "description": "Integrate a custom Drizzle ORM adapter with NextAuth.js to persist user and session data in the database.",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement the Drizzle adapter to connect NextAuth.js with the database, ensuring user, session, and account tables are correctly mapped. Handle edge cases such as duplicate users and session invalidation. Security considerations: Sanitize all database inputs, use parameterized queries, and restrict database permissions. Testing: Unit test adapter methods, perform migration tests, and verify data integrity after authentication events.",
             "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 3
+            "testStrategy": ""
           },
           {
             "id": 3,
-            "title": "Add error handling for uploads",
-            "description": "Implement proper error handling for failed uploads, invalid CSV formats, and database errors with user-friendly messages",
-            "details": "",
+            "title": "TOTP 2FA Implementation",
+            "description": "Add Time-based One-Time Password (TOTP) two-factor authentication to the authentication flow.",
+            "dependencies": [
+              2
+            ],
+            "details": "Integrate TOTP 2FA using a library like speakeasy. Store TOTP secrets securely (e.g., encrypted in the database). Update authentication flows to require TOTP verification after password login. Security considerations: Use secure random secret generation, encrypt TOTP secrets, and implement brute-force protection. Testing: Write tests for TOTP enrollment, verification, backup codes, and recovery flows.",
             "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Protected Routes and RBAC Middleware",
+            "description": "Implement middleware to protect routes and enforce role-based access control (RBAC).",
+            "dependencies": [
+              3
+            ],
+            "details": "Create middleware that checks authentication and user roles before allowing access to protected routes. Define roles and permissions in the database or configuration. Security considerations: Prevent privilege escalation, validate user roles on every request, and log access attempts. Testing: Test access control for all roles, simulate unauthorized access, and verify middleware logic.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Authentication UI Components",
+            "description": "Build UI components for login, registration, 2FA setup, and error handling.",
+            "dependencies": [
+              4
+            ],
+            "details": "Develop reusable UI components for authentication flows, including forms for login, registration, TOTP setup, and error messages. Ensure accessibility and responsive design. Security considerations: Prevent XSS in form inputs, avoid leaking sensitive error details, and use secure form handling. Testing: Write component tests for all UI states, simulate user interactions, and verify error handling.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "Report Layouts for shadcn/ui Component Library",
+            "description": "Design and implement reusable report layouts using shadcn/ui components.",
             "dependencies": [],
-            "parentTaskId": 3
+            "details": "Create flexible layout components for reports, supporting headers, footers, and content sections. Ensure layouts are compatible with other shadcn/ui components. Security considerations: Sanitize dynamic content and prevent layout injection. Testing: Snapshot and visual regression tests for layout consistency.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 7,
+            "title": "Filter Components and TanStack Table Integration",
+            "description": "Develop filter UI components and integrate them with TanStack Table for advanced data filtering.",
+            "dependencies": [],
+            "details": "Build filter components (dropdowns, search, date pickers) and connect them to TanStack Table state. Ensure filters are accessible and performant. Security considerations: Sanitize filter inputs and prevent SQL injection if filters are server-driven. Testing: Unit and integration tests for filter logic and table updates.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 8,
+            "title": "Recharts Wrappers, Loading States, Error Boundaries, Responsive Design, and Theming System",
+            "description": "Implement wrappers for Recharts, global loading states, error boundaries, responsive design utilities, and a theming system for the component library.",
+            "dependencies": [],
+            "details": "Create reusable wrappers for Recharts charts, global loading spinners, and error boundary components. Implement responsive design utilities and a theming system for consistent styling. Security considerations: Handle chart data securely, prevent error boundary information leaks, and ensure theming does not expose sensitive data. Testing: Write tests for chart rendering, loading/error states, responsive behavior, and theme switching.",
+            "status": "pending",
+            "testStrategy": ""
           }
         ]
       },
       {
         "id": 4,
-        "title": "Connect Filters to Real Data API Endpoints",
-        "description": "Implement working filter functionality by connecting existing filter UI components to backend API endpoints with real-time data filtering and search capabilities.",
-        "details": "This task involves connecting the existing filter UI components to backend API endpoints to enable real-time data filtering and search:\n\n1. API Integration:\n   - Identify all filter components across the application that need to be connected to real data\n   - Map each filter type (dropdown, range slider, search box, date picker, etc.) to appropriate API parameters\n   - Create or extend service functions to handle parameterized API requests with filter criteria\n   - Implement debouncing for search inputs to prevent excessive API calls\n   - Ensure filter state is properly maintained in the application state management system\n\n2. Filter Request Implementation:\n   - Modify existing API service functions to accept filter parameters\n   - Implement URL query parameter construction for RESTful filtering\n   - Create transformers to convert UI filter state to API-compatible parameters\n   - Add support for multiple concurrent filter criteria (combined filtering)\n   - Implement proper error handling for filter requests\n\n3. Real-time Updates:\n   - Implement loading states during filter operations\n   - Add visual feedback when filters are applied or cleared\n   - Ensure filtered results update the relevant components (DataTable, charts, etc.)\n   - Maintain filter state during navigation or component remounting\n   - Implement filter reset functionality\n\n4. Performance Considerations:\n   - Implement pagination for filtered results to handle large datasets\n   - Consider server-side vs. client-side filtering based on data volume\n   - Optimize filter requests to minimize payload size\n   - Add caching for frequently used filter combinations if appropriate\n\n5. Filter State Management:\n   - Store active filters in application state\n   - Implement filter history or recently used filters if required\n   - Enable filter state to be shareable via URLs\n   - Persist filter preferences in user settings if applicable",
-        "testStrategy": "To verify this task has been completed successfully:\n\n1. Functional Testing:\n   - Test each filter type individually to ensure it correctly filters data\n   - Verify combined filters work properly (e.g., date range + search term + dropdown selection)\n   - Confirm that clearing filters restores the original unfiltered data view\n   - Test edge cases like empty result sets, all items matching, etc.\n   - Verify search functionality works with partial matches and different text cases\n\n2. API Integration Testing:\n   - Use browser network tools to confirm filter parameters are correctly sent to API\n   - Verify API requests contain the expected parameters based on UI filter selections\n   - Check that error responses from the API are properly handled in the UI\n   - Test with mock API delays to ensure loading states display correctly\n\n3. Performance Testing:\n   - Test with large datasets to ensure filtering remains responsive\n   - Verify that debouncing works correctly for search inputs\n   - Check that pagination works correctly with filtered results\n\n4. UI/UX Testing:\n   - Confirm appropriate loading indicators display during filter operations\n   - Verify filter state is visually represented (showing which filters are active)\n   - Test that filter components are accessible and keyboard navigable\n   - Ensure mobile responsiveness of filter UI components\n\n5. Regression Testing:\n   - Verify that existing dashboard functionality continues to work with filters applied\n   - Check that filtered data correctly updates all connected visualizations and tables",
+        "title": "Cohort-Specific UI Implementation",
+        "description": "Develop a cohort analysis interface featuring a TanStack Table with triangular cohort visualization, heatmap cells, breakpoint selectors, metric toggles (DEP2COST, ROAS, AVG DEPOSIT SUM, RETENTION RATE), a cohort configuration panel, and interactive features for in-depth cohort exploration. All metric toggles and header controls must exactly match the demo structure, with updated metric names and labels throughout the UI.",
         "status": "pending",
-        "dependencies": [2],
-        "priority": "high",
+        "dependencies": [
+          1,
+          3
+        ],
+        "priority": "medium",
+        "details": "Implement a React-based cohort analysis UI that leverages TanStack Table for rendering cohort data in a triangular format, supporting advanced features such as sorting, filtering, and pagination. Integrate heatmap visualization directly into the table cells to display cohort metrics over time, with dynamic color scaling based on metric intensity. Add responsive breakpoint selectors (e.g., dropdowns or segmented controls) to allow users to adjust cohort time intervals (daily, weekly, monthly), updating both the table and heatmap accordingly. Implement metric toggles enabling users to switch between DEP2COST, ROAS, AVG DEPOSIT SUM, and RETENTION RATE metrics, ensuring real-time updates to the visualization. All metric toggle controls and header labels must exactly match the demo structure. Include a cohort configuration panel for users to define cohort grouping logic and filters. Ensure all UI elements are accessible, responsive, and styled consistently with the component library from Task 3. Coordinate with the data engine to fetch and display real cohort data, handling loading and error states gracefully. Use compositional patterns to allow future extensibility for additional visualizations or controls. Provide interactive features such as cell tooltips, cohort highlighting, and drill-down actions.",
+        "testStrategy": "1. Render the cohort analysis interface with mock and real data, verifying correct integration of TanStack Table with triangular cohort visualization and heatmap cells. 2. Test breakpoint selectors and metric toggles (DEP2COST, ROAS, AVG DEPOSIT SUM, RETENTION RATE) to ensure they update the displayed data and visualizations in real time, and that all labels and controls match the demo structure. 3. Validate the cohort configuration panel for correct cohort grouping and filtering. 4. Validate accessibility by checking keyboard navigation, ARIA attributes, and screen reader compatibility. 5. Confirm responsive layout across devices and browsers. 6. Simulate loading and error states to ensure graceful UI degradation. 7. Test interactive features such as tooltips, cohort highlighting, and drill-down actions. 8. Conduct user acceptance testing with sample cohort scenarios to verify usability and correctness of cohort breakdowns and visualizations.",
         "subtasks": [
           {
             "id": 1,
-            "title": "Connect filter UI to backend",
-            "description": "Connect existing filter components to backend API endpoints for real-time data filtering",
-            "details": "",
+            "title": "Design Triangular Cohort Table Layout",
+            "description": "Design and implement the TanStack Table layout to support triangular cohort visualization, ensuring correct alignment of heatmap cells and cohort metrics.",
             "status": "pending",
             "dependencies": [],
-            "parentTaskId": 4
+            "details": "",
+            "testStrategy": ""
           },
           {
             "id": 2,
-            "title": "Implement search functionality",
-            "description": "Add working search functionality to data tables with database queries and proper indexing",
-            "details": "",
+            "title": "Integrate Heatmap Visualization in Table Cells",
+            "description": "Embed heatmap color scaling into the cohort table cells, dynamically reflecting metric intensity for each cohort/time period intersection.",
             "status": "pending",
             "dependencies": [],
-            "parentTaskId": 4
+            "details": "",
+            "testStrategy": ""
           },
           {
             "id": 3,
-            "title": "Add date range filtering",
-            "description": "Implement date range filtering for traffic and player data with proper SQL queries",
-            "details": "",
+            "title": "Implement Breakpoint Selectors",
+            "description": "Add responsive controls (dropdowns or segmented controls) for users to select cohort time intervals (daily, weekly, monthly), updating the table and heatmap accordingly.",
             "status": "pending",
             "dependencies": [],
-            "parentTaskId": 4
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Add Metric Toggles",
+            "description": "Implement toggles for DEP2COST, ROAS, AVG DEPOSIT SUM, and RETENTION RATE metrics, ensuring real-time updates to the cohort visualization. All toggle controls and labels must exactly match the demo structure.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Build Cohort Configuration Panel",
+            "description": "Develop a configuration panel allowing users to define cohort grouping logic and apply filters before visualization.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "Ensure Responsive and Accessible UI",
+            "description": "Validate that all UI elements are responsive and accessible, following best practices for keyboard navigation, ARIA attributes, and screen reader compatibility.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 7,
+            "title": "Implement Interactive Features",
+            "description": "Add interactive features such as cell tooltips, cohort highlighting, and drill-down actions for deeper cohort exploration.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 8,
+            "title": "Integrate with Data Engine",
+            "description": "Connect the UI to the data engine to fetch and display real cohort data, handling loading and error states gracefully.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
           }
         ]
       },
       {
         "id": 5,
-        "title": "Build Analytics Report Generation System",
-        "description": "Create at least one working report (player performance or traffic analysis) with export functionality, charts, and data visualization using existing Recharts components.",
-        "details": "This task involves implementing a comprehensive analytics report generation system:\n\n1. Report Framework Development:\n   - Create a modular report template system that can be extended for different report types\n   - Implement a report configuration interface to define data sources, visualization types, and export options\n   - Develop a report rendering engine that can generate both on-screen and exportable reports\n\n2. Data Integration:\n   - Connect to existing API endpoints to fetch relevant analytics data\n   - Implement data transformation functions to prepare raw data for visualization\n   - Create data aggregation utilities for summarizing information across different time periods\n   - Ensure proper error handling for data fetching and processing\n\n3. Visualization Implementation:\n   - Utilize existing Recharts components to create meaningful data visualizations\n   - Implement at least two chart types (line, bar, pie, or area) for the initial report\n   - Add interactive elements like tooltips, zoom functionality, and clickable data points\n   - Ensure visualizations are responsive and maintain readability across device sizes\n\n4. Export Functionality:\n   - Implement PDF export capability using a library like jsPDF or react-pdf\n   - Add CSV/Excel export option for raw data tables\n   - Create export configuration options (paper size, orientation, included sections)\n   - Ensure exported reports maintain visual fidelity and proper formatting\n\n5. User Interface:\n   - Design an intuitive report configuration panel with options for data filtering\n   - Implement a preview mode for reports before export\n   - Add loading states and error handling for report generation process\n   - Create a reports history/saved reports section if applicable",
-        "testStrategy": "To verify this task has been completed successfully:\n\n1. Functional Testing:\n   - Verify that at least one complete report type (player performance or traffic analysis) can be generated\n   - Confirm all charts and visualizations correctly display data from the API\n   - Test interactive elements like tooltips, filters, and date range selectors\n   - Ensure the export functionality produces well-formatted PDF and CSV/Excel files\n   - Validate that exported reports contain all the same data as the on-screen version\n\n2. Data Accuracy Testing:\n   - Compare the data displayed in reports with direct database queries to confirm accuracy\n   - Test with different date ranges and filter combinations to ensure consistent results\n   - Verify aggregated metrics are calculated correctly according to business requirements\n\n3. Performance Testing:\n   - Measure report generation time with various data set sizes\n   - Test with simulated large data sets to ensure the system remains responsive\n   - Verify that long-running report generation doesn't block the UI\n\n4. UI/UX Testing:\n   - Confirm the report configuration interface is intuitive and user-friendly\n   - Test the responsiveness of reports on different screen sizes\n   - Verify accessibility standards are met for all report components\n\n5. Integration Testing:\n   - Ensure the report system works correctly with the authentication system\n   - Verify proper integration with existing dashboard components\n   - Test that filter changes propagate correctly to the report data",
+        "title": "Saved Cohorts & State Management Implementation",
+        "description": "Implement a robust saved cohorts system with Zustand state management, cohort persistence, saved reports UI, collaboration features, a tab system for multiple open cohorts, URL sharing, and report templates to enhance the application's functionality and user experience.",
         "status": "pending",
-        "dependencies": [2, 4],
-        "priority": "high",
-        "subtasks": [
-          {
-            "id": 1,
-            "title": "Create player performance report",
-            "description": "Build a comprehensive player performance report with charts, statistics, and export functionality",
-            "details": "",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 5
-          },
-          {
-            "id": 2,
-            "title": "Add report export functionality",
-            "description": "Implement PDF and CSV export functionality for generated reports",
-            "details": "",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 5
-          },
-          {
-            "id": 3,
-            "title": "Create traffic analysis report",
-            "description": "Build a traffic analysis report with conversion metrics, source analysis, and trend visualization",
-            "details": "",
-            "status": "pending",
-            "dependencies": [],
-            "parentTaskId": 5
-          }
-        ]
+        "dependencies": [
+          1,
+          3
+        ],
+        "priority": "medium",
+        "details": "### Implementation Steps\n\n1. **Cohort Persistence**: Develop a system to save and load cohorts from a database or local storage. This involves creating API endpoints for storing and retrieving cohort data and integrating these endpoints with the application's frontend. Ensure that cohorts can be persisted and restored across sessions.\n\n2. **State Management with Zustand**: Set up Zustand for managing global state across the application, including:\n   - Cohort data (supporting multiple open cohorts via a tab system)\n   - User preferences\n   - Report settings\n   - Saved reports and templates\n   Implement actions and selectors to update and retrieve state efficiently. Use middleware for state persistence, logging, and asynchronous actions as needed[1][2].\n\n3. **Saved Reports System & Templates**: Design a feature to save, manage, and template reports generated from cohort analyses. This includes:\n   - Creating a database schema to store report metadata, content, and templates\n   - Implementing UI components to list, view, manage, and create reports from templates\n\n4. **Collaboration Features**: Implement features that allow users to share cohorts and reports with others. This includes:\n   - Integrating authentication and authorization to manage access permissions\n   - Creating a sharing mechanism via email, direct links, or URL sharing for cohorts and reports\n\n5. **Tab System for Multiple Open Cohorts**: Implement a tabbed interface in the UI to allow users to have multiple cohorts open simultaneously. Ensure that each tab's state is managed independently within Zustand and persists as needed.\n\n6. **URL Sharing**: Enable users to share the current state of a cohort or report via a unique URL, allowing others to access or collaborate on the same data view.\n\n### Technical Approach\n\n- Use **Zustand** for state management to ensure efficient data sharing across components without prop drilling[1][2].\n- Leverage **React hooks** to integrate Zustand with the application's UI components.\n- For cohort persistence, use a backend framework like **Node.js** with **PostgreSQL** for database operations.\n- Implement **middleware** in Zustand to handle asynchronous actions, state logging, and persistence for debugging and reliability[2].\n- Design the UI to support tabbed navigation for cohorts and a clear interface for managing saved reports and templates.\n\n### Code Example\n\n```javascript\nimport { create } from 'zustand';\nimport { persist, devtools } from 'zustand/middleware';\n\nconst useCohortStore = create(\n  devtools(\n    persist(\n      (set) => ({\n        cohorts: [],\n        openTabs: [], // Array of cohort IDs or objects representing open tabs\n        addCohort: (newCohort) => set((state) => ({ cohorts: [...state.cohorts, newCohort] })),\n        removeCohort: (cohortId) => set((state) => ({ cohorts: state.cohorts.filter(cohort => cohort.id !== cohortId) })),\n        openTab: (cohortId) => set((state) => ({ openTabs: [...state.openTabs, cohortId] })),\n        closeTab: (cohortId) => set((state) => ({ openTabs: state.openTabs.filter(id => id !== cohortId) })),\n        // ...other actions for reports, templates, sharing, etc.\n      }),\n      { name: 'cohort-storage' }\n    )\n  )\n);\n```\n",
+        "testStrategy": "1. **Cohort Persistence Test**: Verify that cohorts are correctly saved and loaded from the database or local storage by testing the API endpoints and frontend integration. Confirm that cohorts persist across sessions and can be restored.\n2. **State Management Test**: Use the Redux DevTools extension to monitor state changes and ensure that Zustand updates components correctly, including tab state and report templates.\n3. **Saved Reports & Templates Test**: Validate that reports and templates are saved, retrieved, and instantiated correctly by checking the database and UI listing. Test creating new reports from templates.\n4. **Collaboration Features Test**: Test sharing functionality by verifying that shared cohorts and reports (including via URL) are accessible to authorized users and that permissions are enforced.\n5. **Tab System Test**: Ensure that multiple cohorts can be opened, closed, and switched between via the tab UI, and that each tab maintains its own state.\n6. **URL Sharing Test**: Confirm that sharing a cohort or report via URL correctly loads the intended state for other users.",
+        "subtasks": []
       },
       {
         "id": 6,
-        "title": "Set Up Production Deployment Infrastructure",
-        "description": "Configure Docker, environment variables, DigitalOcean deployment scripts, database migrations, and production optimizations to prepare the application for stable production deployment.",
-        "details": "This task involves setting up the complete production deployment infrastructure:\n\n1. Docker Configuration:\n   - Create a production-ready Dockerfile optimized for the application\n   - Set up docker-compose.yml for orchestrating multiple services (application, database, cache)\n   - Implement multi-stage builds to minimize final image size\n   - Configure proper caching strategies for dependencies\n   - Set up volume mappings for persistent data\n   - Define appropriate network configurations for service communication\n\n2. Environment Variables Management:\n   - Extend the .env.example file from Task 1 with production-specific configurations\n   - Implement a secure strategy for managing sensitive credentials in production\n   - Set up environment variable validation at application startup\n   - Configure different environment profiles (development, staging, production)\n   - Document all required environment variables and their purposes\n\n3. DigitalOcean Deployment Scripts:\n   - Create deployment scripts for provisioning DigitalOcean resources (Droplets, Databases, etc.)\n   - Set up CI/CD pipeline configuration for automated deployments\n   - Implement blue-green deployment strategy to minimize downtime\n   - Configure proper resource allocation based on expected load\n   - Set up monitoring and logging integrations\n   - Create rollback procedures for failed deployments\n\n4. Database Migrations:\n   - Implement a robust database migration strategy for zero-downtime updates\n   - Create scripts for automated database backups before migrations\n   - Set up validation checks to ensure data integrity after migrations\n   - Configure proper database connection pooling for production\n   - Implement database seeding for initial production data if required\n\n5. Production Optimizations:\n   - Configure proper caching strategies (Redis, CDN, browser caching)\n   - Implement asset compression and minification\n   - Set up rate limiting and request throttling\n   - Configure proper logging levels for production\n   - Implement performance monitoring\n   - Set up automated health checks and alerting\n   - Configure proper security headers and CORS policies",
-        "testStrategy": "To verify this task has been completed successfully:\n\n1. Docker Configuration Testing:\n   - Build the Docker image using the production configuration\n   - Verify the image size is optimized and unnecessary development dependencies are excluded\n   - Test container startup and proper initialization of all services\n   - Validate that all required volumes are correctly mounted\n   - Verify proper network communication between containerized services\n\n2. Environment Variables Testing:\n   - Validate that the application correctly loads and uses environment variables\n   - Test application behavior when required variables are missing or malformed\n   - Verify that sensitive information is properly protected\n   - Test switching between different environment profiles\n\n3. DigitalOcean Deployment Testing:\n   - Execute deployment scripts in a staging environment\n   - Verify resource provisioning works as expected\n   - Test the CI/CD pipeline with a sample deployment\n   - Validate that blue-green deployment correctly switches traffic\n   - Test rollback procedures to ensure they work as expected\n\n4. Database Migration Testing:\n   - Execute migration scripts against a clone of production data\n   - Verify data integrity before and after migrations\n   - Measure migration execution time to ensure it meets requirements\n   - Test backup and restore procedures\n   - Validate connection pooling under load\n\n5. Production Optimization Testing:\n   - Perform load testing to verify system performance under expected traffic\n   - Validate caching mechanisms are working correctly\n   - Test CDN integration and asset delivery\n   - Verify security headers and CORS policies\n   - Monitor resource usage (CPU, memory, disk I/O) under load\n   - Test automated health checks and alerting mechanisms",
+        "title": "Performance Optimization & Caching Implementation",
+        "description": "Implement intelligent query caching, progressive loading, background data refresh, performance monitoring, and optimization suggestions to improve application speed and responsiveness. Include robust cache invalidation strategies and resource monitoring.",
         "status": "pending",
-        "dependencies": [1],
-        "priority": "high",
+        "dependencies": [
+          5
+        ],
+        "priority": "medium",
+        "details": "Start by profiling the application's current performance using tools such as Lighthouse, Web Vitals, or custom logging to identify bottlenecks. Implement intelligent caching at multiple layers: \n- Use browser caching for static assets by setting appropriate cache-control and expires headers, and leverage Service Workers and the Cache API for selective caching of API responses and assets[1][4]. \n- Apply intelligent query caching for frequently accessed or computationally expensive data, such as cohort queries and saved reports, using algorithms like LRU or LFU to manage cache storage efficiently[2]. \n- Integrate cache invalidation strategies to ensure data freshness, including TTL (Time to Live) values and event-driven invalidation on data changes[2]. \n- Enable background data refresh to keep cached data up-to-date without blocking the user interface. \n- Integrate a CDN to serve static files and images, reducing latency for global users[3]. \n- Apply code-splitting and lazy loading for JavaScript bundles and heavy UI components, ensuring only necessary code is loaded initially. \n- Optimize images by compressing and resizing them, and use modern formats (e.g., WebP). \n- Minify and bundle CSS/JS files to reduce HTTP requests and payload size. \n- Monitor performance in production with real-time analytics, error tracking, and resource monitoring, setting up alerts for slow queries, high latency, or cache misses. \n- Provide optimization suggestions based on monitoring insights. \n- Regularly review and optimize database queries, especially those related to cohort and report data. \n- Document all optimizations, cache strategies, and provide fallback mechanisms for users with limited connectivity.",
+        "testStrategy": "1. Use performance profiling tools (Lighthouse, WebPageTest) to benchmark before and after optimizations, ensuring measurable improvements in load time and interactivity. 2. Verify caching headers and Service Worker strategies are correctly set for static assets and API responses, and that server-side and query caches are invalidated appropriately on data changes. 3. Test CDN integration by accessing the app from different geographic locations and confirming reduced latency. 4. Confirm that code-splitting and lazy loading work by monitoring network requests and ensuring only necessary bundles are loaded on initial render. 5. Check that images are served in optimized formats and sizes. 6. Simulate slow network conditions to ensure progressive loading, background data refresh, and fallback mechanisms function correctly. 7. Monitor production performance, resource usage, and error logs to catch regressions or missed optimizations. 8. Validate that optimization suggestions are generated and actionable.",
+        "subtasks": []
+      },
+      {
+        "id": 7,
+        "title": "Integration Testing & Quality Assurance",
+        "description": "Conduct comprehensive integration testing and quality assurance, including end-to-end cohort workflows, data accuracy validation, performance benchmarking, accessibility compliance, cross-browser testing, and user acceptance testing with real gambling industry scenarios. Ensure the application functions seamlessly and meets all requirements across different environments and user contexts.",
+        "status": "pending",
+        "dependencies": [
+          4,
+          5,
+          6
+        ],
+        "priority": "medium",
+        "details": "### Implementation Steps\n\n1. **End-to-End Cohort Workflow Testing**: Execute integration tests covering the entire cohort analysis workflow, including cohort creation, modification, saving, and data retrieval, ensuring all components interact correctly.\n\n2. **Data Accuracy Validation**: Validate that cohort analysis results and related data outputs are accurate and consistent with expected business logic, especially for gambling industry-specific scenarios.\n\n3. **Performance Benchmarking**: Use tools such as Lighthouse, WebPageTest, Apache JMeter, or BrowserStack App Performance to evaluate application speed, responsiveness, and stability under various loads and network conditions. Simulate real-world usage patterns and compare performance before and after optimizations[1][2][3].\n\n4. **Accessibility Compliance**: Assess the application for accessibility compliance (e.g., WCAG 2.1), ensuring that all users, including those with disabilities, can effectively use the application.\n\n5. **Cross-Browser and Device Testing**: Test the application on multiple browsers (Chrome, Firefox, Safari, Edge) and devices (desktop, tablet, mobile) to ensure consistent functionality and appearance across environments.\n\n6. **User Acceptance Testing (UAT)**: Conduct UAT sessions with stakeholders and real users from the gambling industry, using realistic scenarios to validate that the application meets business needs and user expectations.\n\n7. **Integration Validation**: Define clear acceptance criteria and involve stakeholders in the review and sign-off process for all integration points.\n\n### Technical Approach\n- Utilize automated testing frameworks for integration and regression tests where possible.\n- Leverage open-source and commercial performance testing tools (e.g., JMeter, BrowserStack App Performance) for benchmarking and analysis[1][2][3].\n- Incorporate accessibility testing tools and manual reviews.\n- Collect and analyze user feedback from UAT to refine the user experience.\n- Document all test cases, scenarios, and results for traceability and future reference.\n\n### Dependencies\nThis task depends on the completion of tasks that implement core functionalities and optimizations, such as cohort analysis UI, saved cohorts, state management, and performance optimizations.",
+        "testStrategy": "1. **End-to-End Integration Test Execution**: Run comprehensive integration tests for all cohort workflows, logging results and identifying any interface or data flow issues.\n2. **Data Accuracy Checks**: Compare cohort analysis outputs against expected results for a variety of gambling industry scenarios to ensure correctness.\n3. **Performance Benchmarking**: Use tools like JMeter, Lighthouse, or BrowserStack App Performance to measure and compare performance metrics under different loads and network conditions[1][2][3].\n4. **Accessibility Verification**: Use automated and manual accessibility testing to confirm compliance with relevant standards (e.g., WCAG 2.1).\n5. **Cross-Browser and Device Verification**: Systematically test across supported browsers and devices, documenting any inconsistencies or issues.\n6. **User Acceptance Testing**: Facilitate UAT sessions with real users and stakeholders from the gambling industry, gathering feedback and validating that the application meets business requirements.",
         "subtasks": [
           {
             "id": 1,
-            "title": "Create Docker configuration",
-            "description": "Create Dockerfile and docker-compose.yml for production deployment with proper environment setup",
-            "details": "",
+            "title": "End-to-End Cohort Workflow Integration Testing",
+            "description": "Develop and execute integration tests covering the full cohort workflow, including creation, modification, saving, and retrieval, ensuring all components interact correctly.",
             "status": "pending",
             "dependencies": [],
-            "parentTaskId": 6
+            "details": "",
+            "testStrategy": ""
           },
           {
             "id": 2,
-            "title": "Setup database migrations",
-            "description": "Create production-ready database migration scripts and deployment procedures",
-            "details": "",
+            "title": "Data Accuracy Validation for Cohort Analysis",
+            "description": "Validate the accuracy of cohort analysis results and outputs, especially for gambling industry-specific scenarios, by comparing against expected business logic and sample datasets.",
             "status": "pending",
             "dependencies": [],
-            "parentTaskId": 6
+            "details": "",
+            "testStrategy": ""
           },
           {
             "id": 3,
-            "title": "Configure DigitalOcean deployment",
-            "description": "Set up DigitalOcean App Platform deployment with proper environment variables and database connections",
-            "details": "",
+            "title": "Performance Benchmarking with Realistic Loads",
+            "description": "Benchmark application performance using tools like JMeter, Lighthouse, or BrowserStack App Performance, simulating real-world usage and network conditions.",
             "status": "pending",
             "dependencies": [],
-            "parentTaskId": 6
+            "details": "",
+            "testStrategy": ""
           },
           {
             "id": 4,
-            "title": "Production optimizations",
-            "description": "Implement production optimizations: build optimization, caching, security headers, and monitoring",
-            "details": "",
+            "title": "Accessibility Compliance Testing",
+            "description": "Assess and document the application's accessibility compliance using automated tools and manual reviews, ensuring adherence to standards such as WCAG 2.1.",
             "status": "pending",
             "dependencies": [],
-            "parentTaskId": 6
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Cross-Browser and Device Compatibility Testing",
+            "description": "Test the application on all supported browsers and devices, documenting any inconsistencies or issues in functionality or appearance.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "User Acceptance Testing with Gambling Industry Scenarios",
+            "description": "Conduct UAT sessions with stakeholders and real users from the gambling industry, using realistic scenarios to validate business requirements and gather actionable feedback.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
           }
         ]
       }
     ],
     "metadata": {
       "created": "2025-07-01T22:28:10.873Z",
-      "updated": "2025-07-05T11:22:07.406Z",
+      "updated": "2025-07-07T05:47:05.014Z",
       "description": "Tasks for master context"
     }
   }

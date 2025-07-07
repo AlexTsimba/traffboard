@@ -1,104 +1,42 @@
-# 🚀 TraffBoard - Claude Sonnet 4 Optimized
+# TraffBoard Internal Tool — README
 
-## Quick Navigation
-
-### 📖 **Main Guides**
-- **[CLAUDE.md](./CLAUDE.md)** - Primary development guide for Claude Sonnet 4
-- **[QUICK_REF.md](./QUICK_REF.md)** - Commands, locations, and quick fixes
-- **[.claude/OPTIMIZATION.md](./.claude/OPTIMIZATION.md)** - Claude-specific optimizations
-- **[.claude/PROMPTING_EXAMPLES.md](./.claude/PROMPTING_EXAMPLES.md)** - Effective prompting patterns
-
-### 🛠 **Development Files**
-- **[.cursor/rules/claude_sonnet4.mdc](./.cursor/rules/claude_sonnet4.mdc)** - Cursor rules
-- **[.cursor/rules/simplified_dev.mdc](./.cursor/rules/simplified_dev.mdc)** - Simplified workflow
-- **[package.json](./package.json)** - Dependencies and scripts
-- **[.env.example](./.env.example)** - Environment variables template
-
-### 🏗 **Project Structure**
-```
-src/
-├── app/                    # Next.js App Router pages
-├── components/             # Reusable components
-├── db/                     # Database layer (Drizzle ORM)
-└── lib/                    # Utilities and helpers
-```
-
-## 🎯 Claude Sonnet 4 Optimization Summary
-
-### **Key Optimizations**
-1. **Structured Prompting** - Clear, context-rich requests
-2. **Efficient Tool Usage** - edit_block for changes, read_file for context
-3. **MVP-First Development** - Working code before perfect code
-4. **Systematic Debugging** - Leverage reasoning capabilities
-5. **Pattern Recognition** - Consistent code patterns throughout
-
-### **Performance Improvements**
-- **3-5x faster development** compared to complex TDD approach
-- **Reduced cognitive load** with simplified workflow
-- **Better AI results** with optimized prompting
-- **Faster iteration cycles** with pragmatic testing
-
-### **Quality Gates (Minimal)**
-- ✅ `npm run build` succeeds
-- ✅ `npm run dev` runs without errors
-- ✅ Core functionality works manually
-- ✅ TypeScript compilation passes
-
-## 🚀 Quick Start
-
-1. **Setup Environment**
-   ```bash
-   cp .env.example .env.local
-   # Add your DATABASE_URL
-   ```
-
-2. **Install Dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Start Development**
-   ```bash
-   npm run dev
-   ```
-
-4. **Database Operations**
-   ```bash
-   npm run db:push    # Push schema to database
-   npm run db:studio  # Open database GUI
-   ```
-
-## 💡 Usage Tips
-
-### **For Developers**
-- Read CLAUDE.md for comprehensive development guide
-- Use QUICK_REF.md for fast command lookup
-- Follow patterns in existing code
-- Test manually before writing automated tests
-
-### **For AI Assistants**
-- Use structured prompting from PROMPTING_EXAMPLES.md
-- Leverage OPTIMIZATION.md for Claude-specific features
-- Follow MVP-first development approach
-- Use edit_block for small changes, write_file for new files
-
-## 🎖 Success Metrics
-
-**MVP Phase:**
-- User can access dashboard ✅
-- Data loads from database ✅
-- Basic CRUD operations work ✅
-- No critical runtime errors ✅
-- Fast development velocity ✅
-
-**Post-MVP:**
-- Comprehensive test coverage
-- Performance optimizations
-- Enhanced error handling
-- Production deployment
+## Overview
+This repository contains the internal codebase and data for the TraffBoard analytics/dashboard tool. It is currently in a minimal, cleaned-up state, with all legacy and broken tests, artifacts, and outdated documentation removed. Only essential demo/test data is preserved for future development and testing.
 
 ---
 
-**Mission: Build working TraffBoard MVP fast using Claude Sonnet 4's strengths.**
+## Current State
+- **No active e2e, unit, or integration tests** in the main codebase.
+- **All test and Playwright artifacts, old test helpers, and legacy test code have been removed** for repository hygiene.
+- **Test data** (CSV files) is preserved in `_test-archive/demo/` for future use:
+  - `sample_players.csv` — Player-level casino data (matches current schema)
+  - `sample_traffic.csv` — Traffic/conversion data (matches current schema)
 
-*Last updated: 2025-07-03*
+---
+
+## Directory Structure
+- `src/` — Main application code (Next.js, Prisma, API, UI)
+- `_test-archive/` — Archive for all test data (only CSVs remain)
+- `docs/` — Documentation (Diátaxis structure, some files may be missing)
+
+---
+
+## Testing & Data
+- **No test runners or test scripts are present.**
+- **Test data CSVs** are kept for future restoration of test infrastructure or for manual import/testing.
+- **If you need to restore tests:**
+  - Use the CSVs in `_test-archive/demo/` as seed/demo data.
+  - Refer to previous versions in git for test strategies and Playwright/Vitest setup.
+  - See `docs/testing/DAL_TESTING_STRATEGY.md` in git history for best practices.
+
+---
+
+## Recommendations
+- **Restore or rewrite tests** before any production deployment or major refactoring.
+- **Keep test data up to date** with schema changes.
+- **Document any new test or data import logic** in this README and in `docs/testing/`.
+
+---
+
+## Contact
+For questions or to restore documentation/tests, contact the project maintainer or check git history for previous test and documentation files. 

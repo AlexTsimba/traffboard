@@ -1,0 +1,90 @@
+{
+  "project": {
+    "name": "TraffBoard",
+    "version": "1.0.0",
+    "description": "Analytics dashboard for affiliate/gambling data processing",
+    "location": "/Users/simba/Documents/Projects/TraffBoard_old/"
+  },
+  "tech_stack": {
+    "frontend": {
+      "framework": "Next.js 15",
+      "react": "React 19", 
+      "typescript": "TypeScript strict mode",
+      "ui": "shadcn/ui + Tailwind CSS",
+      "forms": "React Hook Form + Zod",
+      "state": "Zustand"
+    },
+    "backend": {
+      "database": "PostgreSQL + Prisma ORM",
+      "auth": "NextAuth.js v5",
+      "api": "Next.js API routes",
+      "validation": "Zod schemas"
+    },
+    "testing": {
+      "unit": "Vitest",
+      "e2e": "Playwright", 
+      "database": "Real PostgreSQL via Docker"
+    },
+    "quality": {
+      "linting": "ESLint + TypeScript ESLint",
+      "formatting": "Prettier",
+      "git_hooks": "Husky + lint-staged",
+      "commits": "Commitlint"
+    }
+  },
+  "current_status": {
+    "build_status": "Compiles successfully",
+    "dev_server": "Functional",
+    "major_issues": [
+      "150+ linting errors requiring systematic resolution",
+      "TypeScript unsafe assignments in database queries",
+      "Import order violations throughout codebase",
+      "Floating promises without proper error handling"
+    ],
+    "critical_patterns": {
+      "working": [
+        "CSV processing pipeline with PII filtering",
+        "Authentication system with NextAuth.js v5",
+        "Data Access Layer with security checks"
+      ],
+      "broken": [
+        "Unsafe Prisma query result handling",
+        "Missing await statements on promises",
+        "Function scoping violations in React components"
+      ]
+    }
+  },
+  "project_structure": {
+    "source": "src/",
+    "pages": "src/app/",
+    "components": "src/components/",
+    "utilities": "src/lib/",
+    "database": "prisma/",
+    "tests": "src/__tests__/",
+    "documentation": "docs/"
+  },
+  "development_commands": {
+    "start": "npm run dev",
+    "build": "npm run build", 
+    "test": "npm run test",
+    "lint": "npm run lint",
+    "lint_fix": "npm run lint -- --fix",
+    "format": "npm run format",
+    "typecheck": "npm run typecheck",
+    "database": {
+      "generate": "npm run db:generate",
+      "push": "npm run db:push",
+      "migrate": "npm run db:migrate", 
+      "studio": "npm run db:studio",
+      "seed": "npm run db:seed"
+    }
+  },
+  "snapshot_timestamp": "2025-01-06T16:30:00Z",
+  "memory_update_triggers": [
+    "package.json changes",
+    "ESLint config updates", 
+    "Database schema changes",
+    "Major architectural decisions",
+    "Dependency updates"
+  ]
+}

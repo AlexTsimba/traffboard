@@ -36,6 +36,7 @@ export const {
         const parsedCredentials = loginSchema.safeParse(credentials);
 
         if (!parsedCredentials.success) {
+          console.log('AUTH_DEBUG: invalid credentials', credentials);
           return null;
         }
 
@@ -54,12 +55,14 @@ export const {
         });
 
         if (!user?.passwordHash) {
+          console.log('AUTH_DEBUG: user not found or no passwordHash', email, password, user);
           return null;
         }
 
         // Verify password
         const passwordsMatch = await bcryptjs.compare(password, user.passwordHash);
         if (!passwordsMatch) {
+          console.log('AUTH_DEBUG: password mismatch', email, password, user, passwordsMatch);
           return null;
         }
 
@@ -67,7 +70,7 @@ export const {
         if (user.totpSecret) {
           // 2FA is enabled, verify TOTP code
           if (!code) {
-            // No 2FA code provided, but 2FA is required
+            console.log('AUTH_DEBUG: 2FA required but no code', email, password, user, code);
             return null;
           }
 
@@ -93,7 +96,7 @@ export const {
           }
 
           if (!isValidTOTP) {
-            // Invalid 2FA code
+            console.log('AUTH_DEBUG: invalid 2FA code', email, password, user, code);
             return null;
           }
         }

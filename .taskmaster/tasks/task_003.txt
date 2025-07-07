@@ -1,0 +1,61 @@
+# Task ID: 3
+# Title: Universal UI Component Library for Reports
+# Status: pending
+# Dependencies: 1
+# Priority: medium
+# Description: Develop a universal, reusable UI component library using shadcn/ui patterns for all report types, focusing on composable filters, data tables (TanStack Table), charts (Recharts), responsive layouts, loading states, error handling, and theming support.
+# Details:
+Leverage shadcn/ui's open code and compositional approach to build a robust set of accessible, customizable React components tailored for reporting needs. Audit requirements for universal report filters, data tables (using TanStack Table), chart containers (using Recharts), responsive layout primitives, loading indicators, and error boundaries. Use shadcn/ui's headless and composable philosophy to create base components that are easily extensible and support theming. Implement filters with flexible input types, tables with sorting and pagination, chart wrappers compatible with Recharts, and ensure all components handle loading and error states gracefully. All components must be responsive, accessible, and themeable. Document usage patterns, variants, and provide Figma assets for design consistency. Integrate with the report factory architecture to ensure seamless data and state flow between components and the underlying data pipeline.
+
+# Test Strategy:
+1. Render each component in isolation and within composed report layouts, verifying visual consistency, responsiveness, and theming across devices. 2. Test filter, table (TanStack Table), and chart (Recharts) components with mock and real data, ensuring correct data binding, interactivity, accessibility (keyboard navigation, ARIA roles), and proper handling of loading and error states. 3. Validate integration with the report factory by generating sample reports using the new components. 4. Review Figma assets for design fidelity and ensure documentation covers usage, customization, and error/loading state handling.
+
+# Subtasks:
+## 1. NextAuth.js Base Configuration [pending]
+### Dependencies: None
+### Description: Set up the foundational NextAuth.js configuration for authentication in the Next.js application.
+### Details:
+Implement NextAuth.js in the /app/api/auth/[...nextauth]/route.ts file. Configure at least one provider (e.g., Google, GitHub) and set up session management. Ensure environment variables for provider credentials are securely managed. Use advanced initialization to allow for custom logic if needed. Security considerations: Secure environment variables, use HTTPS, and validate provider configurations. Testing: Write integration tests for login/logout flows, and verify session persistence and provider callback handling.
+
+## 2. Custom Drizzle Adapter Implementation [pending]
+### Dependencies: 3.1
+### Description: Integrate a custom Drizzle ORM adapter with NextAuth.js to persist user and session data in the database.
+### Details:
+Implement the Drizzle adapter to connect NextAuth.js with the database, ensuring user, session, and account tables are correctly mapped. Handle edge cases such as duplicate users and session invalidation. Security considerations: Sanitize all database inputs, use parameterized queries, and restrict database permissions. Testing: Unit test adapter methods, perform migration tests, and verify data integrity after authentication events.
+
+## 3. TOTP 2FA Implementation [pending]
+### Dependencies: 3.2
+### Description: Add Time-based One-Time Password (TOTP) two-factor authentication to the authentication flow.
+### Details:
+Integrate TOTP 2FA using a library like speakeasy. Store TOTP secrets securely (e.g., encrypted in the database). Update authentication flows to require TOTP verification after password login. Security considerations: Use secure random secret generation, encrypt TOTP secrets, and implement brute-force protection. Testing: Write tests for TOTP enrollment, verification, backup codes, and recovery flows.
+
+## 4. Protected Routes and RBAC Middleware [pending]
+### Dependencies: 3.3
+### Description: Implement middleware to protect routes and enforce role-based access control (RBAC).
+### Details:
+Create middleware that checks authentication and user roles before allowing access to protected routes. Define roles and permissions in the database or configuration. Security considerations: Prevent privilege escalation, validate user roles on every request, and log access attempts. Testing: Test access control for all roles, simulate unauthorized access, and verify middleware logic.
+
+## 5. Authentication UI Components [pending]
+### Dependencies: 3.4
+### Description: Build UI components for login, registration, 2FA setup, and error handling.
+### Details:
+Develop reusable UI components for authentication flows, including forms for login, registration, TOTP setup, and error messages. Ensure accessibility and responsive design. Security considerations: Prevent XSS in form inputs, avoid leaking sensitive error details, and use secure form handling. Testing: Write component tests for all UI states, simulate user interactions, and verify error handling.
+
+## 6. Report Layouts for shadcn/ui Component Library [pending]
+### Dependencies: None
+### Description: Design and implement reusable report layouts using shadcn/ui components.
+### Details:
+Create flexible layout components for reports, supporting headers, footers, and content sections. Ensure layouts are compatible with other shadcn/ui components. Security considerations: Sanitize dynamic content and prevent layout injection. Testing: Snapshot and visual regression tests for layout consistency.
+
+## 7. Filter Components and TanStack Table Integration [pending]
+### Dependencies: None
+### Description: Develop filter UI components and integrate them with TanStack Table for advanced data filtering.
+### Details:
+Build filter components (dropdowns, search, date pickers) and connect them to TanStack Table state. Ensure filters are accessible and performant. Security considerations: Sanitize filter inputs and prevent SQL injection if filters are server-driven. Testing: Unit and integration tests for filter logic and table updates.
+
+## 8. Recharts Wrappers, Loading States, Error Boundaries, Responsive Design, and Theming System [pending]
+### Dependencies: None
+### Description: Implement wrappers for Recharts, global loading states, error boundaries, responsive design utilities, and a theming system for the component library.
+### Details:
+Create reusable wrappers for Recharts charts, global loading spinners, and error boundary components. Implement responsive design utilities and a theming system for consistent styling. Security considerations: Handle chart data securely, prevent error boundary information leaks, and ensure theming does not expose sensitive data. Testing: Write tests for chart rendering, loading/error states, responsive behavior, and theme switching.
+

@@ -13,9 +13,6 @@ export default defineConfig({
     // Global test functions (describe, it, expect)
     globals: true,
 
-    // Setup files
-    setupFiles: ["./src/__tests__/setup.tsx"],
-
     // Include patterns for test files
     include: ["src/**/*.{test,spec}.{js,ts,jsx,tsx}"],
 

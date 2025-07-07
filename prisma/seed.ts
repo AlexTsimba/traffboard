@@ -51,6 +51,12 @@ async function main() {
       name: "John Doe",
       role: "user",
     },
+    {
+      email: "user@traffboard.com",
+      password: "user123",
+      name: "Regular User",
+      role: "user",
+    },
   ];
 
   for (const userData of testUsers) {

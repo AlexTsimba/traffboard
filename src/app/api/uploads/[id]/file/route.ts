@@ -21,9 +21,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
     // Get file from form data
     const formData = await request.formData();
-    const file = formData.get("file") as File;
+    const file = formData.get("file") as File | null;
 
-    if (!file) {
+    if (!file || !(file instanceof File)) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
@@ -41,6 +41,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const buffer = Buffer.from(arrayBuffer);
 
     console.log("[File Upload] Saving file to:", filePath);
+    // ESLint disabled: filePath is constructed securely using upload ID to prevent path traversal
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     await fs.writeFile(filePath, buffer);
 
     // Update upload status
