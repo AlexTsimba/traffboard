@@ -199,7 +199,7 @@ export async function getUserUploadStats(): Promise<{
     }),
   ]);
 
-  const totalUploads = totalStats.reduce((sum, item) => sum + item._count.status, 0);
+  const totalUploads = totalStats.reduce((sum: number, item) => sum + (item._count.status ?? 0), 0);
   const successfulUploads = totalStats.find((item) => item.status === "completed")?._count.status ?? 0;
   const failedUploads = totalStats.find((item) => item.status === "failed")?._count.status ?? 0;
 
