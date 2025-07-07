@@ -57,6 +57,9 @@ jobs:
       - name: 🔨 Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: 🏢 Generate database types
+        run: pnpm db:generate
+
       - name: 📋 Lint check
         run: pnpm lint
 
@@ -100,6 +103,9 @@ jobs:
       - name: 🔨 Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: 🏢 Generate database types
+        run: pnpm db:generate
+
       - name: 🧪 Quick test
         run: pnpm test:run
 
@@ -131,6 +137,9 @@ jobs:
       - name: 🔨 Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: 🏢 Generate database types
+        run: pnpm db:generate
+
       - name: 🔍 Dependency audit
         run: pnpm audit --audit-level moderate
         continue-on-error: true
@@ -161,6 +170,9 @@ jobs:
 
       - name: 🔨 Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: 🏢 Generate database types
+        run: pnpm db:generate
 
       - name: 🏗️ Production build
         run: pnpm build
