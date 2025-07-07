@@ -24,7 +24,7 @@ export async function requireAuth(): Promise<AuthenticatedUser> {
   const session = await auth();
   console.log("[Auth] Session:", session ? { user: session.user } : "No session");
 
-  if (!session?.user) {
+  if (!session?.user?.id) {
     console.log("[Auth] No session or user found");
     throw new Error("Authentication required");
   }
