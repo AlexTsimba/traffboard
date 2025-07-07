@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { checkDatabaseHealth } from "@/db";
+import { checkDatabaseHealth } from "@/lib/health";
 
 export async function GET() {
   try {
@@ -36,17 +36,18 @@ export async function GET() {
   } catch (error) {
     console.error("Health check failed:", error);
 
-    return NextResponse.json(
-      {
-        status: "unhealthy",
-        timestamp: new Date().toISOString(),
-        error: error instanceof Error ? error.message : "Unknown error",
-        checks: {
-          server: "error",
-          database: "error",
-        },
+    // Return structured error response
+    const errorResponse = {
+      status: "unhealthy",
+      timestamp: new Date().toISOString(),
+      error: error instanceof Error ? error.message : "Unknown error",
+      checks: {
+        server: "error",
+        database: "error",
+        memory: "error",
       },
-      { status: 503 },
-    );
+    };
+
+    return NextResponse.json(errorResponse, { status: 503 });
   }
 }

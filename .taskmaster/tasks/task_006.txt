@@ -1,37 +1,23 @@
 # Task ID: 6
-# Title: Develop Analytics Dashboard
+# Title: Performance Optimization & Caching Implementation
 # Status: pending
-# Dependencies: 2, 4, 5
-# Priority: high
-# Description: Create a simple analytics dashboard with key metrics and basic charts.
+# Dependencies: 5
+# Priority: medium
+# Description: Implement intelligent query caching, progressive loading, background data refresh, performance monitoring, and optimization suggestions to improve application speed and responsiveness. Include robust cache invalidation strategies and resource monitoring.
 # Details:
-1. Implement global filter components for date range, partner, and campaign using Zustand (v4.3.8 or later) for state management
-2. Create a Zustand store for filter state:
-   ```typescript
-   interface FilterState {
-     dateRange: [Date, Date]
-     partners: string[]
-     campaigns: string[]
-     setFilters: (filters: Partial<FilterState>) => void
-     resetFilters: () => void
-   }
-   ```
-3. Use TanStack Query (v5.0.0 or later) for data fetching with proper caching strategies
-4. Implement API routes for fetching analytics data based on filters
-5. Create KPI cards for total clicks, registrations, and revenue
-6. Implement the following charts using shadcn/ui charts (Recharts wrapper):
-   - Line chart for daily metrics
-   - Bar chart for top partners
-   - Pie chart for campaign distribution
-7. Ensure all components are responsive and mobile-friendly
-8. Implement loading states and error handling for data fetching
-9. Add a date range picker component for custom date selection
+Start by profiling the application's current performance using tools such as Lighthouse, Web Vitals, or custom logging to identify bottlenecks. Implement intelligent caching at multiple layers: 
+- Use browser caching for static assets by setting appropriate cache-control and expires headers, and leverage Service Workers and the Cache API for selective caching of API responses and assets[1][4]. 
+- Apply intelligent query caching for frequently accessed or computationally expensive data, such as cohort queries and saved reports, using algorithms like LRU or LFU to manage cache storage efficiently[2]. 
+- Integrate cache invalidation strategies to ensure data freshness, including TTL (Time to Live) values and event-driven invalidation on data changes[2]. 
+- Enable background data refresh to keep cached data up-to-date without blocking the user interface. 
+- Integrate a CDN to serve static files and images, reducing latency for global users[3]. 
+- Apply code-splitting and lazy loading for JavaScript bundles and heavy UI components, ensuring only necessary code is loaded initially. 
+- Optimize images by compressing and resizing them, and use modern formats (e.g., WebP). 
+- Minify and bundle CSS/JS files to reduce HTTP requests and payload size. 
+- Monitor performance in production with real-time analytics, error tracking, and resource monitoring, setting up alerts for slow queries, high latency, or cache misses. 
+- Provide optimization suggestions based on monitoring insights. 
+- Regularly review and optimize database queries, especially those related to cohort and report data. 
+- Document all optimizations, cache strategies, and provide fallback mechanisms for users with limited connectivity.
 
 # Test Strategy:
-1. Test filter functionality and state management
-2. Verify data fetching and caching with TanStack Query
-3. Ensure charts render correctly with various data sets
-4. Test responsiveness on different screen sizes
-5. Validate loading states and error handling
-6. Performance test dashboard with large datasets
-7. Verify date range picker functionality
+1. Use performance profiling tools (Lighthouse, WebPageTest) to benchmark before and after optimizations, ensuring measurable improvements in load time and interactivity. 2. Verify caching headers and Service Worker strategies are correctly set for static assets and API responses, and that server-side and query caches are invalidated appropriately on data changes. 3. Test CDN integration by accessing the app from different geographic locations and confirming reduced latency. 4. Confirm that code-splitting and lazy loading work by monitoring network requests and ensuring only necessary bundles are loaded on initial render. 5. Check that images are served in optimized formats and sizes. 6. Simulate slow network conditions to ensure progressive loading, background data refresh, and fallback mechanisms function correctly. 7. Monitor production performance, resource usage, and error logs to catch regressions or missed optimizations. 8. Validate that optimization suggestions are generated and actionable.

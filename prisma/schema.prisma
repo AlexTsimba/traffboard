@@ -1,0 +1,235 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// NextAuth.js v5 required models
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  
+  // TraffBoard specific fields
+  role          String    @default("user") // user | superuser
+  passwordHash  String?   // for email/password auth
+  totpSecret    String?   // for 2FA
+  isActive      Boolean   @default(true)  // for account enable/disable
+  
+  // User management audit fields
+  createdBy     String?   // ID of user who created this account
+  lastModifiedBy String? // ID of user who last modified this account
+  lastLoginAt   DateTime? // Track last login time
+  
+  accounts      Account[]
+  uploads       ConversionUpload[]
+  backupCodes   TwoFactorBackupCode[]
+  authAttempts  AuthAttempt[]
+  auditLogs     AuditLog[]
+  
+  // Self-referential relations for audit trail
+  createdUsers     User[] @relation("UserCreatedBy")
+  modifiedUsers    User[] @relation("UserModifiedBy")
+  createdByUser    User?  @relation("UserCreatedBy", fields: [createdBy], references: [id])
+  lastModifiedByUser User? @relation("UserModifiedBy", fields: [lastModifiedBy], references: [id])
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  @@map("users")
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+ 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+ 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  @@id([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+ 
+  @@id([identifier, token])
+  @@map("verification_tokens")
+}
+
+// TraffBoard Business Models
+
+model ConversionUpload {
+  id          String   @id @default(cuid())
+  fileName    String
+  fileType    String   // "players" | "conversions"
+  status      String   @default("pending") // pending | uploaded | processing | completed | failed
+  uploadedBy  String
+  recordCount Int?
+  errorLog    String?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  user        User     @relation(fields: [uploadedBy], references: [id])
+  
+  @@map("conversion_uploads")
+}
+
+model PlayerData {
+  id                  String    @id @default(cuid())
+  playerId            String
+  originalPlayerId    String
+  signUpDate          DateTime?
+  firstDepositDate    DateTime?
+  partnerId           String
+  companyName         String
+  // partnersEmail field REMOVED - not stored in database
+  partnerTags         String?
+  campaignId          String
+  campaignName        String?
+  promoId             String?
+  promoCode           String?
+  playerCountry       String?
+  tagClickid          String?
+  tagOs               String?
+  tagSource           String?
+  tagSub2             String?
+  tagWebId            String?
+  date                DateTime
+  prequalified        Boolean   @default(false)
+  duplicate           Boolean   @default(false)
+  selfExcluded        Boolean   @default(false)
+  disabled            Boolean   @default(false)
+  currency            String
+  ftdCount            Int       @default(0)
+  ftdSum              Decimal   @default(0.00) @db.Decimal(10,2)
+  depositsCount       Int       @default(0)
+  depositsSum         Decimal   @default(0.00) @db.Decimal(10,2)
+  cashoutsCount       Int       @default(0)
+  cashoutsSum         Decimal   @default(0.00) @db.Decimal(10,2)
+  casinoBetsCount     Int       @default(0)
+  casinoRealNgr       Decimal   @default(0.00) @db.Decimal(10,2)
+  fixedPerPlayer      Decimal   @default(0.00) @db.Decimal(10,2)
+  casinoBetsSum       Decimal   @default(0.00) @db.Decimal(10,2)
+  casinoWinsSum       Decimal   @default(0.00) @db.Decimal(10,2)
+  
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  
+  @@unique([playerId, date], name: "player_unique")
+  @@index([playerId, date])
+  @@index([partnerId, campaignId])
+  @@index([date])
+  @@map("player_data")
+}
+
+model Conversion {
+  id                    String   @id @default(cuid())
+  date                  DateTime
+  foreignBrandId        String
+  foreignPartnerId      String
+  foreignCampaignId     String
+  foreignLandingId      String?
+  trafficSource         String
+  deviceType            String
+  userAgentFamily       String?
+  osFamily              String?
+  country               String
+  allClicks             Int      @default(0)
+  uniqueClicks          Int      @default(0)
+  registrationsCount    Int      @default(0)
+  ftdCount              Int      @default(0)
+  depositsCount         Int      @default(0)
+  // Conversion rate fields REMOVED - not stored in database:
+  // cr, cftd, cd, rftd - these will be calculated when needed
+  
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  
+  @@unique([date, foreignBrandId, foreignPartnerId, foreignCampaignId, trafficSource, deviceType, country], name: "conversion_unique")
+  @@index([date])
+  @@index([foreignPartnerId, foreignCampaignId])
+  @@index([trafficSource, deviceType])
+  @@map("conversions")
+}
+
+// Two-Factor Authentication Models
+
+model TwoFactorBackupCode {
+  id        String   @id @default(cuid())
+  userId    String
+  code      String   // Hashed backup code
+  used      Boolean  @default(false)
+  usedAt    DateTime?
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([userId, used])
+  @@map("two_factor_backup_codes")
+}
+
+model AuthAttempt {
+  id           String   @id @default(cuid())
+  userId       String?  // Can be null for failed login attempts
+  email        String?  // Store email for failed attempts
+  type         String   // "login", "2fa", "backup_code"
+  success      Boolean
+  ipAddress    String?
+  userAgent    String?
+  errorReason  String?  // "invalid_password", "invalid_2fa", "rate_limited"
+  
+  user         User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt    DateTime @default(now())
+  
+  @@index([userId, type, createdAt])
+  @@index([email, type, createdAt])
+  @@index([ipAddress, type, createdAt])
+  @@map("auth_attempts")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?  // User who performed the action (null for system actions)
+  action    String   // Action performed (e.g., "user.create", "profile.update")
+  details   String?  // JSON string with action details
+  ipAddress String?
+  userAgent String?
+  
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  createdAt DateTime @default(now())
+  
+  @@index([userId, action, createdAt])
+  @@index([action, createdAt])
+  @@map("audit_logs")
+}

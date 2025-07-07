@@ -1,25 +1,61 @@
 # Task ID: 1
-# Title: Setup Project Template and Dependencies
+# Title: Report Factory Foundation Architecture
 # Status: pending
 # Dependencies: None
-# Priority: high
-# Description: Install and configure the remaining required dependencies for TraffBoardLite MVP in the existing Next.js 15 project.
+# Priority: medium
+# Description: Design and implement a universal report framework foundation with reusable components, a flexible filter system, a robust data pipeline, and export capabilities. This foundation must support cohort analysis and all future report types. Emphasize TypeScript interfaces, React context providers, and a plugin architecture to ensure extensibility and maintainability.
 # Details:
-The project already includes shadcn/ui, TanStack Query, Recharts, and Zod. Complete the setup by:
-1. Installing and configuring the following dependencies:
-   - Drizzle ORM v0.27.0 or later
-   - NextAuth.js v4.22.1 or later
-   - PapaParse v5.4.1 or later
-   - Zustand v4.3.8 or later
-2. Ensure all new dependencies are compatible with Next.js 15 and the App Router.
-3. Update or verify TypeScript configuration as needed for the new dependencies.
-4. Ensure the folder structure follows Next.js 15 conventions (no need to reinitialize the project).
-5. Verify that ESLint and Prettier are set up for code quality (update configs if new dependencies require it).
-6. Update the README.md with instructions for installing and configuring the newly added dependencies.
+Establish a modular architecture for the report factory, focusing on separation of concerns and extensibility. Develop core reusable UI components (tables, filters, export buttons) using TypeScript interfaces for strong typing and contract enforcement. Define clear interfaces and plugin points for integrating new data sources and report types. Implement a filter system that supports dynamic parameterization, allowing users to adjust report queries and context areas in real time. Architect a data pipeline that can ingest, transform, and deliver data to report components, supporting hierarchy-aware data and both static/dynamic layouts. Integrate export functionality (e.g., CSV, Excel, PDF) at the framework level. Use React context providers to manage global state and configuration for reports, filters, and plugins. Ensure the design accommodates future enhancements such as additional export formats, custom layouts, advanced filtering, and new report plugins. Document the architecture, component APIs, extension points, and plugin integration for future developers.
 
 # Test Strategy:
-1. Verify that Drizzle ORM, NextAuth.js, PapaParse, and Zustand are correctly installed and compatible with the existing project setup.
-2. Ensure the project builds without errors after adding the new dependencies.
-3. Check that the development server runs correctly.
-4. Validate TypeScript configuration for the new dependencies.
-5. Test ESLint and Prettier configurations for compatibility with the updated codebase.
+1. Create sample reports using the framework to verify component reusability, layout flexibility, and plugin integration. 2. Test the filter system by applying various parameter combinations and confirming correct data rendering and context updates. 3. Validate the data pipeline with multiple data sources, hierarchical data structures, and plugin-based data transformations. 4. Export reports in all supported formats and confirm data integrity and formatting. 5. Conduct code reviews and architecture walkthroughs to ensure modularity, extensibility, and plugin compatibility. 6. Review documentation for completeness, clarity, and accuracy regarding TypeScript interfaces, React context, and plugin usage.
+
+# Subtasks:
+## 1. Define TypeScript interfaces for core report components [pending]
+### Dependencies: None
+### Description: Create TypeScript interfaces for tables, filters, export buttons, and data pipeline contracts to ensure type safety and extensibility.
+### Details:
+
+
+## 2. Implement React context providers for global report state [pending]
+### Dependencies: None
+### Description: Set up React context providers to manage global state for reports, filters, and plugin configuration.
+### Details:
+
+
+## 3. Design plugin architecture for extensible report types and data sources [pending]
+### Dependencies: None
+### Description: Establish a plugin system that allows new report types, data sources, and export formats to be added without modifying the core framework.
+### Details:
+
+
+## 4. Develop reusable UI components using TypeScript and React [pending]
+### Dependencies: None
+### Description: Build core UI components (tables, filters, export buttons) as reusable, strongly-typed React components.
+### Details:
+
+
+## 5. Implement dynamic filter system with real-time parameterization [pending]
+### Dependencies: None
+### Description: Create a filter system that supports dynamic parameters and context areas, enabling real-time updates to report queries.
+### Details:
+
+
+## 6. Architect data pipeline with plugin support [pending]
+### Dependencies: None
+### Description: Design and implement a data pipeline that can ingest, transform, and deliver data to report components, supporting plugins for custom data processing.
+### Details:
+
+
+## 7. Integrate export functionality at the framework level [pending]
+### Dependencies: None
+### Description: Provide export capabilities (CSV, Excel, PDF) as part of the core framework, with plugin support for future formats.
+### Details:
+
+
+## 8. Document architecture, APIs, and plugin extension points [pending]
+### Dependencies: None
+### Description: Produce comprehensive documentation covering the architecture, TypeScript interfaces, React context usage, and plugin integration.
+### Details:
+
+

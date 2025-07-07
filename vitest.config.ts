@@ -10,14 +10,14 @@ export default defineConfig({
     // Test environment
     environment: "jsdom",
 
+    // Setup files
+    setupFiles: ["./vitest.setup.ts"],
+
     // Global test functions (describe, it, expect)
     globals: true,
 
-    // Setup files
-    setupFiles: ["./src/__tests__/setup.tsx"],
-
     // Include patterns for test files
-    include: ["**/*.{test,spec}.{js,ts,jsx,tsx}"],
+    include: ["src/**/*.{test,spec}.{js,ts,jsx,tsx}"],
 
     // Exclude patterns
     exclude: [
@@ -25,6 +25,7 @@ export default defineConfig({
       "**/dist/**",
       "**/.next/**",
       "**/coverage/**",
+      "**/e2e/**", // Exclude Playwright tests
       "**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*",
     ],
 

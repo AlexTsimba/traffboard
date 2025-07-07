@@ -1,6 +1,40 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Suspense } from "react";
 
-export default function AdministrationPage() {
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { requireAdminPageAuth } from "@/lib/auth/page-protection";
+import { getUsers } from "@/lib/data/users";
+
+import { CsvUploadClient } from "./_components/csv-upload-client";
+import { DataManagementSummary } from "./_components/data-management-summary";
+import { SystemStatus } from "./_components/system-status";
+import { UserManagement } from "./_components/user-management";
+
+interface AdministrationPageProps {
+  readonly searchParams?: Promise<{
+    readonly page?: string;
+    readonly search?: string;
+    readonly role?: string;
+  }>;
+}
+
+export default async function AdministrationPage({ searchParams }: AdministrationPageProps) {
+  // SECURITY: Require admin authentication at page level
+  await requireAdminPageAuth();
+
+  const resolvedSearchParams = await searchParams;
+  const page = Number(resolvedSearchParams?.page) || 1;
+  const search = resolvedSearchParams?.search ?? "";
+
+  // Load users server-side using secure Data Access Layer
+  const { users, totalCount } = await getUsers(page, 10, search || undefined);
+
+  const pagination = {
+    page,
+    limit: 10,
+    total: totalCount,
+    pages: Math.ceil(totalCount / 10),
+  };
+
   return (
     <div className="@container/main flex flex-col gap-4 md:gap-6">
       <div className="space-y-2">
@@ -9,62 +43,55 @@ export default function AdministrationPage() {
       </div>
 
       <Tabs className="w-full" defaultValue="data">
-        <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
+        <TabsList className="grid w-full grid-cols-3 lg:w-[600px]">
           <TabsTrigger value="data">Data Management</TabsTrigger>
           <TabsTrigger value="users">User Management</TabsTrigger>
+          <TabsTrigger value="system">System Status</TabsTrigger>
         </TabsList>
 
         <TabsContent className="space-y-6" value="data">
           <div className="rounded-lg border p-6">
             <h3 className="mb-4 text-lg font-semibold">CSV Data Import</h3>
-            <div className="space-y-4">
-              <div className="rounded-lg border-2 border-dashed border-gray-300 p-12 text-center">
-                <div className="mx-auto max-w-sm">
-                  <svg
-                    className="mx-auto h-12 w-12 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 48 48"
-                  >
-                    <path
-                      d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                    />
-                  </svg>
-                  <h4 className="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">Upload CSV Files</h4>
-                  <p className="mt-1 text-sm text-gray-500">
-                    Drag and drop your conversion data files here, or click to browse
-                  </p>
-                  <button className="bg-primary hover:bg-primary/90 mt-4 inline-flex items-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm">
-                    Choose Files
-                  </button>
-                </div>
-              </div>
+            <CsvUploadClient />
+          </div>
 
-              <div>
-                <h4 className="mb-2 text-sm font-medium">Recent Uploads</h4>
-                <div className="text-muted-foreground text-sm">No files uploaded yet</div>
-              </div>
-            </div>
+          <div className="rounded-lg border p-6">
+            <DataManagementSummary />
           </div>
         </TabsContent>
 
         <TabsContent className="space-y-6" value="users">
           <div className="rounded-lg border p-6">
             <h3 className="mb-4 text-lg font-semibold">User Management</h3>
-            <div className="mb-4 flex items-center justify-between">
-              <p className="text-muted-foreground text-sm">Manage user accounts and permissions</p>
-              <button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2">
-                Add User
-              </button>
-            </div>
+            <p className="text-muted-foreground mb-6 text-sm">Manage user accounts and permissions</p>
+            <Suspense
+              fallback={
+                <div className="text-muted-foreground flex h-32 items-center justify-center">Loading users...</div>
+              }
+            >
+              <UserManagement
+                initialUsers={users}
+                initialPagination={pagination}
+                initialSearch={search}
+                initialRole=""
+              />
+            </Suspense>
+          </div>
+        </TabsContent>
 
-            <div className="text-muted-foreground py-12 text-center">
-              <p className="text-lg">User management interface</p>
-              <p className="text-sm">Create, edit, and manage user accounts and roles</p>
-            </div>
+        <TabsContent className="space-y-6" value="system">
+          <div className="rounded-lg border p-6">
+            <h3 className="mb-4 text-lg font-semibold">System Status</h3>
+            <p className="text-muted-foreground mb-6 text-sm">Monitor database connectivity and system health</p>
+            <Suspense
+              fallback={
+                <div className="text-muted-foreground flex h-32 items-center justify-center">
+                  Loading system status...
+                </div>
+              }
+            >
+              <SystemStatus />
+            </Suspense>
           </div>
         </TabsContent>
       </Tabs>

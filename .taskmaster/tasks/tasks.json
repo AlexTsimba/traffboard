@@ -3,197 +3,544 @@
     "tasks": [
       {
         "id": 1,
-        "title": "Setup Project Template and Dependencies",
-        "description": "Integrate the remaining required dependencies for TraffBoardLite MVP into the existing Next.js 15 project. The project already includes shadcn/ui, TanStack Query, Recharts, Zod, TypeScript, ESLint, and Prettier. Focus on adding and configuring only the following libraries:\n- Drizzle ORM (v0.27.0 or later) and drizzle-kit\n- NextAuth.js (v4.22.1 or later) with @auth/drizzle-adapter\n- PapaParse (v5.4.1 or later) for CSV parsing\n- Zustand (v4.3.8 or later) for state management\nEnsure these new dependencies are integrated with the existing architecture and follow Next.js 15 App Router conventions.",
-        "status": "done",
+        "title": "Report Factory Foundation Architecture",
+        "description": "Design and implement a universal report framework foundation with reusable components, a flexible filter system (including modal dialog functionality), a robust data pipeline, and export capabilities. This foundation must support cohort analysis and all future report types. Emphasize TypeScript interfaces, React context providers, and a plugin architecture to ensure extensibility and maintainability. The filter system must include a square filter button in the top-right of reports, a centered modal dialog with SUBMIT and CLEAR buttons, and a horizontal chips display showing active filters above the table. All filter-related interfaces and components must reflect these UI and interaction requirements.",
+        "status": "pending",
         "dependencies": [],
-        "priority": "high",
-        "details": "1. Install and configure Drizzle ORM (v0.27.0+) and drizzle-kit for database access and migrations.\n2. Integrate NextAuth.js (v4.22.1+) with @auth/drizzle-adapter for authentication, ensuring compatibility with Drizzle ORM and Next.js 15 App Router.\n3. Add PapaParse (v5.4.1+) for CSV import/export functionality, and provide a utility or example usage in the codebase.\n4. Add Zustand (v4.3.8+) for state management, and provide a basic store example or integration point.\n5. Ensure all new dependencies are compatible with the existing Next.js 15, TypeScript, ESLint, and Prettier setup.\n6. Update the folder structure or configuration only if required for the integration of these new libraries (do not reinitialize the project).\n7. Update README.md with clear instructions for installing, configuring, and using the newly added dependencies.\n<info added on 2025-07-02T08:31:31.510Z>\n## Task Completion Update\n\nThe following dependencies have been successfully installed and configured:\n\n- drizzle-orm 0.44.2 (main ORM)\n- drizzle-kit 0.31.4 (migration CLI)\n- postgres 3.4.7 (PostgreSQL driver)\n- next-auth 4.24.11 (authentication)\n- @auth/drizzle-adapter 1.10.0 (NextAuth Drizzle adapter)\n- papaparse 5.5.3 (CSV parser)\n- @types/papaparse 5.3.16 (TypeScript types)\n- zustand 5.0.6 (state management)\n- dotenv 17.0.1 (environment variables)\n\nThe following database scripts have been added to package.json:\n- db:generate - generate migrations\n- db:migrate - apply migrations\n- db:studio - launch Drizzle Studio\n- db:drop - remove migrations\n- db:push - push schema to database\n\nAll installations have been verified:\n- pnpm build completes successfully\n- All TypeScript types are correct\n- No dependency conflicts exist\n\nStatus: COMPLETED\n</info added on 2025-07-02T08:31:31.510Z>",
-        "testStrategy": "1. Verify that Drizzle ORM, drizzle-kit, NextAuth.js with @auth/drizzle-adapter, PapaParse, and Zustand are correctly installed and integrated with the existing project setup.\n2. Ensure the project builds and runs without errors after adding and configuring the new dependencies.\n3. Validate TypeScript configuration and type safety for the new libraries.\n4. Test ESLint and Prettier configurations for compatibility with the updated codebase.\n5. Confirm that example usages (e.g., Zustand store, PapaParse CSV import) work as expected.",
+        "priority": "medium",
+        "details": "Establish a modular architecture for the report factory, focusing on separation of concerns and extensibility. Develop core reusable UI components (tables, filters, export buttons) using TypeScript interfaces for strong typing and contract enforcement. Define clear interfaces and plugin points for integrating new data sources and report types. Implement a filter system that supports dynamic parameterization, allowing users to adjust report queries and context areas in real time. The filter system must include a square filter button in the top-right of reports, a centered modal dialog with SUBMIT and CLEAR buttons, and a horizontal chips display showing active filters above the table. Architect a data pipeline that can ingest, transform, and deliver data to report components, supporting hierarchy-aware data and both static/dynamic layouts. Integrate export functionality (e.g., CSV, Excel, PDF) at the framework level. Use React context providers to manage global state and configuration for reports, filters, and plugins. Ensure the design accommodates future enhancements such as additional export formats, custom layouts, advanced filtering, and new report plugins. Document the architecture, component APIs, extension points, and plugin integration for future developers.",
+        "testStrategy": "1. Create sample reports using the framework to verify component reusability, layout flexibility, and plugin integration. 2. Test the filter system by applying various parameter combinations, using the modal dialog, SUBMIT/CLEAR buttons, and confirming correct data rendering, context updates, and chip display. 3. Validate the data pipeline with multiple data sources, hierarchical data structures, and plugin-based data transformations. 4. Export reports in all supported formats and confirm data integrity and formatting. 5. Conduct code reviews and architecture walkthroughs to ensure modularity, extensibility, and plugin compatibility. 6. Review documentation for completeness, clarity, and accuracy regarding TypeScript interfaces, React context, plugin usage, and filter modal/chip UI.",
         "subtasks": [
           {
             "id": 1,
-            "title": "Install Drizzle ORM and drizzle-kit",
-            "description": "Add Drizzle ORM (v0.27.0+) and drizzle-kit to the project. Configure database connection and set up basic migration scripts.",
-            "status": "done",
+            "title": "Define TypeScript interfaces for core report components",
+            "description": "Create TypeScript interfaces for tables, filters (including modal dialog, filter button, and chips display), export buttons, and data pipeline contracts to ensure type safety and extensibility.",
+            "status": "pending",
             "dependencies": [],
-            "details": "",
-            "testStrategy": ""
+            "details": "Update filter-related interfaces to support modal dialog state, SUBMIT/CLEAR actions, and chip display for active filters.",
+            "testStrategy": "Verify that interfaces cover modal dialog props/state, filter button interactions, and chip rendering for active filters."
           },
           {
             "id": 2,
-            "title": "Integrate NextAuth.js with @auth/drizzle-adapter",
-            "description": "Install NextAuth.js (v4.22.1+) and @auth/drizzle-adapter. Configure authentication to use Drizzle ORM as the adapter, ensuring compatibility with Next.js 15 App Router.",
-            "status": "done",
+            "title": "Implement React context providers for global report state",
+            "description": "Set up React context providers to manage global state for reports, filters (including modal dialog state), and plugin configuration.",
+            "status": "pending",
             "dependencies": [],
-            "details": "",
-            "testStrategy": ""
+            "details": "Ensure context providers can manage modal open/close state, active filter values, and chip display updates.",
+            "testStrategy": "Test context updates for opening/closing modal, submitting/clearing filters, and updating chips."
           },
           {
             "id": 3,
-            "title": "Add PapaParse for CSV parsing",
-            "description": "Install PapaParse (v5.4.1+). Provide a utility or example for importing and exporting CSV data.",
-            "status": "done",
+            "title": "Design plugin architecture for extensible report types and data sources",
+            "description": "Establish a plugin system that allows new report types, data sources, and export formats to be added without modifying the core framework.",
+            "status": "pending",
             "dependencies": [],
             "details": "",
             "testStrategy": ""
           },
           {
             "id": 4,
-            "title": "Add Zustand for state management",
-            "description": "Install Zustand (v4.3.8+). Provide a basic example store and demonstrate integration with the existing architecture.",
-            "status": "done",
+            "title": "Develop reusable UI components using TypeScript and React",
+            "description": "Build core UI components (tables, filters with modal dialog and chips, export buttons) as reusable, strongly-typed React components.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "Implement a square filter button in the top-right of reports, a modal dialog for filter selection with SUBMIT/CLEAR buttons, and a horizontal chips display above the table for active filters.",
+            "testStrategy": "Render the filter button, open/close modal, submit/clear filters, and verify chips display updates as expected."
+          },
+          {
+            "id": 5,
+            "title": "Implement dynamic filter system with real-time parameterization",
+            "description": "Create a filter system that supports dynamic parameters and context areas, enabling real-time updates to report queries. The system must use a modal dialog for filter selection and display active filters as chips.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "Ensure the filter system includes modal dialog logic, SUBMIT/CLEAR actions, and chip management for active filters.",
+            "testStrategy": "Test dynamic parameter changes via modal, confirm real-time updates to report data, and verify chip display reflects current filters."
+          },
+          {
+            "id": 6,
+            "title": "Architect data pipeline with plugin support",
+            "description": "Design and implement a data pipeline that can ingest, transform, and deliver data to report components, supporting plugins for custom data processing.",
+            "status": "pending",
             "dependencies": [],
             "details": "",
             "testStrategy": ""
           },
           {
-            "id": 5,
-            "title": "Update README.md with new dependency instructions",
-            "description": "Document installation, configuration, and usage instructions for Drizzle ORM, drizzle-kit, NextAuth.js with @auth/drizzle-adapter, PapaParse, and Zustand in the README.md.",
-            "status": "done",
+            "id": 7,
+            "title": "Integrate export functionality at the framework level",
+            "description": "Provide export capabilities (CSV, Excel, PDF) as part of the core framework, with plugin support for future formats.",
+            "status": "pending",
             "dependencies": [],
             "details": "",
             "testStrategy": ""
+          },
+          {
+            "id": 8,
+            "title": "Document architecture, APIs, and plugin extension points",
+            "description": "Produce comprehensive documentation covering the architecture, TypeScript interfaces, React context usage, plugin integration, and filter modal/chip UI.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "Include documentation for modal dialog filter workflow, filter button, and chips display.",
+            "testStrategy": "Review documentation for completeness and clarity on new filter system UI and interaction patterns."
           }
         ]
       },
       {
         "id": 2,
-        "title": "Database Setup and Models Implementation",
-        "description": "Set up the database connection and implement the data models using Drizzle ORM.",
-        "details": "1. Install and configure Drizzle ORM with PostgreSQL adapter\n2. Set up connection to PostgreSQL database\n3. Implement the following schemas using Drizzle:\n   - users table:\n     * id: serial primary key\n     * email: varchar(255) unique not null\n     * passwordHash: text not null\n     * role: varchar(50) default 'user' not null\n     * totpSecret: text\n     * createdAt: timestamp default now() not null\n   - conversions table:\n     * id: serial primary key\n     * date: date not null\n     * partnerId: varchar(100) not null\n     * campaignId: varchar(100) not null\n     * clicks: integer default 0 not null\n     * registrations: integer default 0 not null\n     * revenue: decimal(10,2) default 0 not null\n     * createdAt: timestamp default now() not null\n4. Set up migrations using drizzle-kit\n5. Create seed data for testing purposes\n6. Implement database utility functions for common operations\n<info added on 2025-07-02T15:44:00.714Z>\n## CRITICAL REQUIREMENTS\n\n**Testing & Quality Gates:**\n- Every subtask must be tested locally before completion\n- Every subtask must pass GitHub Actions workflow (build, lint, tests)  \n- NO subtask marked \"done\" without successful local + CI tests\n\n**Commit Strategy:**\n- ONE commit per subtask (not per task)\n- Commit naming: \"feat(database): implement subtask description - refs task 2.X\"\n- Each commit must be atomic and pass all quality checks\n\n**Workflow per Subtask:**\n1. Implement subtask\n2. Run `pnpm build` locally (must pass)\n3. Run `pnpm test` locally (must pass)  \n4. Run `pnpm lint` locally (must pass)\n5. Commit with correct naming convention\n6. Push to feature branch\n7. Verify GitHub Actions passes\n8. Only then mark subtask as \"done\"\n\n**Updated Schema Requirements:**\n- Add user_sessions table:\n  * id: serial primary key\n  * userId: integer references users(id)\n  * deviceInfo: text not null\n  * lastActive: timestamp default now() not null\n  * isRevoked: boolean default false not null\n  * createdAt: timestamp default now() not null\n\n- Add conversion_uploads table:\n  * id: serial primary key\n  * filename: varchar(255) not null\n  * uploadedBy: integer references users(id)\n  * recordCount: integer not null\n  * status: varchar(50) default 'pending' not null\n  * processedAt: timestamp\n  * createdAt: timestamp default now() not null\n\n- PII data exclusion: Ensure no emails or personal identifiable information in database\n- Computed fields excluded (cr/cftd/cd/rftd calculated on demand)\n\n**Environment Configuration:**\n- Development: Local PostgreSQL\n- Testing: SQLite in-memory for unit tests\n- Production: DigitalOcean PostgreSQL\n</info added on 2025-07-02T15:44:00.714Z>",
-        "testStrategy": "1. Verify database connection\n2. Run and test migrations\n3. Validate schema creation\n4. Test seed data insertion\n5. Write unit tests for database utility functions\n6. Ensure proper error handling for database operations",
-        "priority": "high",
-        "dependencies": [1],
-        "status": "in-progress",
+        "title": "Cohort Analysis Data Engine: PostgreSQL-Arquero Pipeline",
+        "description": "Develop a data engine that leverages a PostgreSQL-Arquero pipeline for efficient cohort calculations, including breakpoint mapping, metric processing (DEP2COST, ROAS, AVG DEPOSIT SUM, RETENTION RATE), and performance optimization. The engine must support DAY_BREAKPOINTS=[1,3,5,7,14,17,21,24,27,30] and WEEK_BREAKPOINTS=[7,14,21,28,35,42], with week mode starting Monday and viewing Sunday. Retention rate must be calculated as active_players/initial_cohort_size*100.",
+        "status": "pending",
+        "dependencies": [
+          1
+        ],
+        "priority": "medium",
+        "details": "Implement a robust data pipeline connecting PostgreSQL with Arquero for cohort analysis. Establish a secure and reusable PostgreSQL integration, managing credentials and connection parameters according to best practices[1][3][4]. Design optimized SQL queries using window functions to extract raw event/user data, focusing on cohort-defining attributes and time-based breakpoints. Support DAY_BREAKPOINTS=[1,3,5,7,14,17,21,24,27,30] and WEEK_BREAKPOINTS=[7,14,21,28,35,42], ensuring week mode starts Monday and views Sunday. Use PostgreSQL pipeline mode to batch and asynchronously process multiple queries, reducing network latency and improving throughput—manage error handling and synchronization points to avoid pipeline aborts[2]. Transform and aggregate the extracted data in Arquero, mapping breakpoints (e.g., signup dates, feature adoption) and calculating cohort metrics: DEP2COST, ROAS, AVG DEPOSIT SUM, and RETENTION RATE (calculated as active_players/initial_cohort_size*100). Optimize the pipeline for large datasets by minimizing round-trips, leveraging parallelism where possible, and tuning memory usage. Provide clear interfaces for metric definitions and breakpoint configuration to support extensibility. Integrate with the report factory foundation to ensure compatibility with the broader reporting framework.",
+        "testStrategy": "1. Validate the PostgreSQL-Arquero pipeline by running end-to-end cohort analyses on sample datasets, confirming correct extraction, transformation, and aggregation for all specified breakpoints and metrics. 2. Benchmark pipeline performance with varying data volumes, measuring latency and throughput improvements from pipelining and SQL optimization. 3. Test error handling by injecting faults and verifying that pipeline aborts and synchronization behave as expected. 4. Confirm that breakpoint mapping (including week mode logic) and metric calculations (DEP2COST, ROAS, AVG DEPOSIT SUM, RETENTION RATE) produce accurate and reproducible results, with retention rate calculated as active_players/initial_cohort_size*100. 5. Ensure seamless integration with the report factory by generating reports using the processed cohort data.",
         "subtasks": [
           {
             "id": 1,
-            "title": "Setup Drizzle ORM Configuration",
-            "description": "Configure Drizzle ORM with PostgreSQL and create basic project structure",
-            "details": "- Create drizzle.config.ts with PostgreSQL connection\n- Set up database configuration in src/config/database.ts\n- Create basic folder structure: src/db/schema/, src/db/migrations/\n- Configure environment variables for database connection\n- Test basic connection to PostgreSQL\n\nCOMMIT: \"feat(database): setup drizzle orm configuration - refs task 2.1\"\n<info added on 2025-07-02T15:50:11.999Z>\n**Implementation Details:**\n\n- Created directory structure with `/src/db/`, `/src/db/schema/`, and `/src/db/migrations/`\n- Implemented configuration files:\n  - `drizzle.config.ts` with PostgreSQL dialect\n  - `src/config/database.ts` with environment-based config and Zod validation\n  - `src/db/connection.ts` using singleton pattern with connection pooling\n  - `src/db/index.ts` for database module exports\n- Set up environment configuration:\n  - `.env.example` template with required variables\n  - `.env.local` for local development\n- Enhanced health check system:\n  - Updated `src/app/api/health/route.ts` with database connectivity checks\n  - Added latency monitoring and error reporting\n- Implemented key features:\n  - Connection pooling with configurable pool size\n  - Singleton pattern to prevent multiple connections during hot reload\n  - Environment validation using Zod schema\n  - Health monitoring with latency tracking\n  - Multi-environment support (development, test, production)\n- Ready for quality gate testing (requires PostgreSQL instance)\n</info added on 2025-07-02T15:50:11.999Z>\n<info added on 2025-07-02T16:00:41.604Z>\n**Test Implementation Details:**\n\n- Created comprehensive test suite with 27 unit and integration tests\n- Implemented test files:\n  - `src/db/__tests__/database.config.test.ts` - Configuration validation (9 tests)\n  - `src/db/__tests__/connection.test.ts` - Connection and health checks (8 tests)\n  - `src/db/__tests__/index.test.ts` - Module exports validation (5 tests)\n  - `src/__tests__/api/health.test.ts` - Health API integration tests (5 tests)\n- Followed TDD methodology:\n  1. Created failing tests first\n  2. Implemented code to pass tests\n  3. Refactored for improved reliability\n- Test coverage includes:\n  - Database configuration parsing and validation\n  - Environment detection and pool settings\n  - Health check functionality and API responses\n  - Error handling scenarios with mocks\n  - Environment variable validation and URL masking\n- Quality verification completed:\n  - All tests passing\n  - Build successful\n  - Linting clean\n- Updated documentation with TDD requirements\n- Established testing pattern for future database-related subtasks\n</info added on 2025-07-02T16:00:41.604Z>",
-            "status": "done",
+            "title": "Establish Secure PostgreSQL Integration",
+            "description": "Set up a secure, reusable PostgreSQL connection with proper credential management and parameterization.",
+            "status": "pending",
             "dependencies": [],
-            "parentTaskId": 2
+            "details": "",
+            "testStrategy": ""
           },
           {
             "id": 2,
-            "title": "Create Database Schema Definitions",
-            "description": "Define all database tables using Drizzle schema",
-            "details": "- Create src/db/schema/users.ts with users table\n- Create src/db/schema/sessions.ts with sessions and user_sessions tables\n- Create src/db/schema/conversions.ts with conversions and conversion_uploads tables\n- Create src/db/schema/index.ts to export all schemas\n- Include proper TypeScript types and relationships\n- Ensure PII exclusion and no computed fields in schema\n\nCOMMIT: \"feat(database): create drizzle schema definitions - refs task 2.2\"\n<info added on 2025-07-02T16:19:53.467Z>\nFixed CI errors in database tests:\n- Resolved TypeScript error in connection.test.ts where mock postgres client was incorrectly structured\n- Fixed \"Property 'end' does not exist on type 'Mock<Procedure>'\" error\n- Implemented proper mocking using Object.assign() to correctly add methods to the mock function\n- Verified fix with all 40 tests passing, successful TypeScript compilation, and all 6 connection tests passing\n</info added on 2025-07-02T16:19:53.467Z>\n<info added on 2025-07-02T18:06:17.898Z>\nAdded critical database optimizations to schema definitions:\n\n1. Performance Indexes (20 total):\n   - Added composite indexes for analytics queries (idx_player_data_date_partner, idx_traffic_reports_analytics)\n   - Implemented unique_player_per_upload index for data integrity\n   - Created date-based indexes for time-series data\n   - Added partner/campaign indexes for business analytics\n   - Implemented upload management indexes for file system operations\n\n2. Database-Level Validation (12+ constraints):\n   - Implemented CHECK constraints for data integrity (positive amounts, valid enums)\n   - Added logic validation (unique_clicks <= all_clicks)\n   - Implemented boolean flags validation\n   - Created foreign key constraints with cascade deletes for data consistency\n\n3. Scale-Ready Architecture:\n   - Made schema partitioning-ready with appropriate date indexes\n   - Ensured analytics tables contain no PII\n   - Used Numeric(15,2) for financial precision\n   - Implemented composite indexes for complex queries\n\nMigration file 20250702180052_opposite_turbo.sql created with all optimizations. All 14 schema tests passing, successful compilation, and proper formatting.\n</info added on 2025-07-02T18:06:17.898Z>",
-            "status": "done",
+            "title": "Design SQL Extraction with Window Functions and Breakpoints",
+            "description": "Develop optimized SQL queries using window functions to extract cohort-defining attributes and support DAY_BREAKPOINTS and WEEK_BREAKPOINTS. Ensure week mode starts Monday and views Sunday.",
+            "status": "pending",
             "dependencies": [],
-            "parentTaskId": 2
+            "details": "",
+            "testStrategy": ""
           },
           {
             "id": 3,
-            "title": "Setup Migration System",
-            "description": "Configure and test database migration system with drizzle-kit",
-            "details": "- Configure drizzle-kit for migrations generation\n- Create initial migration from schema\n- Test migration system with development database\n- Update package.json scripts (db:generate, db:migrate, db:push, db:studio)\n- Validate migration rollback capability\n- Document migration process\n\nCOMMIT: \"feat(database): setup migration system with drizzle-kit - refs task 2.3\"\n<info added on 2025-07-02T16:37:43.237Z>\n## Migration System Setup Completed\n\n**Implemented Components:**\n1. ✅ **Migration Configuration**: drizzle.config.ts already configured from subtask 2.1\n2. ✅ **Migration Generation**: First migration automatically created from schema\n3. ✅ **Migration Structure**: 20250702162300_lumpy_cammi.sql with complete schema\n4. ✅ **Rollback System**: Created .down.sql file for safe rollbacks\n5. ✅ **Documentation**: Complete migration documentation in docs/how-to/development/migrations.md\n6. ✅ **Testing**: 14 migration system tests, all passing\n\n**System Configuration:**\n- Drizzle-kit with PostgreSQL dialect\n- Environment-based configuration (DATABASE_URL)\n- Timestamp-based migration naming\n- Metadata tracking in _journal.json\n- Strict mode for safety\n\n**Package.json Scripts Ready:**\n- `pnpm db:generate` - generate migrations\n- `pnpm db:migrate` - apply migrations\n- `pnpm db:push` - direct schema update\n- `pnpm db:studio` - GUI for database\n- `pnpm db:drop` - delete migrations\n\n**Quality Gates Passed:**\n✅ 54 tests passing (including 14 new migration tests)\n✅ pnpm build successful\n✅ TypeScript compilation without errors\n✅ ESLint warnings fixed (only notifications remaining)\n</info added on 2025-07-02T16:37:43.237Z>",
-            "status": "done",
+            "title": "Implement PostgreSQL Pipeline Mode for Batch Processing",
+            "description": "Utilize PostgreSQL pipeline mode to batch and asynchronously process multiple queries, handling errors and synchronization points to avoid pipeline aborts.",
+            "status": "pending",
             "dependencies": [],
-            "parentTaskId": 2
+            "details": "",
+            "testStrategy": ""
           },
           {
             "id": 4,
-            "title": "Create Database Utility Functions",
-            "description": "Implement database connection and utility functions",
-            "details": "- Create src/db/connection.ts with database connection logic\n- Implement connection pooling and error handling\n- Create src/db/utils.ts with common database operations\n- Add database health check function\n- Implement proper connection cleanup\n- Add TypeScript types for database operations\n\nCOMMIT: \"feat(database): create database utility functions - refs task 2.4\"",
-            "status": "in-progress",
+            "title": "Arquero Transformation and Metric Calculation",
+            "description": "Transform and aggregate extracted data in Arquero, mapping breakpoints and calculating DEP2COST, ROAS, AVG DEPOSIT SUM, and RETENTION RATE metrics. Implement retention rate as active_players/initial_cohort_size*100.",
+            "status": "pending",
             "dependencies": [],
-            "parentTaskId": 2
+            "details": "",
+            "testStrategy": ""
           },
           {
             "id": 5,
-            "title": "Create Seed Data System",
-            "description": "Implement database seeding with demo data for testing",
-            "details": "- Create src/db/seed.ts with seeding logic\n- Load demo data from src/data/demo/ CSV files\n- Parse and clean CSV data (exclude PII, computed fields)\n- Create seed users with different roles\n- Create sample conversions and uploads data\n- Add npm script: db:seed\n- Ensure idempotent seeding (can run multiple times)\n\nCOMMIT: \"feat(database): create seed data system with demo data - refs task 2.5\"",
+            "title": "Performance Optimization for Large Datasets",
+            "description": "Optimize the pipeline for large datasets by minimizing round-trips, leveraging parallelism, and tuning memory usage.",
             "status": "pending",
             "dependencies": [],
-            "parentTaskId": 2
+            "details": "",
+            "testStrategy": ""
           },
           {
             "id": 6,
-            "title": "Create Database Tests",
-            "description": "Implement comprehensive database testing suite",
-            "details": "- Create src/__tests__/db/ directory for database tests\n- Implement unit tests for schema validation\n- Create integration tests for database operations\n- Set up in-memory SQLite for fast unit tests\n- Test seed data loading and validation\n- Test migration up/down scenarios\n- Add database connection health checks tests\n- Ensure all tests pass before marking task complete\n\nCOMMIT: \"feat(database): create comprehensive database test suite - refs task 2.6\"",
+            "title": "Interface for Metric Definitions and Breakpoint Configuration",
+            "description": "Provide clear interfaces for defining metrics and configuring breakpoints to support extensibility. Ensure metric definitions reflect DEP2COST, ROAS, AVG DEPOSIT SUM, and RETENTION RATE.",
             "status": "pending",
             "dependencies": [],
-            "parentTaskId": 2
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 7,
+            "title": "Integration with Report Factory",
+            "description": "Ensure compatibility and seamless integration with the report factory foundation for downstream reporting.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
           }
         ]
       },
       {
         "id": 3,
-        "title": "Implement Authentication and 2FA",
-        "description": "Set up user authentication with NextAuth.js and implement Two-Factor Authentication (2FA) using TOTP.",
-        "details": "1. Configure NextAuth.js with Drizzle adapter\n2. Implement email/password authentication strategy\n3. Add TOTP-based 2FA support using a library like 'otpauth' (v9.1.3 or later)\n4. Create protected route middleware\n5. Implement role-based access control (RBAC) for user and superuser roles\n6. Design and implement login, 2FA setup, and 2FA verification pages\n7. Create API routes for authentication operations\n8. Implement secure password hashing using bcrypt (v5.1.0 or later)\n9. Set up proper session management and CSRF protection",
-        "testStrategy": "1. Unit test authentication functions\n2. Test login flow with and without 2FA\n3. Verify RBAC functionality\n4. Test protected routes for both user and superuser roles\n5. Ensure proper error handling for authentication failures\n6. Validate session management and security measures\n7. Perform security audit of authentication implementation",
-        "priority": "high",
-        "dependencies": [2],
+        "title": "Universal UI Component Library for Reports",
+        "description": "Develop a universal, reusable UI component library using shadcn/ui patterns for all report types, focusing on composable filters, data tables (TanStack Table), charts (Recharts), responsive layouts, loading states, error handling, and theming support.",
         "status": "pending",
-        "subtasks": []
+        "dependencies": [
+          1
+        ],
+        "priority": "medium",
+        "details": "Leverage shadcn/ui's open code and compositional approach to build a robust set of accessible, customizable React components tailored for reporting needs. Audit requirements for universal report filters, data tables (using TanStack Table), chart containers (using Recharts), responsive layout primitives, loading indicators, and error boundaries. Use shadcn/ui's headless and composable philosophy to create base components that are easily extensible and support theming. Implement filters with flexible input types, tables with sorting and pagination, chart wrappers compatible with Recharts, and ensure all components handle loading and error states gracefully. All components must be responsive, accessible, and themeable. Document usage patterns, variants, and provide Figma assets for design consistency. Integrate with the report factory architecture to ensure seamless data and state flow between components and the underlying data pipeline.",
+        "testStrategy": "1. Render each component in isolation and within composed report layouts, verifying visual consistency, responsiveness, and theming across devices. 2. Test filter, table (TanStack Table), and chart (Recharts) components with mock and real data, ensuring correct data binding, interactivity, accessibility (keyboard navigation, ARIA roles), and proper handling of loading and error states. 3. Validate integration with the report factory by generating sample reports using the new components. 4. Review Figma assets for design fidelity and ensure documentation covers usage, customization, and error/loading state handling.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "NextAuth.js Base Configuration",
+            "description": "Set up the foundational NextAuth.js configuration for authentication in the Next.js application.",
+            "dependencies": [],
+            "details": "Implement NextAuth.js in the /app/api/auth/[...nextauth]/route.ts file. Configure at least one provider (e.g., Google, GitHub) and set up session management. Ensure environment variables for provider credentials are securely managed. Use advanced initialization to allow for custom logic if needed. Security considerations: Secure environment variables, use HTTPS, and validate provider configurations. Testing: Write integration tests for login/logout flows, and verify session persistence and provider callback handling.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Custom Drizzle Adapter Implementation",
+            "description": "Integrate a custom Drizzle ORM adapter with NextAuth.js to persist user and session data in the database.",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement the Drizzle adapter to connect NextAuth.js with the database, ensuring user, session, and account tables are correctly mapped. Handle edge cases such as duplicate users and session invalidation. Security considerations: Sanitize all database inputs, use parameterized queries, and restrict database permissions. Testing: Unit test adapter methods, perform migration tests, and verify data integrity after authentication events.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "TOTP 2FA Implementation",
+            "description": "Add Time-based One-Time Password (TOTP) two-factor authentication to the authentication flow.",
+            "dependencies": [
+              2
+            ],
+            "details": "Integrate TOTP 2FA using a library like speakeasy. Store TOTP secrets securely (e.g., encrypted in the database). Update authentication flows to require TOTP verification after password login. Security considerations: Use secure random secret generation, encrypt TOTP secrets, and implement brute-force protection. Testing: Write tests for TOTP enrollment, verification, backup codes, and recovery flows.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Protected Routes and RBAC Middleware",
+            "description": "Implement middleware to protect routes and enforce role-based access control (RBAC).",
+            "dependencies": [
+              3
+            ],
+            "details": "Create middleware that checks authentication and user roles before allowing access to protected routes. Define roles and permissions in the database or configuration. Security considerations: Prevent privilege escalation, validate user roles on every request, and log access attempts. Testing: Test access control for all roles, simulate unauthorized access, and verify middleware logic.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Authentication UI Components",
+            "description": "Build UI components for login, registration, 2FA setup, and error handling.",
+            "dependencies": [
+              4
+            ],
+            "details": "Develop reusable UI components for authentication flows, including forms for login, registration, TOTP setup, and error messages. Ensure accessibility and responsive design. Security considerations: Prevent XSS in form inputs, avoid leaking sensitive error details, and use secure form handling. Testing: Write component tests for all UI states, simulate user interactions, and verify error handling.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "Report Layouts for shadcn/ui Component Library",
+            "description": "Design and implement reusable report layouts using shadcn/ui components.",
+            "dependencies": [],
+            "details": "Create flexible layout components for reports, supporting headers, footers, and content sections. Ensure layouts are compatible with other shadcn/ui components. Security considerations: Sanitize dynamic content and prevent layout injection. Testing: Snapshot and visual regression tests for layout consistency.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 7,
+            "title": "Filter Components and TanStack Table Integration",
+            "description": "Develop filter UI components and integrate them with TanStack Table for advanced data filtering.",
+            "dependencies": [],
+            "details": "Build filter components (dropdowns, search, date pickers) and connect them to TanStack Table state. Ensure filters are accessible and performant. Security considerations: Sanitize filter inputs and prevent SQL injection if filters are server-driven. Testing: Unit and integration tests for filter logic and table updates.",
+            "status": "pending",
+            "testStrategy": ""
+          },
+          {
+            "id": 8,
+            "title": "Recharts Wrappers, Loading States, Error Boundaries, Responsive Design, and Theming System",
+            "description": "Implement wrappers for Recharts, global loading states, error boundaries, responsive design utilities, and a theming system for the component library.",
+            "dependencies": [],
+            "details": "Create reusable wrappers for Recharts charts, global loading spinners, and error boundary components. Implement responsive design utilities and a theming system for consistent styling. Security considerations: Handle chart data securely, prevent error boundary information leaks, and ensure theming does not expose sensitive data. Testing: Write tests for chart rendering, loading/error states, responsive behavior, and theme switching.",
+            "status": "pending",
+            "testStrategy": ""
+          }
+        ]
       },
       {
         "id": 4,
-        "title": "Develop Basic Layout and Navigation",
-        "description": "Integrate authentication and role-based access control into the existing layout and navigation for the TraffBoardLite MVP.",
+        "title": "Cohort-Specific UI Implementation",
+        "description": "Develop a cohort analysis interface featuring a TanStack Table with triangular cohort visualization, heatmap cells, breakpoint selectors, metric toggles (DEP2COST, ROAS, AVG DEPOSIT SUM, RETENTION RATE), a cohort configuration panel, and interactive features for in-depth cohort exploration. All metric toggles and header controls must exactly match the demo structure, with updated metric names and labels throughout the UI.",
         "status": "pending",
-        "dependencies": [1, 3],
+        "dependencies": [
+          1,
+          3
+        ],
         "priority": "medium",
-        "details": "1. Integrate authentication into the main layout (src/app/main/dashboard/layout.tsx) to protect routes using NextAuth.js from Task 3\n2. Implement role-based menu visibility in the sidebar navigation (app-sidebar.tsx) and related components (nav-main.tsx, nav-user.tsx, account-switcher.tsx, theme-switcher.tsx)\n3. Update navigation items to display only for users with the appropriate roles (e.g., show 'administration' only to superusers)\n4. Ensure all navigation and layout logic is integrated with the existing Next.js 15 App Router structure\n5. Remove any redundant or legacy sidebar creation logic—use the existing sidebar and navigation components",
-        "testStrategy": "1. Verify that unauthenticated users are redirected to the login page when accessing protected routes\n2. Test that authenticated users see navigation items appropriate to their roles\n3. Confirm that navigation between pages works as expected for different user roles\n4. Ensure integration with NextAuth.js is functioning (login, logout, session persistence)\n5. Perform accessibility and responsive design checks on the updated navigation and layout",
-        "subtasks": []
+        "details": "Implement a React-based cohort analysis UI that leverages TanStack Table for rendering cohort data in a triangular format, supporting advanced features such as sorting, filtering, and pagination. Integrate heatmap visualization directly into the table cells to display cohort metrics over time, with dynamic color scaling based on metric intensity. Add responsive breakpoint selectors (e.g., dropdowns or segmented controls) to allow users to adjust cohort time intervals (daily, weekly, monthly), updating both the table and heatmap accordingly. Implement metric toggles enabling users to switch between DEP2COST, ROAS, AVG DEPOSIT SUM, and RETENTION RATE metrics, ensuring real-time updates to the visualization. All metric toggle controls and header labels must exactly match the demo structure. Include a cohort configuration panel for users to define cohort grouping logic and filters. Ensure all UI elements are accessible, responsive, and styled consistently with the component library from Task 3. Coordinate with the data engine to fetch and display real cohort data, handling loading and error states gracefully. Use compositional patterns to allow future extensibility for additional visualizations or controls. Provide interactive features such as cell tooltips, cohort highlighting, and drill-down actions.",
+        "testStrategy": "1. Render the cohort analysis interface with mock and real data, verifying correct integration of TanStack Table with triangular cohort visualization and heatmap cells. 2. Test breakpoint selectors and metric toggles (DEP2COST, ROAS, AVG DEPOSIT SUM, RETENTION RATE) to ensure they update the displayed data and visualizations in real time, and that all labels and controls match the demo structure. 3. Validate the cohort configuration panel for correct cohort grouping and filtering. 4. Validate accessibility by checking keyboard navigation, ARIA attributes, and screen reader compatibility. 5. Confirm responsive layout across devices and browsers. 6. Simulate loading and error states to ensure graceful UI degradation. 7. Test interactive features such as tooltips, cohort highlighting, and drill-down actions. 8. Conduct user acceptance testing with sample cohort scenarios to verify usability and correctness of cohort breakdowns and visualizations.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design Triangular Cohort Table Layout",
+            "description": "Design and implement the TanStack Table layout to support triangular cohort visualization, ensuring correct alignment of heatmap cells and cohort metrics.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Integrate Heatmap Visualization in Table Cells",
+            "description": "Embed heatmap color scaling into the cohort table cells, dynamically reflecting metric intensity for each cohort/time period intersection.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Implement Breakpoint Selectors",
+            "description": "Add responsive controls (dropdowns or segmented controls) for users to select cohort time intervals (daily, weekly, monthly), updating the table and heatmap accordingly.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Add Metric Toggles",
+            "description": "Implement toggles for DEP2COST, ROAS, AVG DEPOSIT SUM, and RETENTION RATE metrics, ensuring real-time updates to the cohort visualization. All toggle controls and labels must exactly match the demo structure.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Build Cohort Configuration Panel",
+            "description": "Develop a configuration panel allowing users to define cohort grouping logic and apply filters before visualization.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "Ensure Responsive and Accessible UI",
+            "description": "Validate that all UI elements are responsive and accessible, following best practices for keyboard navigation, ARIA attributes, and screen reader compatibility.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 7,
+            "title": "Implement Interactive Features",
+            "description": "Add interactive features such as cell tooltips, cohort highlighting, and drill-down actions for deeper cohort exploration.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 8,
+            "title": "Integrate with Data Engine",
+            "description": "Connect the UI to the data engine to fetch and display real cohort data, handling loading and error states gracefully.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          }
+        ]
       },
       {
         "id": 5,
-        "title": "Implement CSV Upload and Processing",
-        "description": "Create a CSV upload feature with file processing and database insertion.",
-        "details": "1. Design and implement a file upload form using shadcn/ui components\n2. Create a Server Action for file upload and processing\n3. Use PapaParse (v5.4.1 or later) to process the uploaded CSV file\n4. Implement data validation using Zod (v3.21.4 or later) with the following schema:\n   - date: string (YYYY-MM-DD format)\n   - partnerId: string\n   - campaignId: string\n   - clicks: number (integer)\n   - registrations: number (integer)\n   - revenue: number (decimal)\n5. Transform and insert valid data into the conversions table\n6. Implement error handling and validation feedback\n7. Create a progress indicator for large file uploads\n8. Optimize for performance to handle files with up to 50K records\n9. Implement file type and size restrictions",
-        "testStrategy": "1. Test CSV upload with various file sizes and formats\n2. Verify data validation and error handling\n3. Check database insertion accuracy\n4. Test performance with large files (up to 50K records)\n5. Ensure proper feedback for upload progress and success/failure\n6. Validate file type and size restrictions\n7. Test concurrent uploads",
-        "priority": "high",
-        "dependencies": [2, 3, 4],
+        "title": "Saved Cohorts & State Management Implementation",
+        "description": "Implement a robust saved cohorts system with Zustand state management, cohort persistence, saved reports UI, collaboration features, a tab system for multiple open cohorts, URL sharing, and report templates to enhance the application's functionality and user experience.",
         "status": "pending",
+        "dependencies": [
+          1,
+          3
+        ],
+        "priority": "medium",
+        "details": "### Implementation Steps\n\n1. **Cohort Persistence**: Develop a system to save and load cohorts from a database or local storage. This involves creating API endpoints for storing and retrieving cohort data and integrating these endpoints with the application's frontend. Ensure that cohorts can be persisted and restored across sessions.\n\n2. **State Management with Zustand**: Set up Zustand for managing global state across the application, including:\n   - Cohort data (supporting multiple open cohorts via a tab system)\n   - User preferences\n   - Report settings\n   - Saved reports and templates\n   Implement actions and selectors to update and retrieve state efficiently. Use middleware for state persistence, logging, and asynchronous actions as needed[1][2].\n\n3. **Saved Reports System & Templates**: Design a feature to save, manage, and template reports generated from cohort analyses. This includes:\n   - Creating a database schema to store report metadata, content, and templates\n   - Implementing UI components to list, view, manage, and create reports from templates\n\n4. **Collaboration Features**: Implement features that allow users to share cohorts and reports with others. This includes:\n   - Integrating authentication and authorization to manage access permissions\n   - Creating a sharing mechanism via email, direct links, or URL sharing for cohorts and reports\n\n5. **Tab System for Multiple Open Cohorts**: Implement a tabbed interface in the UI to allow users to have multiple cohorts open simultaneously. Ensure that each tab's state is managed independently within Zustand and persists as needed.\n\n6. **URL Sharing**: Enable users to share the current state of a cohort or report via a unique URL, allowing others to access or collaborate on the same data view.\n\n### Technical Approach\n\n- Use **Zustand** for state management to ensure efficient data sharing across components without prop drilling[1][2].\n- Leverage **React hooks** to integrate Zustand with the application's UI components.\n- For cohort persistence, use a backend framework like **Node.js** with **PostgreSQL** for database operations.\n- Implement **middleware** in Zustand to handle asynchronous actions, state logging, and persistence for debugging and reliability[2].\n- Design the UI to support tabbed navigation for cohorts and a clear interface for managing saved reports and templates.\n\n### Code Example\n\n```javascript\nimport { create } from 'zustand';\nimport { persist, devtools } from 'zustand/middleware';\n\nconst useCohortStore = create(\n  devtools(\n    persist(\n      (set) => ({\n        cohorts: [],\n        openTabs: [], // Array of cohort IDs or objects representing open tabs\n        addCohort: (newCohort) => set((state) => ({ cohorts: [...state.cohorts, newCohort] })),\n        removeCohort: (cohortId) => set((state) => ({ cohorts: state.cohorts.filter(cohort => cohort.id !== cohortId) })),\n        openTab: (cohortId) => set((state) => ({ openTabs: [...state.openTabs, cohortId] })),\n        closeTab: (cohortId) => set((state) => ({ openTabs: state.openTabs.filter(id => id !== cohortId) })),\n        // ...other actions for reports, templates, sharing, etc.\n      }),\n      { name: 'cohort-storage' }\n    )\n  )\n);\n```\n",
+        "testStrategy": "1. **Cohort Persistence Test**: Verify that cohorts are correctly saved and loaded from the database or local storage by testing the API endpoints and frontend integration. Confirm that cohorts persist across sessions and can be restored.\n2. **State Management Test**: Use the Redux DevTools extension to monitor state changes and ensure that Zustand updates components correctly, including tab state and report templates.\n3. **Saved Reports & Templates Test**: Validate that reports and templates are saved, retrieved, and instantiated correctly by checking the database and UI listing. Test creating new reports from templates.\n4. **Collaboration Features Test**: Test sharing functionality by verifying that shared cohorts and reports (including via URL) are accessible to authorized users and that permissions are enforced.\n5. **Tab System Test**: Ensure that multiple cohorts can be opened, closed, and switched between via the tab UI, and that each tab maintains its own state.\n6. **URL Sharing Test**: Confirm that sharing a cohort or report via URL correctly loads the intended state for other users.",
         "subtasks": []
       },
       {
         "id": 6,
-        "title": "Develop Analytics Dashboard",
-        "description": "Create a simple analytics dashboard with key metrics and basic charts.",
-        "details": "1. Implement global filter components for date range, partner, and campaign using Zustand (v4.3.8 or later) for state management\n2. Create a Zustand store for filter state:\n   ```typescript\n   interface FilterState {\n     dateRange: [Date, Date]\n     partners: string[]\n     campaigns: string[]\n     setFilters: (filters: Partial<FilterState>) => void\n     resetFilters: () => void\n   }\n   ```\n3. Use TanStack Query (v5.0.0 or later) for data fetching with proper caching strategies\n4. Implement API routes for fetching analytics data based on filters\n5. Create KPI cards for total clicks, registrations, and revenue\n6. Implement the following charts using shadcn/ui charts (Recharts wrapper):\n   - Line chart for daily metrics\n   - Bar chart for top partners\n   - Pie chart for campaign distribution\n7. Ensure all components are responsive and mobile-friendly\n8. Implement loading states and error handling for data fetching\n9. Add a date range picker component for custom date selection",
-        "testStrategy": "1. Test filter functionality and state management\n2. Verify data fetching and caching with TanStack Query\n3. Ensure charts render correctly with various data sets\n4. Test responsiveness on different screen sizes\n5. Validate loading states and error handling\n6. Performance test dashboard with large datasets\n7. Verify date range picker functionality",
-        "priority": "high",
-        "dependencies": [2, 4, 5],
+        "title": "Performance Optimization & Caching Implementation",
+        "description": "Implement intelligent query caching, progressive loading, background data refresh, performance monitoring, and optimization suggestions to improve application speed and responsiveness. Include robust cache invalidation strategies and resource monitoring.",
         "status": "pending",
+        "dependencies": [
+          5
+        ],
+        "priority": "medium",
+        "details": "Start by profiling the application's current performance using tools such as Lighthouse, Web Vitals, or custom logging to identify bottlenecks. Implement intelligent caching at multiple layers: \n- Use browser caching for static assets by setting appropriate cache-control and expires headers, and leverage Service Workers and the Cache API for selective caching of API responses and assets[1][4]. \n- Apply intelligent query caching for frequently accessed or computationally expensive data, such as cohort queries and saved reports, using algorithms like LRU or LFU to manage cache storage efficiently[2]. \n- Integrate cache invalidation strategies to ensure data freshness, including TTL (Time to Live) values and event-driven invalidation on data changes[2]. \n- Enable background data refresh to keep cached data up-to-date without blocking the user interface. \n- Integrate a CDN to serve static files and images, reducing latency for global users[3]. \n- Apply code-splitting and lazy loading for JavaScript bundles and heavy UI components, ensuring only necessary code is loaded initially. \n- Optimize images by compressing and resizing them, and use modern formats (e.g., WebP). \n- Minify and bundle CSS/JS files to reduce HTTP requests and payload size. \n- Monitor performance in production with real-time analytics, error tracking, and resource monitoring, setting up alerts for slow queries, high latency, or cache misses. \n- Provide optimization suggestions based on monitoring insights. \n- Regularly review and optimize database queries, especially those related to cohort and report data. \n- Document all optimizations, cache strategies, and provide fallback mechanisms for users with limited connectivity.",
+        "testStrategy": "1. Use performance profiling tools (Lighthouse, WebPageTest) to benchmark before and after optimizations, ensuring measurable improvements in load time and interactivity. 2. Verify caching headers and Service Worker strategies are correctly set for static assets and API responses, and that server-side and query caches are invalidated appropriately on data changes. 3. Test CDN integration by accessing the app from different geographic locations and confirming reduced latency. 4. Confirm that code-splitting and lazy loading work by monitoring network requests and ensuring only necessary bundles are loaded on initial render. 5. Check that images are served in optimized formats and sizes. 6. Simulate slow network conditions to ensure progressive loading, background data refresh, and fallback mechanisms function correctly. 7. Monitor production performance, resource usage, and error logs to catch regressions or missed optimizations. 8. Validate that optimization suggestions are generated and actionable.",
         "subtasks": []
       },
       {
         "id": 7,
-        "title": "Implement User Management",
-        "description": "Create a user management interface for superusers to perform CRUD operations on user accounts.",
-        "details": "1. Design and implement a user list page using shadcn/ui data table component\n2. Create forms for adding and editing users\n3. Implement user creation with the following fields:\n   - Email (required)\n   - Password (required)\n   - Role (user/superuser)\n4. Add functionality to edit existing user details\n5. Implement user deletion with confirmation dialog\n6. Create API routes for user CRUD operations\n7. Implement server-side pagination for the user list\n8. Add search and filter functionality to the user list\n9. Ensure proper error handling and validation for all user management operations\n10. Implement role management functionality for superusers\n11. Add audit logging for user management actions",
-        "testStrategy": "1. Test CRUD operations for user management\n2. Verify role-based access control for user management features\n3. Test pagination, search, and filter functionality\n4. Ensure proper error handling and validation\n5. Verify audit logging for user management actions\n6. Test edge cases (e.g., deleting the last superuser)\n7. Perform security testing on user management endpoints",
-        "priority": "medium",
-        "dependencies": [2, 3, 4],
+        "title": "Integration Testing & Quality Assurance",
+        "description": "Conduct comprehensive integration testing and quality assurance, including end-to-end cohort workflows, data accuracy validation, performance benchmarking, accessibility compliance, cross-browser testing, and user acceptance testing with real gambling industry scenarios. Ensure the application functions seamlessly and meets all requirements across different environments and user contexts.",
         "status": "pending",
-        "subtasks": []
+        "dependencies": [
+          4,
+          5,
+          6
+        ],
+        "priority": "medium",
+        "details": "### Implementation Steps\n\n1. **End-to-End Cohort Workflow Testing**: Execute integration tests covering the entire cohort analysis workflow, including cohort creation, modification, saving, and data retrieval, ensuring all components interact correctly.\n\n2. **Data Accuracy Validation**: Validate that cohort analysis results and related data outputs are accurate and consistent with expected business logic, especially for gambling industry-specific scenarios.\n\n3. **Performance Benchmarking**: Use tools such as Lighthouse, WebPageTest, Apache JMeter, or BrowserStack App Performance to evaluate application speed, responsiveness, and stability under various loads and network conditions. Simulate real-world usage patterns and compare performance before and after optimizations[1][2][3].\n\n4. **Accessibility Compliance**: Assess the application for accessibility compliance (e.g., WCAG 2.1), ensuring that all users, including those with disabilities, can effectively use the application.\n\n5. **Cross-Browser and Device Testing**: Test the application on multiple browsers (Chrome, Firefox, Safari, Edge) and devices (desktop, tablet, mobile) to ensure consistent functionality and appearance across environments.\n\n6. **User Acceptance Testing (UAT)**: Conduct UAT sessions with stakeholders and real users from the gambling industry, using realistic scenarios to validate that the application meets business needs and user expectations.\n\n7. **Integration Validation**: Define clear acceptance criteria and involve stakeholders in the review and sign-off process for all integration points.\n\n### Technical Approach\n- Utilize automated testing frameworks for integration and regression tests where possible.\n- Leverage open-source and commercial performance testing tools (e.g., JMeter, BrowserStack App Performance) for benchmarking and analysis[1][2][3].\n- Incorporate accessibility testing tools and manual reviews.\n- Collect and analyze user feedback from UAT to refine the user experience.\n- Document all test cases, scenarios, and results for traceability and future reference.\n\n### Dependencies\nThis task depends on the completion of tasks that implement core functionalities and optimizations, such as cohort analysis UI, saved cohorts, state management, and performance optimizations.",
+        "testStrategy": "1. **End-to-End Integration Test Execution**: Run comprehensive integration tests for all cohort workflows, logging results and identifying any interface or data flow issues.\n2. **Data Accuracy Checks**: Compare cohort analysis outputs against expected results for a variety of gambling industry scenarios to ensure correctness.\n3. **Performance Benchmarking**: Use tools like JMeter, Lighthouse, or BrowserStack App Performance to measure and compare performance metrics under different loads and network conditions[1][2][3].\n4. **Accessibility Verification**: Use automated and manual accessibility testing to confirm compliance with relevant standards (e.g., WCAG 2.1).\n5. **Cross-Browser and Device Verification**: Systematically test across supported browsers and devices, documenting any inconsistencies or issues.\n6. **User Acceptance Testing**: Facilitate UAT sessions with real users and stakeholders from the gambling industry, gathering feedback and validating that the application meets business requirements.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "End-to-End Cohort Workflow Integration Testing",
+            "description": "Develop and execute integration tests covering the full cohort workflow, including creation, modification, saving, and retrieval, ensuring all components interact correctly.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Data Accuracy Validation for Cohort Analysis",
+            "description": "Validate the accuracy of cohort analysis results and outputs, especially for gambling industry-specific scenarios, by comparing against expected business logic and sample datasets.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Performance Benchmarking with Realistic Loads",
+            "description": "Benchmark application performance using tools like JMeter, Lighthouse, or BrowserStack App Performance, simulating real-world usage and network conditions.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Accessibility Compliance Testing",
+            "description": "Assess and document the application's accessibility compliance using automated tools and manual reviews, ensuring adherence to standards such as WCAG 2.1.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Cross-Browser and Device Compatibility Testing",
+            "description": "Test the application on all supported browsers and devices, documenting any inconsistencies or issues in functionality or appearance.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "User Acceptance Testing with Gambling Industry Scenarios",
+            "description": "Conduct UAT sessions with stakeholders and real users from the gambling industry, using realistic scenarios to validate business requirements and gather actionable feedback.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          }
+        ]
       },
       {
         "id": 8,
-        "title": "Deploy to DigitalOcean App Platform",
-        "description": "Set up and deploy the TraffBoardLite MVP to a DigitalOcean Droplet (VPS) with a locally installed PostgreSQL database.",
+        "title": "Critical Repository Refactoring for Cohort Analysis Foundation",
+        "description": "Refactor the TraffBoard repository to address architectural blockers for cohort analysis, including API endpoint consolidation, legacy code removal, database schema cleanup, and foundational architecture preparation. The repository must use consistent 'conversion' terminology throughout all code, interfaces, and endpoints, with all legacy 'traffic' references fully eliminated.",
         "status": "pending",
-        "dependencies": [1, 2, 3, 4, 5, 6, 7],
+        "dependencies": [
+          1,
+          3
+        ],
         "priority": "high",
-        "details": "1. Create a DigitalOcean account if not already available\n2. Create and configure an Ubuntu Droplet (VPS)\n3. Install Node.js, PM2, and Nginx on the Droplet\n4. Install and configure PostgreSQL on the same Droplet\n5. Set up SSL certificates using Certbot for HTTPS via Nginx\n6. Configure environment variables securely on the Droplet\n7. Set up GitHub Actions for automatic deployment to the Droplet\n8. Configure Nginx as a reverse proxy for the Node.js application\n9. Set up logging and monitoring for the application and server\n10. Implement a health check endpoint\n11. Create a production-ready build script",
-        "testStrategy": "1. Verify successful deployment to the Droplet\n2. Test database connection in the production environment\n3. Ensure all environment variables are correctly set and loaded\n4. Verify HTTPS and SSL certificate setup via Nginx and Certbot\n5. Test application functionality in the production environment\n6. Monitor application and server logs and performance\n7. Verify health check endpoint\n8. Test automatic deployment via GitHub Actions\n9. Perform load testing on the deployed application",
-        "subtasks": []
+        "details": "Conduct a comprehensive audit of the TraffBoard codebase to identify and document all remaining legacy modules, redundant API endpoints, and outdated database schema elements that could impede cohort analysis development. Ensure all API endpoints related to reporting and cohort data are consolidated and standardized, following RESTful naming conventions and consistent request/response formats[1][4]. Remove any remaining obsolete or deprecated code, libraries, and configuration files, with careful regression testing to avoid breaking existing functionality. Review and refactor the database schema to eliminate unused tables, columns, and relationships, and to optimize for cohort-based queries (e.g., adding necessary indexes, normalizing tables for cohort metrics). Prepare the foundational architecture by modularizing core services, establishing clear boundaries for data access layers, and documenting new interfaces and data contracts. Ensure all changes are backward compatible with ongoing work in Tasks 1-7, and provide migration scripts and documentation for seamless team adoption. All 'traffic' terminology and legacy code must remain fully removed, with 'conversion' naming standardized across the codebase.",
+        "testStrategy": "1. Run the full test suite before and after refactoring to ensure no regressions or breaking changes. 2. Use API contract testing tools (e.g., Postman, Swagger) to verify endpoint consolidation, RESTful naming, and response consistency[1][4]. 3. Validate that all legacy code and schema elements targeted for removal are fully eliminated and that no references remain. 4. Benchmark key cohort-related queries before and after schema cleanup to confirm performance improvements. 5. Review migration scripts and documentation with the team to ensure clarity and ease of adoption. 6. Confirm that all code, interfaces, and endpoints use 'conversion' terminology exclusively, with no residual 'traffic' references.",
+        "subtasks": [
+          {
+            "id": 2,
+            "title": "Database Schema Cleanup and Cohort Optimization",
+            "description": "Audit and refactor the database schema to remove any remaining unused tables, columns, or relationships related to legacy 'traffic' data. Normalize tables and add necessary indexes to optimize for cohort-based queries. Ensure all schema elements use 'conversion' terminology.",
+            "status": "pending",
+            "dependencies": [
+              1
+            ],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Legacy Code and Configuration Removal",
+            "description": "Identify and remove any remaining obsolete or deprecated code, libraries, and configuration files that reference 'traffic' or are no longer relevant after the API consolidation. Confirm that all code and documentation use 'conversion' naming exclusively.",
+            "status": "pending",
+            "dependencies": [
+              1
+            ],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "API Endpoint Standardization and Documentation",
+            "description": "Review all reporting and cohort-related API endpoints to ensure they follow RESTful naming conventions, use consistent 'conversion' terminology, and provide standardized request/response formats. Update or create API documentation to reflect these changes.",
+            "status": "pending",
+            "dependencies": [
+              1
+            ],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "Foundational Architecture Preparation",
+            "description": "Modularize core services, establish clear boundaries for data access layers, and document new interfaces and data contracts. Ensure all foundational architecture is ready for cohort analysis and is free of legacy 'traffic' dependencies.",
+            "status": "pending",
+            "dependencies": [
+              2,
+              3,
+              4
+            ],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 1,
+            "title": "API Structure Consolidation",
+            "description": "Remove legacy /api/traffic/ endpoint and traffic.ts data layer, ensuring all imports and references point to the current /api/conversions/ and conversions.ts. This critical cleanup prevents naming conflicts and confusion during cohort analysis development. Delete obsolete files, update all import statements, and verify no broken references remain.",
+            "details": "",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 8
+          },
+          {
+            "id": 6,
+            "title": "E2E Testing Infrastructure Setup",
+            "description": "Setup comprehensive E2E testing infrastructure with Playwright for authentication flows. Create test database setup, CI integration, and documentation for testing patterns and troubleshooting common issues like Next.js dev tools interference.",
+            "details": "- Setup isolated test database for E2E tests\n- Create login/logout authentication test with proper selectors\n- Configure Playwright for both local and CI environments  \n- Document testing patterns and troubleshooting guide\n- Integrate E2E tests into GitHub Actions CI pipeline",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 8
+          },
+          {
+            "id": 7,
+            "title": "Report Factory Foundation Architecture Implementation",
+            "description": "Create the foundational directory structure and base architecture for the Report Factory system. This includes creating missing directories (src/components/reports/, src/lib/reports/, src/stores/), implementing core TypeScript interfaces (src/types/reports.ts), and establishing the base plugin architecture. This foundation is critical for Task 1 and all subsequent cohort analysis work.",
+            "details": "",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 8
+          },
+          {
+            "id": 8,
+            "title": "Comprehensive Testing Suite for Report Factory Foundation",
+            "description": "Create comprehensive unit and integration tests for the Report Factory Foundation architecture using Vitest and Playwright. This includes testing TypeScript interfaces, React context providers, filter system components, plugin architecture, data pipeline functionality, and state management. Tests must validate component functionality, type safety, error handling, performance, and integration between different parts of the system. Focus on critical paths: filter modal workflows, plugin registration/unregistration, data pipeline transformations, and Zustand store mutations.",
+            "details": "",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 8
+          }
+        ]
       }
     ],
     "metadata": {
       "created": "2025-07-01T22:28:10.873Z",
-      "updated": "2025-07-02T16:38:22.509Z",
+      "updated": "2025-07-07T15:08:17.644Z",
       "description": "Tasks for master context"
     }
   }

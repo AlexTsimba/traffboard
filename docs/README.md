@@ -1,38 +1,25 @@
 # TraffBoard Documentation
 
-Modern traffic analytics dashboard built with Next.js 15, TypeScript, and Tailwind CSS.
+## 🏗️ Architecture
+- **[System Overview](ARCHITECTURE.md)** - Core tech stack, patterns, and decisions
+- **[Database Schema](DATABASE.md)** - Prisma models, indexes, and queries
+- **[API Design](API.md)** - Server actions, data flow, and caching
 
-## Quick Start
+## 🧱 Components
+- **[Report Factory](REPORTS.md)** - Modular reporting system with filters, pipelines, and exports
+- **[Authentication](AUTH.md)** - NextAuth v5 setup, roles, and security patterns
 
-```bash
-git clone <repo>
-cd traffboard
-pnpm install
-pnpm dev
-```
+## 🚀 Development
+- **[Quick Start](QUICK_START.md)** - Setup, commands, and common workflows
+- **[Testing Guide](TESTING.md)** - Test patterns, mocks, and coverage expectations
 
-Open [http://localhost:3000](http://localhost:3000)
+## 📊 Current Features
+- **Report Factory Foundation** ✅ - Universal filters, pipelines, exports
+- **Cohort Analysis** 🚧 - In development (Task 2)
+- **User Management** ✅ - Admin interface with CSV import
+- **Authentication** ✅ - Role-based access control
 
-## Documentation Structure
-
-- **[Tutorial](./tutorial/)** - Learning guides and getting started
-- **[How-To](./how-to/)** - Problem-solving guides  
-- **[Reference](./reference/)** - Technical documentation
-- **[Explanation](./explanation/)** - Design decisions and architecture
-
-## Key Features
-
-- **Analytics Dashboard** with interactive charts
-- **Modern UI** with shadcn/ui components
-- **Responsive Design** optimized for all devices
-- **Dark/Light Theme** with system preference detection
-
-## Contributing
-
-1. Follow [commit conventions](./how-to/development/commit-conventions.md)
-2. Run tests: `pnpm test`
-3. Ensure build passes: `pnpm build`
-
----
-
-**Status:** ✅ Active Development | **License:** MIT 
+## 🎯 Next Milestones
+1. **Cohort Analysis MVP** - Core metrics (Dep2Cost, ROAS) with partner filtering
+2. **Performance Optimization** - Caching, indexing, query optimization
+3. **Advanced Reports** - Funnel, retention, attribution analysis 

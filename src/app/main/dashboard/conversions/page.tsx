@@ -1,4 +1,27 @@
+"use client";
+
+import { useState } from "react";
+
+import { CsvUpload } from "@/components/csv-upload";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+
+const handleUploadError = (error: string) => {
+  console.error("Upload error:", error);
+  // Show error message to user
+  alert(`Upload failed: ${error}`);
+};
+
 export default function ConversionsPage() {
+  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
+
+  const handleUploadComplete = (uploadId: string, processedCount: number) => {
+    console.log(`Upload ${uploadId} completed with ${processedCount} records`);
+    setIsUploadDialogOpen(false);
+    // Refresh conversion data after successful upload
+    globalThis.location.reload();
+  };
+
   return (
     <div className="@container/main flex flex-col gap-4 md:gap-6">
       <div className="space-y-2">
@@ -11,10 +34,23 @@ export default function ConversionsPage() {
           <h2 className="text-lg font-semibold">Conversion Data</h2>
         </div>
         <div className="flex items-center gap-2">
-          <button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2">
-            Upload CSV
-          </button>
-          <button className="border-input hover:bg-accent rounded-md border px-4 py-2">Export Data</button>
+          <Dialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>Upload CSV</Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Upload CSV Files</DialogTitle>
+              </DialogHeader>
+              <CsvUpload
+                onUploadComplete={handleUploadComplete}
+                onError={handleUploadError}
+                maxFiles={3}
+                allowedTypes={["conversion"]}
+              />
+            </DialogContent>
+          </Dialog>
+          <Button variant="outline">Export Data</Button>
         </div>
       </div>
 
@@ -27,31 +63,6 @@ export default function ConversionsPage() {
           </div>
         </div>
       </div>
-
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="rounded-lg border p-6">
-          <h3 className="mb-2 text-lg font-semibold">Top Converting Sources</h3>
-          <p className="text-muted-foreground">Data will appear after CSV upload</p>
-        </div>
-        <div className="rounded-lg border p-6">
-          <h3 className="mb-2 text-lg font-semibold">Conversion Trends</h3>
-          <p className="text-muted-foreground">Charts will appear after CSV upload</p>
-        </div>
-      </div>
-
-      {/* Demographics Section */}
-      {/*
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="rounded-lg border p-6 flex flex-col items-center">
-          <h3 className="mb-4 text-lg font-semibold">Age Distribution</h3>
-          <DemographicsAgeChart />
-        </div>
-        <div className="rounded-lg border p-6 flex flex-col items-center">
-          <h3 className="mb-4 text-lg font-semibold">Gender Distribution</h3>
-          <DemographicsGenderChart />
-        </div>
-      </div>
-      */}
     </div>
   );
 }

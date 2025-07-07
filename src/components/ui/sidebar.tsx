@@ -522,7 +522,8 @@ function SidebarMenuButton({
     />
   )
 
-  if (!tooltip) {
+  // Only show tooltip when sidebar is collapsed and not mobile
+  if (!tooltip || state !== "collapsed" || isMobile) {
     return button
   }
 
@@ -533,12 +534,12 @@ function SidebarMenuButton({
   }
 
   return (
-    <Tooltip>
+    <Tooltip delayDuration={0}>
       <TooltipTrigger asChild>{button}</TooltipTrigger>
       <TooltipContent
         side="right"
         align="center"
-        hidden={state !== "collapsed" || isMobile}
+        className="bg-orange-500 text-white border-orange-500"
         {...tooltip}
       />
     </Tooltip>

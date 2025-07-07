@@ -15,6 +15,13 @@ import {
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
 import { getInitials } from "@/lib/utils";
 
+import { logoutAction } from "./_actions/logout-action";
+
+// Move handleLogout to outer scope to fix linting issue
+async function handleLogout() {
+  await logoutAction();
+}
+
 export function NavUser({
   user,
 }: {
@@ -22,6 +29,7 @@ export function NavUser({
     readonly name: string;
     readonly email: string;
     readonly avatar: string;
+    readonly role: string;
   };
 }) {
   const { isMobile } = useSidebar();
@@ -72,15 +80,17 @@ export function NavUser({
                   Preferences
                 </a>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <a href="/main/dashboard/administration">
-                  <Shield />
-                  Administration
-                </a>
-              </DropdownMenuItem>
+              {user.role === "superuser" && (
+                <DropdownMenuItem asChild>
+                  <a href="/main/dashboard/administration">
+                    <Shield />
+                    Administration
+                  </a>
+                </DropdownMenuItem>
+              )}
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => void handleLogout()}>
               <LogOut />
               Log out
             </DropdownMenuItem>

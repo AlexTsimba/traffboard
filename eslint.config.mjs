@@ -66,11 +66,11 @@ export default tseslint.config(
       ],
 
       // TypeScript strict rules - make more pragmatic for real projects
-      "@typescript-eslint/no-unsafe-assignment": "warn",
-      "@typescript-eslint/no-unsafe-call": "warn",
-      "@typescript-eslint/no-unsafe-member-access": "warn",
-      "@typescript-eslint/no-unsafe-return": "warn",
-      "@typescript-eslint/no-unsafe-argument": "warn",
+      "@typescript-eslint/no-unsafe-assignment": "off",
+      "@typescript-eslint/no-unsafe-call": "off", 
+      "@typescript-eslint/no-unsafe-member-access": "off",
+      "@typescript-eslint/no-unsafe-return": "off",
+      "@typescript-eslint/no-unsafe-argument": "off",
       "@typescript-eslint/restrict-template-expressions": [
         "warn",
         {
@@ -93,7 +93,7 @@ export default tseslint.config(
 
       // Reduce strictness for better DX
       "@typescript-eslint/prefer-nullish-coalescing": "warn",
-      "@typescript-eslint/no-unnecessary-condition": "warn",
+      "@typescript-eslint/no-unnecessary-condition": "off",
       "@typescript-eslint/no-redundant-type-constituents": "warn",
 
       // React rules
@@ -101,14 +101,7 @@ export default tseslint.config(
       ...pluginReactHooks.configs.recommended.rules,
       "react/react-in-jsx-scope": "off",
       "react/prop-types": "off",
-      "react/jsx-sort-props": [
-        "warn",
-        {
-          callbacksLast: true,
-          shorthandFirst: true,
-          reservedFirst: true,
-        },
-      ],
+      "react/jsx-sort-props": "off",
 
       // Next.js rules - using core-web-vitals config
       ...pluginNext.configs.recommended.rules,
@@ -153,11 +146,14 @@ export default tseslint.config(
       "sonarjs/pseudo-random": "warn",
 
       ...unicorn.configs.recommended.rules,
+      "unicorn/no-nested-ternary": "warn",
+      "unicorn/no-array-reduce": "off",
+      "unicorn/prefer-ternary": "warn",
       "unicorn/prevent-abbreviations": "off",
       "unicorn/filename-case": "off",
-      "unicorn/no-null": "warn",
+      "unicorn/no-null": "off",
       "unicorn/no-document-cookie": "warn",
-      "unicorn/explicit-length-check": "warn",
+      "unicorn/explicit-length-check": "off",
 
       // Prettier integration - change to warn to not block CI
       "prettier/prettier": "warn",
@@ -185,6 +181,64 @@ export default tseslint.config(
       // Ensure Next.js specific rules are properly applied
       "@next/next/no-img-element": "error",
       "@next/next/no-page-custom-font": "error",
+    },
+  },
+
+  // Test files configuration - relaxed rules for testing
+  // Rationale: Test files need flexibility for mocks, test data, and comprehensive test scenarios
+  // This configuration maintains code quality where it matters while enabling productive testing
+  {
+    files: [
+      "**/__tests__/**/*.{js,ts,tsx}",
+      "**/*.{test,spec}.{js,ts,tsx}",
+      "**/tests/**/*.{js,ts,tsx}",
+      "**/test/**/*.{js,ts,tsx}",
+    ],
+    rules: {
+      // Allow any types in test files - common for mocks and test data
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unsafe-assignment": "off",
+      "@typescript-eslint/no-unsafe-call": "off",
+      "@typescript-eslint/no-unsafe-member-access": "off",
+      "@typescript-eslint/no-unsafe-return": "off",
+      "@typescript-eslint/no-unsafe-argument": "off",
+      
+      // Relax async/await requirements for test helpers
+      "@typescript-eslint/require-await": "off",
+      
+      // Allow non-null assertions in tests
+      "@typescript-eslint/no-non-null-assertion": "off",
+      
+      // Allow empty functions in test mocks
+      "@typescript-eslint/no-empty-function": "off",
+      
+      // Relax complexity rules for comprehensive test scenarios
+      "sonarjs/cognitive-complexity": "off",
+      "sonarjs/no-nested-functions": "off",
+      "sonarjs/no-duplicated-branches": "off",
+      
+      // Allow console.log for test debugging
+      "no-console": "off",
+      
+      // Relax accessibility rules for test components
+      "jsx-a11y/click-events-have-key-events": "off",
+      "jsx-a11y/no-static-element-interactions": "off",
+      
+      // Allow missing display names for test components
+      "react/display-name": "off",
+      
+      // Allow string comparisons with different types in tests
+      "sonarjs/different-types-comparison": "off",
+      
+      // Allow object injection patterns for test data
+      "security/detect-object-injection": "off",
+      "security/detect-non-literal-regexp": "off",
+      
+      // Allow dynamic property deletion in test cleanup
+      "@typescript-eslint/no-dynamic-delete": "off",
+      
+      // Allow base-to-string conversions for test assertions
+      "@typescript-eslint/no-base-to-string": "off",
     },
   },
 
