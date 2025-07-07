@@ -21,15 +21,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { ReportHeaderProps } from "@/types/reports";
 
-export function ReportHeader({
-  title,
-  description,
-  onFilterClick,
-  onExportClick,
-  actions,
-  className,
-}: ReportHeaderProps) {
-  const handleExport = (format: string) => {
+// eslint-disable-next-line sonarjs/prefer-read-only-props -- Props are readonly in interface
+export function ReportHeader(props: ReportHeaderProps) {
+  const { title, description, onFilterClick, onExportClick, actions, className } = props;
+  const handleExport = (_format: string) => {
     // Export functionality will be implemented in export system
     onExportClick();
   };

@@ -42,7 +42,7 @@ export function buildPrismaWhereClause(filter: AppliedFilter): Record<string, un
     }
 
     default: {
-      console.warn(`Unsupported filter type: ${filter.definition.type}`);
+      console.warn(`Unsupported filter type: ${String(filter.definition.type)}`);
     }
   }
 

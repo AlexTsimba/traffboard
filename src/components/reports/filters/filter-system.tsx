@@ -47,15 +47,9 @@ export function FilterButton({ onClick, hasActiveFilters, className }: FilterBut
 // FILTER MODAL DIALOG
 // =============================================================================
 
-export function FilterModal({
-  isOpen,
-  onClose,
-  onSubmit,
-  onClear,
-  filterDefinitions,
-  currentFilters,
-  title = "Filter Report",
-}: FilterModalProps) {
+// eslint-disable-next-line sonarjs/prefer-read-only-props -- Props are readonly in interface
+export function FilterModal(props: FilterModalProps) {
+  const { isOpen, onClose, onSubmit, onClear, filterDefinitions, currentFilters, title = "Filter Report" } = props;
   const [localFilters, setLocalFilters] = useState<Record<string, FilterValue>>(currentFilters);
 
   const handleFilterChange = useCallback((filterId: string, value: FilterValue) => {
@@ -162,7 +156,9 @@ export function FilterModal({
 // FILTER CHIPS COMPONENT
 // =============================================================================
 
-export function FilterChips({ appliedFilters, onRemoveFilter, onClearAll, className }: FilterChipsProps) {
+// eslint-disable-next-line sonarjs/prefer-read-only-props -- Props are readonly in interface
+export function FilterChips(props: FilterChipsProps) {
+  const { appliedFilters, onRemoveFilter, onClearAll, className } = props;
   if (appliedFilters.length === 0) {
     return null;
   }

@@ -157,13 +157,13 @@ export interface FilterDialogState {
  * Filter modal component props based on demo requirements
  */
 export interface FilterModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmit: (filters: Record<string, FilterValue>) => void;
-  onClear: () => void;
-  filterDefinitions: FilterDefinition[];
-  currentFilters: Record<string, FilterValue>;
-  title?: string;
+  readonly isOpen: boolean;
+  readonly onClose: () => void;
+  readonly onSubmit: (filters: Record<string, FilterValue>) => void;
+  readonly onClear: () => void;
+  readonly filterDefinitions: FilterDefinition[];
+  readonly currentFilters: Record<string, FilterValue>;
+  readonly title?: string;
 }
 
 /**

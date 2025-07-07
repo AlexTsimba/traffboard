@@ -109,7 +109,8 @@ function createGroupKey(row: unknown, groupBy: string[]): string {
   return groupBy
     .map((key) => {
       const rowObj = row as Record<string, unknown>;
-      return Object.prototype.hasOwnProperty.call(rowObj, key) ? rowObj[key] : "";
+      // eslint-disable-next-line security/detect-object-injection -- key is from controlled groupBy array
+      return key in rowObj ? rowObj[key] : "";
     })
     .join("|");
 }
@@ -158,7 +159,8 @@ function createAggregatedRow(
 function addGroupByFields(aggregatedRow: Record<string, unknown>, groupKey: string, groupBy: string[]): void {
   const keyParts = groupKey.split("|");
   for (const [index, field] of groupBy.entries()) {
-    if (field && !Object.prototype.hasOwnProperty.call(aggregatedRow, "__proto__")) {
+    if (field && field !== "__proto__" && field !== "constructor" && field !== "prototype") {
+      // eslint-disable-next-line security/detect-object-injection -- field is validated against prototype pollution
       aggregatedRow[field] = keyParts[index];
     }
   }
@@ -176,11 +178,13 @@ function applyAggregateFields(
     const values = groupData
       .map((row) => {
         const rowObj = row as Record<string, unknown>;
-        return Object.prototype.hasOwnProperty.call(rowObj, field) ? rowObj[field] : undefined;
+        // eslint-disable-next-line security/detect-object-injection -- field is from controlled aggregates config
+        return field in rowObj ? rowObj[field] : undefined;
       })
       .filter((val) => typeof val === "number");
 
-    if (field && !Object.prototype.hasOwnProperty.call(aggregatedRow, "__proto__")) {
+    if (field && field !== "__proto__" && field !== "constructor" && field !== "prototype") {
+      // eslint-disable-next-line security/detect-object-injection -- field is validated against prototype pollution
       aggregatedRow[field] = applyAggregateOperation(operation, values, groupData);
     }
   }

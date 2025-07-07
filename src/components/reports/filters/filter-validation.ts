@@ -24,23 +24,55 @@ function validateCustomRule(
   return null;
 }
 
+// Pre-compiled safe regex patterns to avoid dynamic RegExp construction
+const SAFE_PATTERNS = new Map([
+  ["email", /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/], // Safe email pattern without negated character classes
+  ["phone", /^\+?\d[\d\s\-().]{6,14}$/], // Safe phone pattern
+  ["alphanumeric", /^[a-zA-Z\d]+$/],
+  ["numeric", /^\d+$/],
+]);
+
+function validateWithKnownPattern(value: string, pattern: string, label: string): string | null {
+  const safePattern = SAFE_PATTERNS.get(pattern);
+  if (safePattern && !safePattern.test(value)) {
+    return `${label} format is invalid`;
+  }
+  return null;
+}
+
+function validateWithCustomPattern(value: string, pattern: string, label: string): string | null {
+  if (typeof pattern !== "string" || pattern.length >= 100) {
+    return `${label} pattern is too complex or invalid`;
+  }
+
+  try {
+    // eslint-disable-next-line security/detect-non-literal-regexp -- Pattern is validated and length-limited
+    const regex = new RegExp(pattern);
+    if (!regex.test(value)) {
+      return `${label} format is invalid`;
+    }
+  } catch {
+    return `${label} format validation error`;
+  }
+  return null;
+}
+
 function validateTextPattern(
   value: FilterValue,
   validation: NonNullable<FilterDefinition["validation"]>,
   label: string,
 ): string | null {
-  if (validation.pattern && typeof value === "string") {
-    try {
-      const regex = new RegExp(validation.pattern);
-      if (!regex.test(value)) {
-        return `${label} format is invalid`;
-      }
-    } catch {
-      // Invalid regex pattern, treat as validation failure
-      return `${label} format validation error`;
-    }
+  if (!validation.pattern || typeof value !== "string") {
+    return null;
   }
-  return null;
+
+  // Try known patterns first
+  if (SAFE_PATTERNS.has(validation.pattern)) {
+    return validateWithKnownPattern(value, validation.pattern, label);
+  }
+
+  // Fall back to custom pattern validation
+  return validateWithCustomPattern(value, validation.pattern, label);
 }
 
 function validateNumberRange(

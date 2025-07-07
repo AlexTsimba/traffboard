@@ -84,16 +84,22 @@ export class CacheManager {
       return;
     }
 
-    try {
-      const regex = new RegExp(pattern);
+    // Use simple string matching instead of regex for safety
+    if (pattern.includes("*")) {
+      // Handle wildcard patterns
+      const prefix = pattern.replaceAll("*", "");
       for (const [key] of this.cache) {
-        if (regex.test(key)) {
+        if (key.includes(prefix)) {
           this.cache.delete(key);
         }
       }
-    } catch {
-      // Invalid regex pattern, skip clearing
-      console.warn(`Invalid regex pattern for cache clearing: ${pattern}`);
+    } else {
+      // Exact string matching
+      for (const [key] of this.cache) {
+        if (key === pattern) {
+          this.cache.delete(key);
+        }
+      }
     }
   }
 

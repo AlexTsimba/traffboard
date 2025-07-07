@@ -91,8 +91,9 @@ export class FilterComposer {
    * Add a common filter by ID
    */
   addCommon(filterId: keyof typeof COMMON_FILTERS): this {
-    // Safe to use direct access since filterId is constrained to valid keys
-    const commonFilter = COMMON_FILTERS[filterId];
+    // Use Map for safer property access to avoid object injection
+    const filterMap = new Map(Object.entries(COMMON_FILTERS));
+    const commonFilter = filterMap.get(filterId);
     if (commonFilter) {
       this.add(commonFilter);
     }

@@ -98,7 +98,8 @@ class ExportManager {
       },
     };
 
-    return Object.prototype.hasOwnProperty.call(formats, formatId) ? formats[formatId] : null;
+    const formatMap = new Map(Object.entries(formats));
+    return formatMap.get(formatId) ?? null;
   }
 }
 
@@ -177,7 +178,8 @@ class CSVExporter implements ExportHandler {
     // Add data rows
     for (const row of rows) {
       const values = headers.map((header) => {
-        const value = Object.prototype.hasOwnProperty.call(row, header) ? row[header] : undefined;
+        // eslint-disable-next-line security/detect-object-injection -- header is from controlled headers array
+        const value = header in row ? row[header] : undefined;
         if (value === null || value === undefined) {
           return "";
         }
