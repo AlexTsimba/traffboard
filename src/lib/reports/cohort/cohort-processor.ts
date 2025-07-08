@@ -222,6 +222,7 @@ export class CohortProcessor {
       const costSum = Number(row[`${dayField}_cost_sum`] ?? 0);
       const cohortSize = Number(row.totalCohortSize ?? 0);
 
+      // eslint-disable-next-line security/detect-object-injection
       values[breakpoint] = calculateCohortMetrics({
         metric: this.config.metric,
         activePlayers,

@@ -109,6 +109,7 @@ function createGroupKey(row: unknown, groupBy: string[]): string {
   return groupBy
     .map((key) => {
       const rowObj = row as Record<string, unknown>;
+      // eslint-disable-next-line security/detect-object-injection
       return Object.prototype.hasOwnProperty.call(rowObj, key) ? rowObj[key] : "";
     })
     .join("|");
@@ -159,6 +160,7 @@ function addGroupByFields(aggregatedRow: Record<string, unknown>, groupKey: stri
   const keyParts = groupKey.split("|");
   for (const [index, field] of groupBy.entries()) {
     if (field && !Object.prototype.hasOwnProperty.call(aggregatedRow, "__proto__")) {
+      // eslint-disable-next-line security/detect-object-injection
       aggregatedRow[field] = keyParts[index];
     }
   }
@@ -176,11 +178,13 @@ function applyAggregateFields(
     const values = groupData
       .map((row) => {
         const rowObj = row as Record<string, unknown>;
+        // eslint-disable-next-line security/detect-object-injection
         return Object.prototype.hasOwnProperty.call(rowObj, field) ? rowObj[field] : undefined;
       })
       .filter((val) => typeof val === "number");
 
     if (field && !Object.prototype.hasOwnProperty.call(aggregatedRow, "__proto__")) {
+      // eslint-disable-next-line security/detect-object-injection
       aggregatedRow[field] = applyAggregateOperation(operation, values, groupData);
     }
   }

@@ -98,6 +98,7 @@ class ExportManager {
       },
     };
 
+    // eslint-disable-next-line security/detect-object-injection
     return Object.prototype.hasOwnProperty.call(formats, formatId) ? formats[formatId] : null;
   }
 }
@@ -177,6 +178,7 @@ class CSVExporter implements ExportHandler {
     // Add data rows
     for (const row of rows) {
       const values = headers.map((header) => {
+        // eslint-disable-next-line security/detect-object-injection
         const value = Object.prototype.hasOwnProperty.call(row, header) ? row[header] : undefined;
         if (value === null || value === undefined) {
           return "";

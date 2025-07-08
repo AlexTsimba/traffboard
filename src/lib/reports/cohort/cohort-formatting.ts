@@ -82,6 +82,7 @@ export function formatBreakpointValues(
 
   for (const [breakpoint, value] of Object.entries(values)) {
     const bp = Number(breakpoint);
+    // eslint-disable-next-line security/detect-object-injection
     formatted[bp] = value === null ? null : formatMetricValue(value, metric);
   }
 
@@ -225,10 +226,12 @@ export function createTriangularStructure(
     const cells: CohortCell[] = [];
 
     for (let bpIndex = 0; bpIndex < breakpoints.length; bpIndex++) {
+      // eslint-disable-next-line security/detect-object-injection
       const breakpoint = breakpoints[bpIndex];
 
       // Triangular logic: newer cohorts (higher index) have fewer filled cells
       const isEmpty = cohortIndex > 0 && bpIndex >= breakpoints.length - cohortIndex;
+      // eslint-disable-next-line security/detect-object-injection
       const value = isEmpty ? null : (cohort.breakpointValues[breakpoint] ?? null);
 
       cells.push(createCohortCell(value, metric, isEmpty));
@@ -253,6 +256,7 @@ export function createWeightedAverageRow(
   const cells: CohortCell[] = [];
 
   for (const breakpoint of breakpoints) {
+    // eslint-disable-next-line security/detect-object-injection
     const values = cohorts.map((c) => c.breakpointValues[breakpoint]).filter((v): v is number => v !== null);
 
     if (values.length === 0) {
@@ -282,6 +286,7 @@ export function formatForCSVExport(cohorts: CohortData[], breakpoints: number[],
     cohort.cohortDate,
     cohort.ftdCount.toString(),
     ...breakpoints.map((bp) => {
+      // eslint-disable-next-line security/detect-object-injection
       const value = cohort.breakpointValues[bp];
       return value === null ? "" : value.toString();
     }),
@@ -305,6 +310,7 @@ export function formatForExcelExport(
     };
 
     for (const bp of breakpoints) {
+      // eslint-disable-next-line security/detect-object-injection
       row[`Day ${bp}`] = cohort.breakpointValues[bp];
     }
 

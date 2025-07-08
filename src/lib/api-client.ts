@@ -34,53 +34,70 @@ export class APIClient {
    */
   async fetchWithRetry(url: string, options: RequestInit = {}, customRetries?: number): Promise<Response> {
     const maxRetries = customRetries ?? this.options.maxRetries;
-    const circuit = this.getOrCreateCircuit(url);
+    this.checkCircuitBreaker(url);
 
-    // Circuit breaker check
+    return this.executeRetryLoop(url, options, maxRetries);
+  }
+
+  private checkCircuitBreaker(url: string): void {
+    const circuit = this.getOrCreateCircuit(url);
     if (circuit.isOpen && Date.now() - circuit.lastFailure < this.options.circuitBreakerTimeout) {
       throw new Error(`Circuit breaker open for ${url}. Too many recent failures.`);
     }
+  }
 
+  private async executeRetryLoop(url: string, options: RequestInit, maxRetries: number): Promise<Response> {
     let lastError: Error | null = null;
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        const response = await fetch(url, {
-          ...options,
-          signal: options.signal, // Respect abort signals
-        });
+        const response = await this.attemptFetch(url, options);
 
         if (response.ok) {
-          // Success - reset circuit breaker
           this.resetCircuit(url);
           return response;
         }
 
-        // HTTP error response
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       } catch (error) {
-        lastError = error instanceof Error ? error : new Error("Unknown error");
+        lastError = this.handleRetryError(error, url);
 
-        // Don't retry on abort signal
-        if (lastError.name === "AbortError") {
-          throw lastError;
-        }
-
-        // Update circuit breaker state
-        this.recordFailure(url);
-
-        // If this is the last attempt, don't wait
-        if (attempt === maxRetries) {
+        if (this.shouldStopRetrying(lastError, attempt, maxRetries)) {
           break;
         }
 
-        // Exponential backoff with jitter
-        const delay = this.calculateDelay(attempt);
-        await this.sleep(delay);
+        await this.waitForRetry(attempt);
       }
     }
 
     throw lastError ?? new Error("Max retries exceeded");
+  }
+
+  private async attemptFetch(url: string, options: RequestInit): Promise<Response> {
+    return fetch(url, {
+      ...options,
+      signal: options.signal, // Respect abort signals
+    });
+  }
+
+  private handleRetryError(error: unknown, url: string): Error {
+    const lastError = error instanceof Error ? error : new Error("Unknown error");
+    this.recordFailure(url);
+    return lastError;
+  }
+
+  private shouldStopRetrying(error: Error, attempt: number, maxRetries: number): boolean {
+    // Don't retry on abort signal
+    if (error.name === "AbortError") {
+      throw error;
+    }
+
+    return attempt === maxRetries;
+  }
+
+  private async waitForRetry(attempt: number): Promise<void> {
+    const delay = this.calculateDelay(attempt);
+    await this.sleep(delay);
   }
 
   /**
@@ -142,6 +159,7 @@ export class APIClient {
     const exponentialDelay = this.options.baseDelay * Math.pow(2, attempt - 1);
 
     // Add jitter to prevent thundering herd
+    // eslint-disable-next-line sonarjs/pseudo-random
     const jitter = Math.random() * 0.1 * exponentialDelay;
 
     return Math.min(exponentialDelay + jitter, 10_000); // Cap at 10 seconds
@@ -173,7 +191,7 @@ export class APIClient {
   }
 }
 
-// Global instance for use across the application  
+// Global instance for use across the application
 export const apiClient = new APIClient({
   maxRetries: 1, // Reduce retries for auth calls
   baseDelay: 500, // Shorter delay for auth operations
