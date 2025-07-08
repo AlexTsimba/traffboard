@@ -110,7 +110,7 @@
             "id": 2,
             "title": "Design SQL Extraction with Window Functions and Breakpoints",
             "description": "Develop optimized SQL queries using window functions to extract cohort-defining attributes and support DAY_BREAKPOINTS and WEEK_BREAKPOINTS. Ensure week mode starts Monday and views Sunday.",
-            "status": "pending",
+            "status": "in-progress",
             "dependencies": [],
             "details": "",
             "testStrategy": ""
@@ -557,7 +557,7 @@
     ],
     "metadata": {
       "created": "2025-07-01T22:28:10.873Z",
-      "updated": "2025-07-08T15:56:15.762Z",
+      "updated": "2025-07-08T15:59:57.810Z",
       "description": "Tasks for master context"
     }
   }

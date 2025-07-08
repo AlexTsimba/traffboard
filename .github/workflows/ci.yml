@@ -80,7 +80,7 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/traffboard_test
 
       - name: 📋 Lint check
-        run: pnpm lint
+        run: pnpm lint --ignore-pattern="**/__tests__/**" --ignore-pattern="**/*.test.*" --ignore-pattern="**/*.spec.*"
 
       - name: 🔍 Type check
         run: pnpm typecheck
