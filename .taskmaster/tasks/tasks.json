@@ -128,7 +128,7 @@
             "id": 4,
             "title": "Arquero Transformation and Metric Calculation",
             "description": "Transform and aggregate extracted data in Arquero, mapping breakpoints and calculating DEP2COST, ROAS, AVG DEPOSIT SUM, and RETENTION RATE metrics. Implement retention rate as active_players/initial_cohort_size*100.",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "details": "",
             "testStrategy": ""
@@ -557,7 +557,7 @@
     ],
     "metadata": {
       "created": "2025-07-01T22:28:10.873Z",
-      "updated": "2025-07-08T10:24:59.995Z",
+      "updated": "2025-07-08T15:56:15.762Z",
       "description": "Tasks for master context"
     }
   }
