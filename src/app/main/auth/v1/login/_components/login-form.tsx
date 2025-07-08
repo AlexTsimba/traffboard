@@ -12,6 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import { apiClient } from "@/lib/api-client";
 import { toastUtils } from "@/lib/toast-utils";
 
 // Schema for initial login (email/password)
@@ -70,22 +71,28 @@ export function LoginFormV1({ onStepChange }: Readonly<LoginFormV1Props>) {
 
   // First step: Verify email/password and check if 2FA is required
   const onLoginSubmit = async (data: LoginData) => {
+    if (isSubmitting) {
+      return; // Prevent multiple submissions
+    }
+
     setIsSubmitting(true);
     try {
-      // First, check if user exists and has 2FA enabled
-      const checkResponse = await fetch("/api/auth/check-2fa", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: data.email, password: data.password }),
-      });
+      // Use enhanced API client with circuit breaker
+      const result = await apiClient.safeAPICall(
+        "/api/auth/check-2fa",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: data.email, password: data.password }),
+        }
+      );
 
-      if (!checkResponse.ok) {
-        toastUtils.auth.loginFailed();
+      if (!result.success) {
+        toastUtils.auth.loginFailed(result.error);
         return;
       }
 
-      const checkData = (await checkResponse.json()) as { requires2FA: boolean };
-      const { requires2FA } = checkData;
+      const { requires2FA } = result.data as { requires2FA: boolean };
 
       if (requires2FA) {
         // User has 2FA enabled, show 2FA input

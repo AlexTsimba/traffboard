@@ -16,10 +16,20 @@ export class BasePage {
 
   /**
    * Wait for the page to be loaded and stable
+   * @param waitForNetwork - Whether to wait for network idle (default: false for performance)
    */
-  async waitForLoad(): Promise<void> {
+  async waitForLoad(waitForNetwork: boolean = false): Promise<void> {
     await this.page.waitForLoadState("domcontentloaded");
-    await this.page.waitForLoadState("networkidle");
+    
+    // Only wait for network idle if explicitly requested
+    // This prevents tests from hanging due to continuous API calls
+    if (waitForNetwork) {
+      try {
+        await this.page.waitForLoadState("networkidle", { timeout: 5000 });
+      } catch (error) {
+        console.warn("Network idle timeout - continuing with test execution");
+      }
+    }
   }
 
   /**

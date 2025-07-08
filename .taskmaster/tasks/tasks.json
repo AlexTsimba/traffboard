@@ -443,29 +443,18 @@
       {
         "id": 8,
         "title": "Critical Repository Refactoring for Cohort Analysis Foundation",
-        "description": "Refactor the TraffBoard repository to address architectural blockers for cohort analysis, including API endpoint consolidation, legacy code removal, database schema cleanup, and foundational architecture preparation. The repository must use consistent 'conversion' terminology throughout all code, interfaces, and endpoints, with all legacy 'traffic' references fully eliminated.",
+        "description": "Refactor the TraffBoard repository to address architectural blockers for cohort analysis, including API endpoint consolidation, legacy code removal, database schema cleanup, and foundational architecture preparation. The repository must use consistent 'conversion' terminology throughout all code, interfaces, and endpoints, with all legacy 'traffic' references fully eliminated. Incorporate lessons from the recent critical E2E performance bug investigation: ensure robust API client error handling, avoid test strategies that rely on network idle state when persistent API polling is present, and implement diagnostic logging for authentication and 2FA flows. All fixes and diagnostics related to E2E test reliability and authentication flows must be integrated into the refactoring process.",
         "status": "pending",
         "dependencies": [
           1,
           3
         ],
         "priority": "high",
-        "details": "Conduct a comprehensive audit of the TraffBoard codebase to identify and document all remaining legacy modules, redundant API endpoints, and outdated database schema elements that could impede cohort analysis development. Ensure all API endpoints related to reporting and cohort data are consolidated and standardized, following RESTful naming conventions and consistent request/response formats[1][4]. Remove any remaining obsolete or deprecated code, libraries, and configuration files, with careful regression testing to avoid breaking existing functionality. Review and refactor the database schema to eliminate unused tables, columns, and relationships, and to optimize for cohort-based queries (e.g., adding necessary indexes, normalizing tables for cohort metrics). Prepare the foundational architecture by modularizing core services, establishing clear boundaries for data access layers, and documenting new interfaces and data contracts. Ensure all changes are backward compatible with ongoing work in Tasks 1-7, and provide migration scripts and documentation for seamless team adoption. All 'traffic' terminology and legacy code must remain fully removed, with 'conversion' naming standardized across the codebase.",
-        "testStrategy": "1. Run the full test suite before and after refactoring to ensure no regressions or breaking changes. 2. Use API contract testing tools (e.g., Postman, Swagger) to verify endpoint consolidation, RESTful naming, and response consistency[1][4]. 3. Validate that all legacy code and schema elements targeted for removal are fully eliminated and that no references remain. 4. Benchmark key cohort-related queries before and after schema cleanup to confirm performance improvements. 5. Review migration scripts and documentation with the team to ensure clarity and ease of adoption. 6. Confirm that all code, interfaces, and endpoints use 'conversion' terminology exclusively, with no residual 'traffic' references.",
+        "details": "Conduct a comprehensive audit of the TraffBoard codebase to identify and document all remaining legacy modules, redundant API endpoints, and outdated database schema elements that could impede cohort analysis development. Ensure all API endpoints related to reporting and cohort data are consolidated and standardized, following RESTful naming conventions and consistent request/response formats[1][4]. Remove any remaining obsolete or deprecated code, libraries, and configuration files, with careful regression testing to avoid breaking existing functionality. Review and refactor the database schema to eliminate unused tables, columns, and relationships, and to optimize for cohort-based queries (e.g., adding necessary indexes, normalizing tables for cohort metrics). Prepare the foundational architecture by modularizing core services, establishing clear boundaries for data access layers, and documenting new interfaces and data contracts. Ensure all changes are backward compatible with ongoing work in Tasks 1-7, and provide migration scripts and documentation for seamless team adoption. All 'traffic' terminology and legacy code must remain fully removed, with 'conversion' naming standardized across the codebase. Integrate robust error handling and circuit breaker patterns in API clients, especially for authentication and 2FA endpoints. Avoid test wait strategies that depend on network idle state when persistent polling is present. Add diagnostic logging to authentication and 2FA flows to support future debugging and monitoring.",
+        "testStrategy": "1. Run the full test suite before and after refactoring to ensure no regressions or breaking changes. 2. Use API contract testing tools (e.g., Postman, Swagger) to verify endpoint consolidation, RESTful naming, and response consistency[1][4]. 3. Validate that all legacy code and schema elements targeted for removal are fully eliminated and that no references remain. 4. Benchmark key cohort-related queries before and after schema cleanup to confirm performance improvements. 5. Review migration scripts and documentation with the team to ensure clarity and ease of adoption. 6. Confirm that all code, interfaces, and endpoints use 'conversion' terminology exclusively, with no residual 'traffic' references. 7. Run E2E tests to verify that authentication and 2FA flows no longer cause timeouts or infinite retries. 8. Check diagnostic logs to confirm that repeated form submissions or API polling are not occurring unexpectedly. 9. Ensure test database users are properly seeded for authentication scenarios. 10. Consider and, if feasible, implement API rate limiting for authentication endpoints to prevent abuse and further test flakiness.",
         "subtasks": [
           {
             "id": 2,
-            "title": "Database Schema Cleanup and Cohort Optimization",
-            "description": "Audit and refactor the database schema to remove any remaining unused tables, columns, or relationships related to legacy 'traffic' data. Normalize tables and add necessary indexes to optimize for cohort-based queries. Ensure all schema elements use 'conversion' terminology.",
-            "status": "pending",
-            "dependencies": [
-              1
-            ],
-            "details": "",
-            "testStrategy": ""
-          },
-          {
-            "id": 3,
             "title": "Legacy Code and Configuration Removal",
             "description": "Identify and remove any remaining obsolete or deprecated code, libraries, and configuration files that reference 'traffic' or are no longer relevant after the API consolidation. Confirm that all code and documentation use 'conversion' naming exclusively.",
             "status": "pending",
@@ -476,7 +465,7 @@
             "testStrategy": ""
           },
           {
-            "id": 4,
+            "id": 3,
             "title": "API Endpoint Standardization and Documentation",
             "description": "Review all reporting and cohort-related API endpoints to ensure they follow RESTful naming conventions, use consistent 'conversion' terminology, and provide standardized request/response formats. Update or create API documentation to reflect these changes.",
             "status": "pending",
@@ -487,14 +476,42 @@
             "testStrategy": ""
           },
           {
-            "id": 5,
+            "id": 4,
             "title": "Foundational Architecture Preparation",
             "description": "Modularize core services, establish clear boundaries for data access layers, and document new interfaces and data contracts. Ensure all foundational architecture is ready for cohort analysis and is free of legacy 'traffic' dependencies.",
             "status": "pending",
             "dependencies": [
               2,
-              3,
-              4
+              3
+            ],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "API Structure Consolidation",
+            "description": "Remove legacy /api/traffic/ endpoint and traffic.ts data layer, ensuring all imports and references point to the current /api/conversions/ and conversions.ts. This critical cleanup prevents naming conflicts and confusion during cohort analysis development. Delete obsolete files, update all import statements, and verify no broken references remain.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 9,
+            "title": "Critical E2E Performance Bug Investigation & Fix",
+            "description": "Fix critical performance bug causing infinite 2FA retry loops and E2E test timeouts. Implemented fixes: enhanced API client with circuit breaker and exponential backoff, improved BasePage.waitForLoad() to avoid networkidle waits, better login test fixture timeout handling, improved Prisma connection management, added diagnostic logging to 2FA API and login form, and reduced API client retries for auth operations. Next steps: run E2E tests to verify fixes, check diagnostic logs for repeated submissions, ensure test database users are seeded, and consider API rate limiting for auth endpoints.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 10,
+            "title": "Diagnostic Log Review and Rate Limiting Assessment",
+            "description": "Review diagnostic logs from authentication and 2FA flows to confirm that repeated form submissions or API polling are not occurring unexpectedly. Ensure test database users are properly seeded for authentication scenarios. Assess the feasibility and impact of adding API rate limiting to authentication endpoints to prevent abuse and further test flakiness.",
+            "status": "pending",
+            "dependencies": [
+              9
             ],
             "details": "",
             "testStrategy": ""
@@ -540,7 +557,7 @@
     ],
     "metadata": {
       "created": "2025-07-01T22:28:10.873Z",
-      "updated": "2025-07-07T20:16:54.485Z",
+      "updated": "2025-07-08T10:24:59.995Z",
       "description": "Tasks for master context"
     }
   }
