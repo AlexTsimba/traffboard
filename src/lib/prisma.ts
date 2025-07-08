@@ -11,9 +11,10 @@ export const prisma =
     log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
     errorFormat: "pretty",
     // Enhanced connection configuration for stability
-    datasourceUrl: process.env.NODE_ENV === "test" 
-      ? process.env.TEST_DATABASE_URL || process.env.DATABASE_URL
-      : process.env.DATABASE_URL,
+    datasourceUrl:
+      process.env.NODE_ENV === "test"
+        ? (process.env.TEST_DATABASE_URL ?? process.env.DATABASE_URL)
+        : process.env.DATABASE_URL,
   });
 
 // Improved connection management for different environments
@@ -33,6 +34,6 @@ export async function testDatabaseConnection(): Promise<boolean> {
 }
 
 // Enhanced disconnect handling
-process.on('beforeExit', async () => {
-  await prisma.$disconnect();
+process.on("beforeExit", () => {
+  void prisma.$disconnect();
 });

@@ -19,10 +19,7 @@ export async function POST(request: Request) {
     const isDbConnected = await testDatabaseConnection();
     if (!isDbConnected) {
       console.error("2FA check failed: Database connection unavailable");
-      return NextResponse.json(
-        { error: "Service temporarily unavailable. Please try again." }, 
-        { status: 503 }
-      );
+      return NextResponse.json({ error: "Service temporarily unavailable. Please try again." }, { status: 503 });
     }
 
     const result = await checkUserRequires2FA(email, password);

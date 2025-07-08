@@ -78,14 +78,11 @@ export function LoginFormV1({ onStepChange }: Readonly<LoginFormV1Props>) {
     setIsSubmitting(true);
     try {
       // Use enhanced API client with circuit breaker
-      const result = await apiClient.safeAPICall(
-        "/api/auth/check-2fa",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: data.email, password: data.password }),
-        }
-      );
+      const result = await apiClient.safeAPICall("/api/auth/check-2fa", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: data.email, password: data.password }),
+      });
 
       if (!result.success) {
         toastUtils.auth.loginFailed(result.error);

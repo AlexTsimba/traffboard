@@ -32,14 +32,10 @@ export class APIClient {
   /**
    * Fetch with circuit breaker and exponential backoff
    */
-  async fetchWithRetry(
-    url: string, 
-    options: RequestInit = {}, 
-    customRetries?: number
-  ): Promise<Response> {
+  async fetchWithRetry(url: string, options: RequestInit = {}, customRetries?: number): Promise<Response> {
     const maxRetries = customRetries ?? this.options.maxRetries;
     const circuit = this.getOrCreateCircuit(url);
-    
+
     // Circuit breaker check
     if (circuit.isOpen && Date.now() - circuit.lastFailure < this.options.circuitBreakerTimeout) {
       throw new Error(`Circuit breaker open for ${url}. Too many recent failures.`);
@@ -62,30 +58,29 @@ export class APIClient {
 
         // HTTP error response
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        
       } catch (error) {
-        lastError = error instanceof Error ? error : new Error('Unknown error');
-        
+        lastError = error instanceof Error ? error : new Error("Unknown error");
+
         // Don't retry on abort signal
-        if (lastError.name === 'AbortError') {
+        if (lastError.name === "AbortError") {
           throw lastError;
         }
 
         // Update circuit breaker state
         this.recordFailure(url);
-        
+
         // If this is the last attempt, don't wait
         if (attempt === maxRetries) {
           break;
         }
-        
+
         // Exponential backoff with jitter
         const delay = this.calculateDelay(attempt);
         await this.sleep(delay);
       }
     }
 
-    throw lastError || new Error('Max retries exceeded');
+    throw lastError ?? new Error("Max retries exceeded");
   }
 
   /**
@@ -94,41 +89,44 @@ export class APIClient {
   async safeAPICall<T>(
     url: string,
     options: RequestInit = {},
-    parser: (response: Response) => Promise<T> = (r) => r.json() as Promise<T>
+    parser: (response: Response) => Promise<T> = (r) => r.json() as Promise<T>,
   ): Promise<{ success: true; data: T } | { success: false; error: string }> {
     try {
       const response = await this.fetchWithRetry(url, options);
       const data = await parser(response);
       return { success: true, data };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
       console.warn(`API call failed for ${url}:`, errorMessage);
       return { success: false, error: errorMessage };
     }
   }
 
   private getOrCreateCircuit(url: string): CircuitBreakerState {
-    if (!this.circuitBreakers.has(url)) {
-      this.circuitBreakers.set(url, {
+    const existing = this.circuitBreakers.get(url);
+    if (!existing) {
+      const newCircuit = {
         failures: 0,
         lastFailure: 0,
         isOpen: false,
-      });
+      };
+      this.circuitBreakers.set(url, newCircuit);
+      return newCircuit;
     }
-    return this.circuitBreakers.get(url)!;
+    return existing;
   }
 
   private recordFailure(url: string): void {
     const circuit = this.getOrCreateCircuit(url);
     circuit.failures++;
     circuit.lastFailure = Date.now();
-    
+
     // Open circuit if threshold exceeded
     if (circuit.failures >= this.options.circuitBreakerThreshold) {
       circuit.isOpen = true;
       console.warn(`Circuit breaker opened for ${url} after ${circuit.failures} failures`);
     }
-    
+
     this.circuitBreakers.set(url, circuit);
   }
 
@@ -142,15 +140,15 @@ export class APIClient {
   private calculateDelay(attempt: number): number {
     // Exponential backoff: 1s, 2s, 4s, 8s, etc.
     const exponentialDelay = this.options.baseDelay * Math.pow(2, attempt - 1);
-    
+
     // Add jitter to prevent thundering herd
     const jitter = Math.random() * 0.1 * exponentialDelay;
-    
+
     return Math.min(exponentialDelay + jitter, 10_000); // Cap at 10 seconds
   }
 
   private sleep(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   /**
@@ -175,13 +173,13 @@ export class APIClient {
   }
 }
 
-// Global instance for use across the application
+// Global instance for use across the application  
 export const apiClient = new APIClient({
-  maxRetries: 1, // Reduce retries for auth calls - most should succeed on first try
+  maxRetries: 1, // Reduce retries for auth calls
   baseDelay: 500, // Shorter delay for auth operations
 });
 
-// Specialized client for non-auth operations that can be more aggressive
+// Specialized client for non-auth operations
 export const dataApiClient = new APIClient({
   maxRetries: 3,
   baseDelay: 1000,
