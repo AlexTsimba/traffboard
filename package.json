@@ -33,7 +33,16 @@
     "backup:clean": "ls -t backups/*.tar.gz 2>/dev/null | tail -n +6 | xargs rm -f || echo 'No old backups to clean'",
     "setup:branch-protection": "node .github/branch-protection/setup-branch-protection.js",
     "setup:branch-protection:dry-run": "node .github/branch-protection/setup-branch-protection.js --dry-run",
-    "setup:branch-protection:force": "node .github/branch-protection/setup-branch-protection.js --force"
+    "setup:branch-protection:force": "node .github/branch-protection/setup-branch-protection.js --force",
+    "ci:install": "pnpm install --frozen-lockfile",
+    "ci:generate": "pnpm db:generate",
+    "ci:lint": "pnpm lint",
+    "ci:typecheck": "pnpm typecheck",
+    "ci:test": "pnpm test:run",
+    "ci:build": "pnpm build",
+    "ci:security": "pnpm audit",
+    "ci:full": "pnpm ci:install && pnpm ci:generate && pnpm ci:lint && pnpm ci:typecheck && pnpm ci:test && pnpm ci:build",
+    "ci:check": "pnpm ci:lint && pnpm ci:typecheck && pnpm ci:test"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

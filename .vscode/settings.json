@@ -1,0 +1,35 @@
+{
+  "typescript.preferences.strictFunctionTypes": true,
+  "typescript.preferences.noImplicitReturns": true,
+  "typescript.preferences.noImplicitAny": true,
+  "typescript.preferences.strictNullChecks": true,
+  "typescript.preferences.strictPropertyInitialization": true,
+  "typescript.preferences.alwaysStrict": true,
+  "typescript.preferences.noImplicitThis": true,
+  "typescript.preferences.noUnusedLocals": true,
+  "typescript.preferences.noUnusedParameters": true,
+  "typescript.preferences.exactOptionalPropertyTypes": true,
+  "typescript.preferences.noImplicitOverride": true,
+  "typescript.preferences.useUnknownInCatchVariables": true,
+  "typescript.validate.enable": true,
+  "typescript.tsc.autoDetect": "on",
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact", 
+    "typescript",
+    "typescriptreact"
+  ],
+  "eslint.run": "onType",
+  "eslint.alwaysShowStatus": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
+}

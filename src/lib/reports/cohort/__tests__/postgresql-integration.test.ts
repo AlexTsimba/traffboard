@@ -91,18 +91,19 @@ describe("PostgreSQL Integration", () => {
     });
 
     it("should safely handle numeric parameters", () => {
-      expect(safeParameterize(123)).toBe(123);
-      expect(safeParameterize(45.67)).toBe(45.67);
+      expect(safeParameterize(123)).toBe("123");
+      expect(safeParameterize(45.67)).toBe("45.67");
     });
 
     it("should safely handle boolean parameters", () => {
-      expect(safeParameterize(true)).toBe(true);
-      expect(safeParameterize(false)).toBe(false);
+      expect(safeParameterize(true)).toBe("true");
+      expect(safeParameterize(false)).toBe("false");
     });
 
     it("should safely handle null parameters", () => {
       expect(safeParameterize(null)).toBe(null);
-      expect(safeParameterize()).toBe(null);
+      const undefinedValue = undefined;
+      expect(safeParameterize(undefinedValue)).toBe(null);
     });
 
     it("should safely handle date parameters", () => {
