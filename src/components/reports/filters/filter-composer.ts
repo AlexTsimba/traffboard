@@ -92,6 +92,7 @@ export class FilterComposer {
    */
   addCommon(filterId: keyof typeof COMMON_FILTERS): this {
     // Safe to use direct access since filterId is constrained to valid keys
+    // eslint-disable-next-line security/detect-object-injection
     const commonFilter = COMMON_FILTERS[filterId];
     if (commonFilter) {
       this.add(commonFilter);

@@ -41,10 +41,23 @@ export class DashboardPage extends BasePage {
   }
 
   async logout(): Promise<void> {
-    await this.openUserDropdown();
-    await this.logoutButton.click();
-    // Wait for navigation to login page
-    await this.page.waitForURL(/\/main\/auth\/v1\/login/);
+    try {
+      await this.openUserDropdown();
+      await this.logoutButton.click();
+      
+      // Wait for either navigation to login page or manual redirect
+      await Promise.race([
+        this.page.waitForURL(/\/main\/auth\/v1\/login/, { timeout: 10000 }),
+        this.page.waitForFunction(() => window.location.href.includes('/main/auth/v1/login'), { timeout: 10000 })
+      ]);
+    } catch (error) {
+      console.warn("Logout timeout - checking current state");
+      // Check if we ended up at login page despite timeout
+      const currentUrl = this.page.url();
+      if (!currentUrl.includes('/main/auth/v1/login')) {
+        throw new Error(`Logout failed - still at ${currentUrl}`);
+      }
+    }
   }
 
   async expectToBeOnDashboard(): Promise<void> {

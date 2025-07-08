@@ -28,8 +28,8 @@ export function ReportHeader({
   onExportClick,
   actions,
   className,
-}: ReportHeaderProps) {
-  const handleExport = (format: string) => {
+}: Readonly<ReportHeaderProps>) {
+  const handleExport = (_format: string) => {
     // Export functionality will be implemented in export system
     onExportClick();
   };

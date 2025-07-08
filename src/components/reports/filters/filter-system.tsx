@@ -55,7 +55,7 @@ export function FilterModal({
   filterDefinitions,
   currentFilters,
   title = "Filter Report",
-}: FilterModalProps) {
+}: Readonly<FilterModalProps>) {
   const [localFilters, setLocalFilters] = useState<Record<string, FilterValue>>(currentFilters);
 
   const handleFilterChange = useCallback((filterId: string, value: FilterValue) => {
@@ -162,7 +162,7 @@ export function FilterModal({
 // FILTER CHIPS COMPONENT
 // =============================================================================
 
-export function FilterChips({ appliedFilters, onRemoveFilter, onClearAll, className }: FilterChipsProps) {
+export function FilterChips({ appliedFilters, onRemoveFilter, onClearAll, className }: Readonly<FilterChipsProps>) {
   if (appliedFilters.length === 0) {
     return null;
   }

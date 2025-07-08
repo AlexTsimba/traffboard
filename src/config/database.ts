@@ -54,7 +54,7 @@ function parsePoolConfig() {
  * Environment-based database configuration with enhanced validation
  */
 export const databaseConfig = databaseConfigSchema.parse({
-  url: process.env.DATABASE_URL ?? "postgresql://localhost:5432/traffboard_dev",
+  url: process.env.DATABASE_URL ?? "postgresql://postgres:postgres@localhost:5432/traffboard_dev",
   ...parsePoolConfig(),
 });
 
@@ -70,7 +70,7 @@ export const isProduction = process.env.NODE_ENV === "production";
  */
 export const testDatabaseConfig = {
   ...databaseConfig,
-  url: process.env.TEST_DATABASE_URL ?? "postgresql://localhost:5432/traffboard_test",
+  url: process.env.TEST_DATABASE_URL ?? "postgresql://postgres:postgres@localhost:5432/traffboard_test",
   poolMax: 5, // Smaller pool for tests
   poolIdleTimeout: 30, // Shorter timeouts for tests
   poolConnectTimeout: 15,

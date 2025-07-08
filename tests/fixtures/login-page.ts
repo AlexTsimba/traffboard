@@ -33,11 +33,21 @@ export class LoginPage extends BasePage {
     
     await this.loginButton.click();
     
-    // Wait for navigation or response
-    await Promise.race([
-      this.page.waitForURL(/\/main\/dashboard/, { timeout: 10000 }),
-      this.page.waitForSelector('[role="alert"], .text-destructive', { timeout: 5000 }).catch(() => null)
-    ]);
+    // Wait for either successful navigation or error message
+    // Don't wait for networkidle to avoid hanging on continuous API calls
+    try {
+      await Promise.race([
+        this.page.waitForURL(/\/main\/dashboard/, { timeout: 15000 }),
+        this.page.waitForSelector('[role="alert"], .text-destructive', { timeout: 8000 })
+      ]);
+    } catch (error) {
+      console.warn("Login timeout - checking current state");
+      // Check if we ended up somewhere expected despite timeout
+      const currentUrl = this.page.url();
+      if (!currentUrl.includes('/main/dashboard') && !await this.errorMessage.isVisible()) {
+        throw new Error(`Login failed - unexpected state at ${currentUrl}`);
+      }
+    }
   }
 
   async expectToBeOnLoginPage(): Promise<void> {

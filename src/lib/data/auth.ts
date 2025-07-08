@@ -20,12 +20,9 @@ export interface AuthenticatedUser {
  * This is the foundation of all data access security
  */
 export async function requireAuth(): Promise<AuthenticatedUser> {
-  console.log("[Auth] Checking authentication...");
   const session = await auth();
-  console.log("[Auth] Session:", session ? { user: session.user } : "No session");
 
   if (!session?.user?.id) {
-    console.log("[Auth] No session or user found");
     throw new Error("Authentication required");
   }
 
@@ -101,14 +98,6 @@ export async function auditLog(action: string, userId?: string, details?: Record
         ipAddress: null,
         userAgent: null,
       },
-    });
-
-    // Also log to console for development
-    console.log("AUDIT:", {
-      timestamp: new Date().toISOString(),
-      action,
-      userId,
-      details,
     });
   } catch (error) {
     console.error("Failed to write audit log:", error);

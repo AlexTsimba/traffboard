@@ -34,8 +34,8 @@ async function main() {
   // Create test users
   const testUsers = [
     {
-      email: "test@traffboard.com",
-      password: "test123",
+      email: "test@example.com",
+      password: "test123456",
       name: "Test User",
       role: "user",
     },
@@ -90,7 +90,7 @@ async function main() {
 
   console.log("\n🔐 Login credentials:");
   console.log("Admin: admin@traffboard.com / admin123");
-  console.log("Test User: test@traffboard.com / test123");
+  console.log("Test User: test@example.com / test123456");
   console.log("Manager: manager@traffboard.com / manager123");
   console.log("John: john@traffboard.com / john123");
 }

@@ -85,6 +85,7 @@ export class CacheManager {
     }
 
     try {
+      // eslint-disable-next-line security/detect-non-literal-regexp
       const regex = new RegExp(pattern);
       for (const [key] of this.cache) {
         if (regex.test(key)) {

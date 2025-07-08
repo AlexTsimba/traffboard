@@ -31,6 +31,7 @@ function validateTextPattern(
 ): string | null {
   if (validation.pattern && typeof value === "string") {
     try {
+      // eslint-disable-next-line security/detect-non-literal-regexp
       const regex = new RegExp(validation.pattern);
       if (!regex.test(value)) {
         return `${label} format is invalid`;

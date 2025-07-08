@@ -1,0 +1,19 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "CI-Local Full Check",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "./scripts/ci-local/full-check.sh",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "CI-Local Quick Check", 
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "./scripts/ci-local/quick-check.sh",
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}

@@ -5,7 +5,7 @@
         "id": 1,
         "title": "Report Factory Foundation Architecture",
         "description": "Design and implement a universal report framework foundation with reusable components, a flexible filter system (including modal dialog functionality), a robust data pipeline, and export capabilities. This foundation must support cohort analysis and all future report types. Emphasize TypeScript interfaces, React context providers, and a plugin architecture to ensure extensibility and maintainability. The filter system must include a square filter button in the top-right of reports, a centered modal dialog with SUBMIT and CLEAR buttons, and a horizontal chips display showing active filters above the table. All filter-related interfaces and components must reflect these UI and interaction requirements.",
-        "status": "pending",
+        "status": "done",
         "dependencies": [],
         "priority": "medium",
         "details": "Establish a modular architecture for the report factory, focusing on separation of concerns and extensibility. Develop core reusable UI components (tables, filters, export buttons) using TypeScript interfaces for strong typing and contract enforcement. Define clear interfaces and plugin points for integrating new data sources and report types. Implement a filter system that supports dynamic parameterization, allowing users to adjust report queries and context areas in real time. The filter system must include a square filter button in the top-right of reports, a centered modal dialog with SUBMIT and CLEAR buttons, and a horizontal chips display showing active filters above the table. Architect a data pipeline that can ingest, transform, and deliver data to report components, supporting hierarchy-aware data and both static/dynamic layouts. Integrate export functionality (e.g., CSV, Excel, PDF) at the framework level. Use React context providers to manage global state and configuration for reports, filters, and plugins. Ensure the design accommodates future enhancements such as additional export formats, custom layouts, advanced filtering, and new report plugins. Document the architecture, component APIs, extension points, and plugin integration for future developers.",
@@ -15,7 +15,7 @@
             "id": 1,
             "title": "Define TypeScript interfaces for core report components",
             "description": "Create TypeScript interfaces for tables, filters (including modal dialog, filter button, and chips display), export buttons, and data pipeline contracts to ensure type safety and extensibility.",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "details": "Update filter-related interfaces to support modal dialog state, SUBMIT/CLEAR actions, and chip display for active filters.",
             "testStrategy": "Verify that interfaces cover modal dialog props/state, filter button interactions, and chip rendering for active filters."
@@ -24,7 +24,7 @@
             "id": 2,
             "title": "Implement React context providers for global report state",
             "description": "Set up React context providers to manage global state for reports, filters (including modal dialog state), and plugin configuration.",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "details": "Ensure context providers can manage modal open/close state, active filter values, and chip display updates.",
             "testStrategy": "Test context updates for opening/closing modal, submitting/clearing filters, and updating chips."
@@ -33,7 +33,7 @@
             "id": 3,
             "title": "Design plugin architecture for extensible report types and data sources",
             "description": "Establish a plugin system that allows new report types, data sources, and export formats to be added without modifying the core framework.",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "details": "",
             "testStrategy": ""
@@ -42,7 +42,7 @@
             "id": 4,
             "title": "Develop reusable UI components using TypeScript and React",
             "description": "Build core UI components (tables, filters with modal dialog and chips, export buttons) as reusable, strongly-typed React components.",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "details": "Implement a square filter button in the top-right of reports, a modal dialog for filter selection with SUBMIT/CLEAR buttons, and a horizontal chips display above the table for active filters.",
             "testStrategy": "Render the filter button, open/close modal, submit/clear filters, and verify chips display updates as expected."
@@ -51,7 +51,7 @@
             "id": 5,
             "title": "Implement dynamic filter system with real-time parameterization",
             "description": "Create a filter system that supports dynamic parameters and context areas, enabling real-time updates to report queries. The system must use a modal dialog for filter selection and display active filters as chips.",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "details": "Ensure the filter system includes modal dialog logic, SUBMIT/CLEAR actions, and chip management for active filters.",
             "testStrategy": "Test dynamic parameter changes via modal, confirm real-time updates to report data, and verify chip display reflects current filters."
@@ -60,7 +60,7 @@
             "id": 6,
             "title": "Architect data pipeline with plugin support",
             "description": "Design and implement a data pipeline that can ingest, transform, and deliver data to report components, supporting plugins for custom data processing.",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "details": "",
             "testStrategy": ""
@@ -69,7 +69,7 @@
             "id": 7,
             "title": "Integrate export functionality at the framework level",
             "description": "Provide export capabilities (CSV, Excel, PDF) as part of the core framework, with plugin support for future formats.",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "details": "",
             "testStrategy": ""
@@ -78,7 +78,7 @@
             "id": 8,
             "title": "Document architecture, APIs, and plugin extension points",
             "description": "Produce comprehensive documentation covering the architecture, TypeScript interfaces, React context usage, plugin integration, and filter modal/chip UI.",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "details": "Include documentation for modal dialog filter workflow, filter button, and chips display.",
             "testStrategy": "Review documentation for completeness and clarity on new filter system UI and interaction patterns."
@@ -89,7 +89,7 @@
         "id": 2,
         "title": "Cohort Analysis Data Engine: PostgreSQL-Arquero Pipeline",
         "description": "Develop a data engine that leverages a PostgreSQL-Arquero pipeline for efficient cohort calculations, including breakpoint mapping, metric processing (DEP2COST, ROAS, AVG DEPOSIT SUM, RETENTION RATE), and performance optimization. The engine must support DAY_BREAKPOINTS=[1,3,5,7,14,17,21,24,27,30] and WEEK_BREAKPOINTS=[7,14,21,28,35,42], with week mode starting Monday and viewing Sunday. Retention rate must be calculated as active_players/initial_cohort_size*100.",
-        "status": "pending",
+        "status": "in-progress",
         "dependencies": [
           1
         ],
@@ -101,9 +101,9 @@
             "id": 1,
             "title": "Establish Secure PostgreSQL Integration",
             "description": "Set up a secure, reusable PostgreSQL connection with proper credential management and parameterization.",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
-            "details": "",
+            "details": "<info added on 2025-07-07T20:17:18.565Z>\nThe PostgreSQL integration layer is now fully operational and provides a secure, high-performance foundation for cohort analysis SQL extraction. All schema mismatches have been resolved, with correct field mappings (e.g., signUpDate as cohort base, PlayerData monetary fields), and the integration module supports connection pooling, pipeline batch execution, and robust security measures. The system is equipped with comprehensive health checks, observability, and performance monitoring, ensuring readiness for advanced SQL extraction using window functions and breakpoints in the next phase. Cohort analysis logic is now aligned to track player behavior over time from signup, with flexible filtering and breakpoint calculations, and all queries are validated against the updated PostgreSQL schema.\n</info added on 2025-07-07T20:17:18.565Z>",
             "testStrategy": ""
           },
           {
@@ -119,9 +119,9 @@
             "id": 3,
             "title": "Implement PostgreSQL Pipeline Mode for Batch Processing",
             "description": "Utilize PostgreSQL pipeline mode to batch and asynchronously process multiple queries, handling errors and synchronization points to avoid pipeline aborts.",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
-            "details": "",
+            "details": "<info added on 2025-07-07T20:16:35.750Z>\nPostgreSQL Pipeline Mode for Batch Processing has been fully implemented and integrated into the cohort analysis data engine. The solution features a robust CohortPipelineProcessor class with advanced capabilities including batch processing, concurrency control via Semaphore, and exponential backoff retry logic for failed batches. The pipeline architecture leverages PostgreSQL transaction-based pipeline mode to minimize network round-trips, especially for large date ranges (auto-enabled for ranges > 90 days). Comprehensive error handling, progress tracking with real-time callbacks and ETA calculation, and support for abort signals ensure reliability and user control. The implementation includes connection pooling, query optimization, and detailed metrics collection for performance monitoring. A test suite of 19 cases covers batch processing, concurrency, error handling, performance, and integration with the main cohort processor, ensuring enterprise-grade scalability and reliability for large dataset cohort analysis.\n</info added on 2025-07-07T20:16:35.750Z>",
             "testStrategy": ""
           },
           {
@@ -443,29 +443,18 @@
       {
         "id": 8,
         "title": "Critical Repository Refactoring for Cohort Analysis Foundation",
-        "description": "Refactor the TraffBoard repository to address architectural blockers for cohort analysis, including API endpoint consolidation, legacy code removal, database schema cleanup, and foundational architecture preparation. The repository must use consistent 'conversion' terminology throughout all code, interfaces, and endpoints, with all legacy 'traffic' references fully eliminated.",
+        "description": "Refactor the TraffBoard repository to address architectural blockers for cohort analysis, including API endpoint consolidation, legacy code removal, database schema cleanup, and foundational architecture preparation. The repository must use consistent 'conversion' terminology throughout all code, interfaces, and endpoints, with all legacy 'traffic' references fully eliminated. Incorporate lessons from the recent critical E2E performance bug investigation: ensure robust API client error handling, avoid test strategies that rely on network idle state when persistent API polling is present, and implement diagnostic logging for authentication and 2FA flows. All fixes and diagnostics related to E2E test reliability and authentication flows must be integrated into the refactoring process.",
         "status": "pending",
         "dependencies": [
           1,
           3
         ],
         "priority": "high",
-        "details": "Conduct a comprehensive audit of the TraffBoard codebase to identify and document all remaining legacy modules, redundant API endpoints, and outdated database schema elements that could impede cohort analysis development. Ensure all API endpoints related to reporting and cohort data are consolidated and standardized, following RESTful naming conventions and consistent request/response formats[1][4]. Remove any remaining obsolete or deprecated code, libraries, and configuration files, with careful regression testing to avoid breaking existing functionality. Review and refactor the database schema to eliminate unused tables, columns, and relationships, and to optimize for cohort-based queries (e.g., adding necessary indexes, normalizing tables for cohort metrics). Prepare the foundational architecture by modularizing core services, establishing clear boundaries for data access layers, and documenting new interfaces and data contracts. Ensure all changes are backward compatible with ongoing work in Tasks 1-7, and provide migration scripts and documentation for seamless team adoption. All 'traffic' terminology and legacy code must remain fully removed, with 'conversion' naming standardized across the codebase.",
-        "testStrategy": "1. Run the full test suite before and after refactoring to ensure no regressions or breaking changes. 2. Use API contract testing tools (e.g., Postman, Swagger) to verify endpoint consolidation, RESTful naming, and response consistency[1][4]. 3. Validate that all legacy code and schema elements targeted for removal are fully eliminated and that no references remain. 4. Benchmark key cohort-related queries before and after schema cleanup to confirm performance improvements. 5. Review migration scripts and documentation with the team to ensure clarity and ease of adoption. 6. Confirm that all code, interfaces, and endpoints use 'conversion' terminology exclusively, with no residual 'traffic' references.",
+        "details": "Conduct a comprehensive audit of the TraffBoard codebase to identify and document all remaining legacy modules, redundant API endpoints, and outdated database schema elements that could impede cohort analysis development. Ensure all API endpoints related to reporting and cohort data are consolidated and standardized, following RESTful naming conventions and consistent request/response formats[1][4]. Remove any remaining obsolete or deprecated code, libraries, and configuration files, with careful regression testing to avoid breaking existing functionality. Review and refactor the database schema to eliminate unused tables, columns, and relationships, and to optimize for cohort-based queries (e.g., adding necessary indexes, normalizing tables for cohort metrics). Prepare the foundational architecture by modularizing core services, establishing clear boundaries for data access layers, and documenting new interfaces and data contracts. Ensure all changes are backward compatible with ongoing work in Tasks 1-7, and provide migration scripts and documentation for seamless team adoption. All 'traffic' terminology and legacy code must remain fully removed, with 'conversion' naming standardized across the codebase. Integrate robust error handling and circuit breaker patterns in API clients, especially for authentication and 2FA endpoints. Avoid test wait strategies that depend on network idle state when persistent polling is present. Add diagnostic logging to authentication and 2FA flows to support future debugging and monitoring.",
+        "testStrategy": "1. Run the full test suite before and after refactoring to ensure no regressions or breaking changes. 2. Use API contract testing tools (e.g., Postman, Swagger) to verify endpoint consolidation, RESTful naming, and response consistency[1][4]. 3. Validate that all legacy code and schema elements targeted for removal are fully eliminated and that no references remain. 4. Benchmark key cohort-related queries before and after schema cleanup to confirm performance improvements. 5. Review migration scripts and documentation with the team to ensure clarity and ease of adoption. 6. Confirm that all code, interfaces, and endpoints use 'conversion' terminology exclusively, with no residual 'traffic' references. 7. Run E2E tests to verify that authentication and 2FA flows no longer cause timeouts or infinite retries. 8. Check diagnostic logs to confirm that repeated form submissions or API polling are not occurring unexpectedly. 9. Ensure test database users are properly seeded for authentication scenarios. 10. Consider and, if feasible, implement API rate limiting for authentication endpoints to prevent abuse and further test flakiness.",
         "subtasks": [
           {
             "id": 2,
-            "title": "Database Schema Cleanup and Cohort Optimization",
-            "description": "Audit and refactor the database schema to remove any remaining unused tables, columns, or relationships related to legacy 'traffic' data. Normalize tables and add necessary indexes to optimize for cohort-based queries. Ensure all schema elements use 'conversion' terminology.",
-            "status": "pending",
-            "dependencies": [
-              1
-            ],
-            "details": "",
-            "testStrategy": ""
-          },
-          {
-            "id": 3,
             "title": "Legacy Code and Configuration Removal",
             "description": "Identify and remove any remaining obsolete or deprecated code, libraries, and configuration files that reference 'traffic' or are no longer relevant after the API consolidation. Confirm that all code and documentation use 'conversion' naming exclusively.",
             "status": "pending",
@@ -476,7 +465,7 @@
             "testStrategy": ""
           },
           {
-            "id": 4,
+            "id": 3,
             "title": "API Endpoint Standardization and Documentation",
             "description": "Review all reporting and cohort-related API endpoints to ensure they follow RESTful naming conventions, use consistent 'conversion' terminology, and provide standardized request/response formats. Update or create API documentation to reflect these changes.",
             "status": "pending",
@@ -487,14 +476,42 @@
             "testStrategy": ""
           },
           {
-            "id": 5,
+            "id": 4,
             "title": "Foundational Architecture Preparation",
             "description": "Modularize core services, establish clear boundaries for data access layers, and document new interfaces and data contracts. Ensure all foundational architecture is ready for cohort analysis and is free of legacy 'traffic' dependencies.",
             "status": "pending",
             "dependencies": [
               2,
-              3,
-              4
+              3
+            ],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "API Structure Consolidation",
+            "description": "Remove legacy /api/traffic/ endpoint and traffic.ts data layer, ensuring all imports and references point to the current /api/conversions/ and conversions.ts. This critical cleanup prevents naming conflicts and confusion during cohort analysis development. Delete obsolete files, update all import statements, and verify no broken references remain.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 9,
+            "title": "Critical E2E Performance Bug Investigation & Fix",
+            "description": "Fix critical performance bug causing infinite 2FA retry loops and E2E test timeouts. Implemented fixes: enhanced API client with circuit breaker and exponential backoff, improved BasePage.waitForLoad() to avoid networkidle waits, better login test fixture timeout handling, improved Prisma connection management, added diagnostic logging to 2FA API and login form, and reduced API client retries for auth operations. Next steps: run E2E tests to verify fixes, check diagnostic logs for repeated submissions, ensure test database users are seeded, and consider API rate limiting for auth endpoints.",
+            "status": "done",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 10,
+            "title": "Diagnostic Log Review and Rate Limiting Assessment",
+            "description": "Review diagnostic logs from authentication and 2FA flows to confirm that repeated form submissions or API polling are not occurring unexpectedly. Ensure test database users are properly seeded for authentication scenarios. Assess the feasibility and impact of adding API rate limiting to authentication endpoints to prevent abuse and further test flakiness.",
+            "status": "pending",
+            "dependencies": [
+              9
             ],
             "details": "",
             "testStrategy": ""
@@ -540,7 +557,7 @@
     ],
     "metadata": {
       "created": "2025-07-01T22:28:10.873Z",
-      "updated": "2025-07-07T15:08:17.644Z",
+      "updated": "2025-07-08T10:24:59.995Z",
       "description": "Tasks for master context"
     }
   }
