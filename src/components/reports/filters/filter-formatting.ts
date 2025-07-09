@@ -13,7 +13,11 @@ import type { FilterDefinition, FilterValue, FilterType, AppliedFilter } from "@
 
 function formatDateValue(value: FilterValue): string {
   if (value instanceof Date) {
-    return value.toLocaleDateString();
+    return value.toLocaleDateString("en-US", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
   }
   return formatGenericValue(value);
 }
@@ -21,7 +25,10 @@ function formatDateValue(value: FilterValue): string {
 function formatDateRangeValue(value: FilterValue): string {
   if (typeof value === "object" && value !== null && "start" in value && "end" in value) {
     const dateRange = value as { start: Date; end: Date };
-    return `${new Date(dateRange.start).toLocaleDateString()} - ${new Date(dateRange.end).toLocaleDateString()}`;
+    const formatOptions = { day: "numeric", month: "long", year: "numeric" } as const;
+    const startDate = new Date(dateRange.start).toLocaleDateString("en-US", formatOptions);
+    const endDate = new Date(dateRange.end).toLocaleDateString("en-US", formatOptions);
+    return `${startDate} - ${endDate}`;
   }
   return formatGenericValue(value);
 }

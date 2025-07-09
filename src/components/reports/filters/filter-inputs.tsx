@@ -9,12 +9,14 @@
 
 import React from "react";
 
+import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import type { FilterDefinition, FilterValue } from "@/types/reports";
 
 // =============================================================================
@@ -130,61 +132,109 @@ export function DateFilterInput({ filter, value, onChange }: FilterInputProps) {
 // =============================================================================
 
 export function DateRangeFilterInput({ value, onChange }: FilterInputProps) {
+  // Default to today-today if no value
+  const today = new Date();
+  const defaultRange = { start: today, end: today };
+
   const dateRange =
     value != null && typeof value === "object" && "start" in value && "end" in value
       ? (value as { start: Date; end: Date })
-      : null;
+      : defaultRange;
 
-  const handleStartChange = (date: Date | undefined) => {
-    if (date && dateRange?.end) {
-      onChange({ start: date, end: dateRange.end });
-    } else if (date) {
-      onChange({ start: date, end: date });
+  // Convert project format {start, end} to calendar format {from, to}
+  const calendarRange = {
+    from: new Date(dateRange.start),
+    to: new Date(dateRange.end),
+  };
+
+  // Format display text
+  const formatDate = (date: Date) =>
+    date.toLocaleDateString("en-US", { day: "numeric", month: "long", year: "numeric" });
+
+  const displayText = dateRange
+    ? `${formatDate(new Date(dateRange.start))} - ${formatDate(new Date(dateRange.end))}`
+    : "Select date range";
+
+  const handleRangeChange = (range: { from?: Date; to?: Date } | undefined) => {
+    if (range?.from && range?.to) {
+      // Convert calendar format {from, to} back to project format {start, end}
+      onChange({ start: range.from, end: range.to });
+    } else if (range?.from) {
+      // Single date selected - use as both start and end
+      onChange({ start: range.from, end: range.from });
     }
   };
 
-  const handleEndChange = (date: Date | undefined) => {
-    if (date && dateRange?.start) {
-      onChange({ start: dateRange.start, end: date });
-    }
+  // Date presets
+  const getThisWeek = () => {
+    const today = new Date();
+    const dayOfWeek = today.getDay();
+    const monday = new Date(today);
+    monday.setDate(today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1));
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    return { start: monday, end: sunday };
+  };
+
+  const getThisMonth = () => {
+    const today = new Date();
+    const start = new Date(today.getFullYear(), today.getMonth(), 1);
+    const end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    return { start, end };
+  };
+
+  const getLastMonth = () => {
+    const today = new Date();
+    const start = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+    const end = new Date(today.getFullYear(), today.getMonth(), 0);
+    return { start, end };
+  };
+
+  const handlePresetClick = (preset: { start: Date; end: Date }) => {
+    onChange(preset);
   };
 
   return (
-    <div className="grid grid-cols-2 gap-2">
-      <Popover>
-        <PopoverTrigger asChild>
-          <Input
-            readOnly
-            placeholder="Start date"
-            value={dateRange?.start ? new Date(dateRange.start).toLocaleDateString() : ""}
-          />
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0">
-          <Calendar
-            mode="single"
-            selected={dateRange?.start ? new Date(dateRange.start) : undefined}
-            onSelect={handleStartChange}
-          />
-        </PopoverContent>
-      </Popover>
-
-      <Popover>
-        <PopoverTrigger asChild>
-          <Input
-            readOnly
-            placeholder="End date"
-            value={dateRange?.end ? new Date(dateRange.end).toLocaleDateString() : ""}
-          />
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0">
-          <Calendar
-            mode="single"
-            selected={dateRange?.end ? new Date(dateRange.end) : undefined}
-            onSelect={handleEndChange}
-          />
-        </PopoverContent>
-      </Popover>
-    </div>
+    <Popover>
+      <PopoverTrigger asChild>
+        <Input readOnly placeholder="Select date range" value={displayText} className="cursor-pointer" />
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0" align="start">
+        <div className="p-3">
+          <div className="mb-3 flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                handlePresetClick(getThisWeek());
+              }}
+            >
+              This Week
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                handlePresetClick(getThisMonth());
+              }}
+            >
+              This Month
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                handlePresetClick(getLastMonth());
+              }}
+            >
+              Last Month
+            </Button>
+          </div>
+          <Separator className="mb-3" />
+        </div>
+        <Calendar mode="range" selected={calendarRange} onSelect={handleRangeChange} numberOfMonths={2} />
+      </PopoverContent>
+    </Popover>
   );
 }
 

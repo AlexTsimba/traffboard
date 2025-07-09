@@ -13,7 +13,7 @@ const createCohortFilterDefinitions = (): FilterDefinition[] => {
       id: "dateRange",
       label: "Date Range",
       type: "daterange",
-      group: "time",
+      group: "timeframe",
       order: 0,
     },
     {
