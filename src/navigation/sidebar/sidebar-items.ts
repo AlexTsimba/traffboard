@@ -31,7 +31,7 @@ export const sidebarItems: NavGroup[] = [
       { title: "Overview", url: "/main/dashboard/overview", icon: Home },
       { title: "Conversions", url: "/main/dashboard/conversions", icon: ChartPie },
       { title: "Traffic Breakdown", url: "/main/dashboard/traffic", icon: Grid2X2, comingSoon: true },
-      { title: "Cohorts", url: "/main/dashboard/cohorts", icon: ChartLine, comingSoon: true },
+      { title: "Cohorts", url: "/main/dashboard/cohorts", icon: ChartLine },
       { title: "Landings", url: "/main/dashboard/landings", icon: ShoppingBag, comingSoon: true },
     ],
   },
