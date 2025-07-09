@@ -7,25 +7,27 @@ import { ChartContainer, type ChartConfig } from "@/components/ui/chart";
 import { cn } from "@/lib/utils";
 import type { CohortData, CohortCell, CohortMetric } from "@/types/reports";
 
+import { getBreakpointValue, getValidBreakpointValues } from "./chart-utils";
+
 export interface CohortHeatmapChartProps {
   /** Cohort data array containing cohort dates and breakpoint values */
-  data: CohortData[];
+  readonly data: CohortData[];
   /** Current metric being displayed */
-  metric: CohortMetric;
+  readonly metric: CohortMetric;
   /** Breakpoints to display (e.g., [1, 3, 7, 14, 30]) */
-  breakpoints: number[];
+  readonly breakpoints: number[];
   /** Chart title */
-  title?: string;
+  readonly title?: string;
   /** Chart description */
-  description?: string;
+  readonly description?: string;
   /** Custom className for styling */
-  className?: string;
+  readonly className?: string;
   /** Loading state */
-  isLoading?: boolean;
+  readonly isLoading?: boolean;
   /** Error state */
-  error?: string;
+  readonly error?: string;
   /** Callback when cell is clicked */
-  onCellClick?: (cohortDate: string, breakpoint: number, value: number | null) => void;
+  readonly onCellClick?: (cohortDate: string, breakpoint: number, value: number | null) => void;
 }
 
 /**
@@ -42,8 +44,9 @@ function getHeatmapIntensity(value: number | null, maxValue: number, metric: Coh
     roas: "bg-blue", // Blue for ROAS
     dep2cost: "bg-purple", // Purple for deposit cost
     avg_deposit_sum: "bg-orange", // Orange for deposit sum
-  };
+  } as const;
 
+  // eslint-disable-next-line security/detect-object-injection
   const baseColor = colorSchemes[metric];
 
   if (intensity >= 0.8) return `${baseColor}-500 text-white`;
@@ -110,16 +113,18 @@ export function CohortHeatmapChart({
   const processedData = useMemo(() => {
     if (!data.length) return [];
 
-    // Find max value for intensity calculation
-    const allValues = data.flatMap((cohort) =>
-      Object.values(cohort.breakpointValues).filter((val): val is number => val !== null),
-    );
+    // Find max value for intensity calculation using safe iteration
+    const allValues: number[] = [];
+    for (const breakpoint of breakpoints) {
+      const values = getValidBreakpointValues(data, breakpoint);
+      allValues.push(...values);
+    }
     const maxValue = Math.max(...allValues, 1);
 
     return data.map((cohort) => ({
       ...cohort,
       cells: breakpoints.map((breakpoint) => {
-        const value = cohort.breakpointValues[breakpoint] ?? null;
+        const value = getBreakpointValue(cohort.breakpointValues, breakpoint);
         return {
           value,
           displayValue: formatValue(value, metric),
@@ -130,6 +135,22 @@ export function CohortHeatmapChart({
       }),
     }));
   }, [data, breakpoints, metric]);
+
+  const handleCellClick = (cohortDate: string, breakpoint: number, value: number | null) => {
+    onCellClick?.(cohortDate, breakpoint, value);
+  };
+
+  const handleCellKeyDown = (
+    event: React.KeyboardEvent,
+    cohortDate: string,
+    breakpoint: number,
+    value: number | null,
+  ) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      handleCellClick(cohortDate, breakpoint, value);
+    }
+  };
 
   if (error) {
     return (
@@ -199,11 +220,18 @@ export function CohortHeatmapChart({
                       return (
                         <div
                           key={cell.breakpoint}
+                          role="button"
+                          tabIndex={0}
                           className={cn(
-                            "hover:ring-primary/50 flex h-8 cursor-pointer items-center justify-center rounded-sm text-xs font-medium transition-all hover:scale-105 hover:ring-2",
+                            "hover:ring-primary/50 focus:ring-primary/50 flex h-8 cursor-pointer items-center justify-center rounded-sm text-xs font-medium transition-all hover:scale-105 hover:ring-2 focus:ring-2 focus:outline-none",
                             cell.heatmapClass,
                           )}
-                          onClick={() => onCellClick?.(cohort.cohortDate, cell.breakpoint, cell.value)}
+                          onClick={() => {
+                            handleCellClick(cohort.cohortDate, cell.breakpoint, cell.value);
+                          }}
+                          onKeyDown={(event) => {
+                            handleCellKeyDown(event, cohort.cohortDate, cell.breakpoint, cell.value);
+                          }}
                           title={`Cohort: ${new Date(cohort.cohortDate).toLocaleDateString()}, Day ${cell.breakpoint} - ${formatValue(cell.value ?? 0, metric)}`}
                         >
                           {cell.displayValue}

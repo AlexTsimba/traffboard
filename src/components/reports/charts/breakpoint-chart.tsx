@@ -10,6 +10,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 
+import {
+  getBreakpointValue,
+  getCohortColorSafe,
+  getChartDataProperty,
+  setChartDataProperty,
+  getValidBreakpointValues,
+} from "./chart-utils";
+
 interface CohortData {
   cohortDate: string;
   ftdCount: number;
@@ -17,14 +25,14 @@ interface CohortData {
 }
 
 export interface BreakpointChartProps {
-  data: CohortData[];
-  metric: "dep2cost" | "roas" | "avgDepositSum" | "retentionRate";
-  breakpoints: number[];
-  title?: string;
-  description?: string;
-  className?: string;
-  showAverage?: boolean;
-  showConfidenceBands?: boolean;
+  readonly data: CohortData[];
+  readonly metric: "dep2cost" | "roas" | "avgDepositSum" | "retentionRate";
+  readonly breakpoints: number[];
+  readonly title?: string;
+  readonly description?: string;
+  readonly className?: string;
+  readonly showAverage?: boolean;
+  readonly showConfidenceBands?: boolean;
 }
 
 const metricConfigs = {
@@ -52,7 +60,7 @@ const metricConfigs = {
     format: (value: number) => `${(value * 100).toFixed(1)}%`,
     yAxisDomain: [0, 1] as [number, number],
   },
-};
+} as const;
 
 const cohortColors = [
   "#ef4444",
@@ -65,7 +73,7 @@ const cohortColors = [
   "#f97316",
   "#ec4899",
   "#14b8a6",
-];
+] as const;
 
 export function BreakpointChart({
   data,
@@ -79,47 +87,39 @@ export function BreakpointChart({
 }: BreakpointChartProps) {
   const [cohortFilter, setCohortFilter] = useState<"all" | "selected" | "top" | "recent">("all");
   const [topCount, setTopCount] = useState(5);
-  const [chartType, _setChartType] = useState<"line" | "bar">("line");
+  const [chartType, setChartType] = useState<"line" | "area">("line");
 
+  // eslint-disable-next-line security/detect-object-injection
   const metricConfig = metricConfigs[metric];
 
   // Filter cohorts based on selection
   const filteredCohorts = useMemo(() => {
     let filtered = [...data];
 
-    switch (cohortFilter) {
-      case "top": {
-        // Sort by average performance across all breakpoints
-        const sortedFiltered = filtered
-          .map((cohort) => {
-            const validValues = breakpoints
-              .map((bp) => cohort.breakpointValues[bp])
-              .filter((val): val is number => val !== null);
-            const avgValue =
-              validValues.length > 0 ? validValues.reduce((sum, val) => sum + val, 0) / validValues.length : 0;
-            return { ...cohort, avgValue };
-          })
-          .toSorted((a, b) => b.avgValue - a.avgValue);
-        filtered = sortedFiltered.slice(0, topCount);
-        break;
-      }
-      case "recent": {
-        const sortedByDate = filtered.toSorted(
-          (a, b) => new Date(b.cohortDate).getTime() - new Date(a.cohortDate).getTime(),
-        );
-        filtered = sortedByDate.slice(0, topCount);
-        break;
-      }
-      case "selected": {
-        // For now, just return all - implementation will add selection filtering logic when needed
-        break;
-      }
-      case "all":
-      default: {
-        // "all" or any other case - no filtering needed
-        break;
-      }
+    if (cohortFilter === "top") {
+      // Sort by average performance across all breakpoints
+      const sortedFiltered = filtered
+        .map((cohort) => {
+          const validValues: number[] = [];
+          for (const bp of breakpoints) {
+            const value = getBreakpointValue(cohort.breakpointValues, bp);
+            if (typeof value === "number") {
+              validValues.push(value);
+            }
+          }
+          const avgValue =
+            validValues.length > 0 ? validValues.reduce((sum, val) => sum + val, 0) / validValues.length : 0;
+          return { ...cohort, avgValue };
+        })
+        .toSorted((a, b) => b.avgValue - a.avgValue);
+      filtered = sortedFiltered.slice(0, topCount);
+    } else if (cohortFilter === "recent") {
+      const sortedByDate = filtered.toSorted(
+        (a, b) => new Date(b.cohortDate).getTime() - new Date(a.cohortDate).getTime(),
+      );
+      filtered = sortedByDate.slice(0, topCount);
     }
+    // For "selected" and "all" cases, return filtered as is
 
     return filtered;
   }, [data, cohortFilter, topCount, breakpoints]);
@@ -127,25 +127,26 @@ export function BreakpointChart({
   // Transform data for chart
   const chartData = useMemo(() => {
     return breakpoints.map((breakpoint) => {
-      const dataPoint: Record<string, unknown> = {
+      let dataPoint: Record<string, unknown> = {
         breakpoint,
         day: `Day ${breakpoint}`,
       };
 
-      // Add data for each cohort
+      // Add data for each cohort using safe property access
       for (const [index, cohort] of filteredCohorts.entries()) {
-        const value = cohort.breakpointValues[breakpoint];
+        const value = getBreakpointValue(cohort.breakpointValues, breakpoint);
         if (value !== null) {
-          dataPoint[`cohort_${index}`] = value;
-          dataPoint[`cohort_${index}_label`] = new Date(cohort.cohortDate).toLocaleDateString();
+          const cohortKey = `cohort_${index}`;
+          const labelKey = `cohort_${index}_label`;
+
+          dataPoint = setChartDataProperty(dataPoint, cohortKey, value);
+          dataPoint = setChartDataProperty(dataPoint, labelKey, new Date(cohort.cohortDate).toLocaleDateString());
         }
       }
 
       // Calculate average if enabled
       if (showAverage) {
-        const validValues = filteredCohorts
-          .map((cohort) => cohort.breakpointValues[breakpoint])
-          .filter((val): val is number => val !== null);
+        const validValues = getValidBreakpointValues(filteredCohorts, breakpoint);
 
         if (validValues.length > 0) {
           dataPoint.average = validValues.reduce((sum, val) => sum + val, 0) / validValues.length;
@@ -163,7 +164,7 @@ export function BreakpointChart({
     for (const [index, cohort] of filteredCohorts.entries()) {
       config[`cohort_${index}`] = {
         label: new Date(cohort.cohortDate).toLocaleDateString(),
-        color: cohortColors[index % cohortColors.length],
+        color: getCohortColorSafe(cohortColors, index),
       };
     }
 
@@ -195,11 +196,12 @@ export function BreakpointChart({
                 if (name === "average") {
                   return [metricConfig.format(Number(value)), "Average"];
                 }
-                const cohortIndex = name.toString().split("_")[1];
-                const label = chartData[0]?.[`cohort_${cohortIndex}_label`] as string;
-                return [metricConfig.format(Number(value)), label || name];
+                const cohortIndexString = String(name);
+                const cohortIndex = cohortIndexString.split("_")[1];
+                const label = getChartDataProperty(chartData[0] ?? {}, `cohort_${cohortIndex ?? ""}_label`) as string;
+                return [metricConfig.format(Number(value)), label || cohortIndexString];
               }}
-              labelFormatter={(label) => `${label}`}
+              labelFormatter={String}
             />
           }
         />
@@ -211,10 +213,10 @@ export function BreakpointChart({
             key={cohort.cohortDate}
             type="monotone"
             dataKey={`cohort_${index}`}
-            stroke={cohortColors[index % cohortColors.length]}
+            stroke={getCohortColorSafe(cohortColors, index)}
             strokeWidth={2}
-            dot={{ r: 3, fill: cohortColors[index % cohortColors.length] }}
-            activeDot={{ r: 5, fill: cohortColors[index % cohortColors.length] }}
+            dot={{ r: 3, fill: getCohortColorSafe(cohortColors, index) }}
+            activeDot={{ r: 5, fill: getCohortColorSafe(cohortColors, index) }}
             connectNulls={false}
           />
         ))}
@@ -253,11 +255,12 @@ export function BreakpointChart({
                 if (name === "average") {
                   return [metricConfig.format(Number(value)), "Average"];
                 }
-                const cohortIndex = name.toString().split("_")[1];
-                const label = chartData[0]?.[`cohort_${cohortIndex}_label`] as string;
-                return [metricConfig.format(Number(value)), label || name];
+                const cohortIndexString = String(name);
+                const cohortIndex = cohortIndexString.split("_")[1];
+                const label = getChartDataProperty(chartData[0] ?? {}, `cohort_${cohortIndex ?? ""}_label`) as string;
+                return [metricConfig.format(Number(value)), label || cohortIndexString];
               }}
-              labelFormatter={(label) => `${label}`}
+              labelFormatter={String}
             />
           }
         />
@@ -269,12 +272,12 @@ export function BreakpointChart({
             key={cohort.cohortDate}
             type="monotone"
             dataKey={`cohort_${index}`}
-            stroke={cohortColors[index % cohortColors.length]}
-            fill={cohortColors[index % cohortColors.length]}
+            stroke={getCohortColorSafe(cohortColors, index)}
+            fill={getCohortColorSafe(cohortColors, index)}
             fillOpacity={0.1}
             strokeWidth={1.5}
-            dot={{ r: 3, fill: cohortColors[index % cohortColors.length] }}
-            activeDot={{ r: 5, fill: cohortColors[index % cohortColors.length] }}
+            dot={{ r: 3, fill: getCohortColorSafe(cohortColors, index) }}
+            activeDot={{ r: 5, fill: getCohortColorSafe(cohortColors, index) }}
             connectNulls={false}
           />
         ))}
@@ -374,8 +377,22 @@ export function BreakpointChart({
             <ChartContainer config={chartConfig}>
               <Tabs defaultValue={chartType} className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="line">Line Chart</TabsTrigger>
-                  <TabsTrigger value="area">Area Chart</TabsTrigger>
+                  <TabsTrigger
+                    value="line"
+                    onClick={() => {
+                      setChartType("line");
+                    }}
+                  >
+                    Line Chart
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="area"
+                    onClick={() => {
+                      setChartType("area");
+                    }}
+                  >
+                    Area Chart
+                  </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="line" className="mt-4">
@@ -392,20 +409,21 @@ export function BreakpointChart({
           <TabsContent value="cohorts" className="mt-4">
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">
-                {cohortFilter === "all"
-                  ? "All Cohorts"
-                  : cohortFilter === "selected"
-                    ? "Selected Cohorts"
-                    : cohortFilter === "top"
-                      ? `Top ${topCount} Performers`
-                      : `${topCount} Most Recent Cohorts`}
+                {cohortFilter === "all" && "All Cohorts"}
+                {cohortFilter === "selected" && "Selected Cohorts"}
+                {cohortFilter === "top" && `Top ${topCount} Performers`}
+                {cohortFilter === "recent" && `${topCount} Most Recent Cohorts`}
               </h3>
 
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {filteredCohorts.map((cohort, index) => {
-                  const validValues = breakpoints
-                    .map((bp) => cohort.breakpointValues[bp])
-                    .filter((val): val is number => val !== null);
+                  const validValues: number[] = [];
+                  for (const bp of breakpoints) {
+                    const value = getBreakpointValue(cohort.breakpointValues, bp);
+                    if (typeof value === "number") {
+                      validValues.push(value);
+                    }
+                  }
                   const avgValue =
                     validValues.length > 0 ? validValues.reduce((sum, val) => sum + val, 0) / validValues.length : 0;
 
@@ -416,7 +434,7 @@ export function BreakpointChart({
                           <CardTitle className="text-sm">{new Date(cohort.cohortDate).toLocaleDateString()}</CardTitle>
                           <div
                             className="h-3 w-3 rounded-full"
-                            style={{ backgroundColor: cohortColors[index % cohortColors.length] }}
+                            style={{ backgroundColor: getCohortColorSafe(cohortColors, index) }}
                           />
                         </div>
                       </CardHeader>
@@ -462,9 +480,7 @@ export function BreakpointChart({
                     <tbody>
                       {chartData.map((point) => {
                         const breakpoint = point.breakpoint as number;
-                        const values = filteredCohorts
-                          .map((cohort) => cohort.breakpointValues[breakpoint])
-                          .filter((val): val is number => val !== null);
+                        const values = getValidBreakpointValues(filteredCohorts, breakpoint);
 
                         if (values.length === 0) return null;
 
@@ -521,9 +537,7 @@ export function BreakpointChart({
                           const avgStdDev =
                             chartData.reduce((sum, point) => {
                               const breakpoint = point.breakpoint as number;
-                              const values = filteredCohorts
-                                .map((cohort) => cohort.breakpointValues[breakpoint])
-                                .filter((val): val is number => val !== null);
+                              const values = getValidBreakpointValues(filteredCohorts, breakpoint);
 
                               if (values.length > 1) {
                                 const avg = values.reduce((s, v) => s + v, 0) / values.length;

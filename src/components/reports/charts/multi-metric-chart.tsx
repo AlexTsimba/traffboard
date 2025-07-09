@@ -11,6 +11,8 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 
+import { getMetricConfig, buildChartConfig } from "./chart-utils";
+
 interface CohortMetrics {
   cohortDate: string;
   ftdCount: number;
@@ -21,13 +23,13 @@ interface CohortMetrics {
 }
 
 export interface MultiMetricChartProps {
-  data: CohortMetrics[];
-  selectedMetrics?: ("dep2cost" | "roas" | "avgDepositSum" | "retentionRate")[];
-  title?: string;
-  description?: string;
-  className?: string;
-  chartType?: "line" | "bar" | "combined";
-  showNormalized?: boolean;
+  readonly data: CohortMetrics[];
+  readonly selectedMetrics?: ("dep2cost" | "roas" | "avgDepositSum" | "retentionRate")[];
+  readonly title?: string;
+  readonly description?: string;
+  readonly className?: string;
+  readonly chartType?: "line" | "bar" | "combined";
+  readonly showNormalized?: boolean;
 }
 
 const metricConfigs = {
@@ -55,7 +57,7 @@ const metricConfigs = {
     format: (value: number) => `${(value * 100).toFixed(1)}%`,
     unit: "%",
   },
-};
+} as const;
 
 export function MultiMetricChart({
   data,
@@ -71,18 +73,24 @@ export function MultiMetricChart({
 
   // Chart configuration
   const chartConfig = useMemo(() => {
-    const config: Record<string, { label: string; color: string }> = {};
+    const configEntries: [string, { label: string; color: string }][] = [];
 
     for (const metric of selectedMetrics) {
       if (activeMetrics.has(metric)) {
-        config[metric] = {
-          label: metricConfigs[metric].label,
-          color: metricConfigs[metric].color,
-        };
+        const metricConfigEntry = getMetricConfig(metricConfigs, metric);
+        if (metricConfigEntry) {
+          configEntries.push([
+            metric,
+            {
+              label: metricConfigEntry.label,
+              color: metricConfigEntry.color,
+            },
+          ]);
+        }
       }
     }
 
-    return config;
+    return buildChartConfig(configEntries);
   }, [selectedMetrics, activeMetrics]);
 
   const toggleMetric = (metric: string) => {
@@ -103,7 +111,7 @@ export function MultiMetricChart({
           dataKey="cohortDate"
           stroke="hsl(var(--muted-foreground))"
           fontSize={12}
-          tickFormatter={(value) => new Date(value).toLocaleDateString()}
+          tickFormatter={(value) => new Date(String(value)).toLocaleDateString()}
         />
         <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
         <ChartTooltip
@@ -111,9 +119,13 @@ export function MultiMetricChart({
             <ChartTooltipContent
               formatter={(value, name) => {
                 const metric = name as keyof typeof metricConfigs;
-                return [metricConfigs[metric]?.format(Number(value)) || value, metricConfigs[metric]?.label || name];
+                const metricConfigEntry = getMetricConfig(metricConfigs, String(metric));
+                return [
+                  metricConfigEntry?.format(Number(value)) ?? String(value),
+                  metricConfigEntry?.label ?? String(name),
+                ];
               }}
-              labelFormatter={(label) => `Cohort: ${new Date(label).toLocaleDateString()}`}
+              labelFormatter={(label) => `Cohort: ${new Date(String(label)).toLocaleDateString()}`}
             />
           }
         />
@@ -122,15 +134,18 @@ export function MultiMetricChart({
         {selectedMetrics.map((metric) => {
           if (!activeMetrics.has(metric)) return null;
 
+          const metricConfigEntry = getMetricConfig(metricConfigs, metric);
+          if (!metricConfigEntry) return null;
+
           return (
             <Line
               key={metric}
               type="monotone"
               dataKey={metric}
-              stroke={metricConfigs[metric].color}
+              stroke={metricConfigEntry.color}
               strokeWidth={2}
-              dot={{ r: 4, fill: metricConfigs[metric].color }}
-              activeDot={{ r: 6, fill: metricConfigs[metric].color }}
+              dot={{ r: 4, fill: metricConfigEntry.color }}
+              activeDot={{ r: 6, fill: metricConfigEntry.color }}
               connectNulls={false}
             />
           );
@@ -147,7 +162,7 @@ export function MultiMetricChart({
           dataKey="cohortDate"
           stroke="hsl(var(--muted-foreground))"
           fontSize={12}
-          tickFormatter={(value) => new Date(value).toLocaleDateString()}
+          tickFormatter={(value) => new Date(String(value)).toLocaleDateString()}
         />
         <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
         <ChartTooltip
@@ -155,9 +170,13 @@ export function MultiMetricChart({
             <ChartTooltipContent
               formatter={(value, name) => {
                 const metric = name as keyof typeof metricConfigs;
-                return [metricConfigs[metric]?.format(Number(value)) || value, metricConfigs[metric]?.label || name];
+                const metricConfigEntry = getMetricConfig(metricConfigs, String(metric));
+                return [
+                  metricConfigEntry?.format(Number(value)) ?? String(value),
+                  metricConfigEntry?.label ?? String(name),
+                ];
               }}
-              labelFormatter={(label) => `Cohort: ${new Date(label).toLocaleDateString()}`}
+              labelFormatter={(label) => `Cohort: ${new Date(String(label)).toLocaleDateString()}`}
             />
           }
         />
@@ -166,7 +185,10 @@ export function MultiMetricChart({
         {selectedMetrics.map((metric) => {
           if (!activeMetrics.has(metric)) return null;
 
-          return <Bar key={metric} dataKey={metric} fill={metricConfigs[metric].color} opacity={0.8} />;
+          const metricConfigEntry = getMetricConfig(metricConfigs, metric);
+          if (!metricConfigEntry) return null;
+
+          return <Bar key={metric} dataKey={metric} fill={metricConfigEntry.color} opacity={0.8} />;
         })}
       </BarChart>
     </ResponsiveContainer>
@@ -191,26 +213,31 @@ export function MultiMetricChart({
         </div>
 
         <div className="mt-4 flex flex-wrap gap-2">
-          {selectedMetrics.map((metric) => (
-            <Badge
-              key={metric}
-              variant={activeMetrics.has(metric) ? "default" : "outline"}
-              className="cursor-pointer"
-              style={
-                activeMetrics.has(metric)
-                  ? {
-                      backgroundColor: metricConfigs[metric].color,
-                      color: "white",
-                    }
-                  : {}
-              }
-              onClick={() => {
-                toggleMetric(metric);
-              }}
-            >
-              {metricConfigs[metric].label}
-            </Badge>
-          ))}
+          {selectedMetrics.map((metric) => {
+            const metricConfigEntry = getMetricConfig(metricConfigs, metric);
+            if (!metricConfigEntry) return null;
+
+            return (
+              <Badge
+                key={metric}
+                variant={activeMetrics.has(metric) ? "default" : "outline"}
+                className="cursor-pointer"
+                style={
+                  activeMetrics.has(metric)
+                    ? {
+                        backgroundColor: metricConfigEntry.color,
+                        color: "white",
+                      }
+                    : {}
+                }
+                onClick={() => {
+                  toggleMetric(metric);
+                }}
+              >
+                {metricConfigEntry.label}
+              </Badge>
+            );
+          })}
         </div>
       </CardHeader>
 

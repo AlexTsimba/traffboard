@@ -79,11 +79,13 @@ export interface ChartComponentConfig {
   description?: string;
 }
 
+import { getRegistryEntry } from "./chart-utils";
+
 /**
  * Utility function to get chart component information
  */
 export function getChartInfo(type: ChartType) {
-  return CHART_REGISTRY[type];
+  return getRegistryEntry(CHART_REGISTRY, type);
 }
 
 /**

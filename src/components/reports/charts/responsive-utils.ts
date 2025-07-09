@@ -5,6 +5,8 @@
  * including data reduction for mobile devices and breakpoint detection.
  */
 
+import React from "react";
+
 /**
  * Reduces data complexity and improves performance on smaller screens
  */
@@ -22,8 +24,8 @@ export function formatChartDataForMobile<T extends Record<string, unknown>>(data
  * Determines if the current viewport is mobile-sized
  */
 export function isMobileViewport(): boolean {
-  if (typeof globalThis === "undefined") return false;
-  return window.innerWidth < 768;
+  if (globalThis.window == undefined) return false;
+  return globalThis.window.innerWidth < 768;
 }
 
 /**
@@ -78,7 +80,7 @@ export function getOptimalTickCount(chartWidth: number, isMobile = false): numbe
  * Truncates long labels for mobile displays
  */
 export function truncateLabelForMobile(label: string, maxLength = 8): string {
-  if (typeof globalThis !== "undefined" && window.innerWidth < 768) {
+  if (globalThis.window != undefined && globalThis.window.innerWidth < 768) {
     return label.length > maxLength ? `${label.slice(0, maxLength)}...` : label;
   }
   return label;
@@ -96,7 +98,7 @@ export const responsiveColors = {
   info: "#0891b2",
   muted: "#6b7280",
   accent: "#ec4899",
-};
+} as const;
 
 /**
  * Cohort-specific color palette for consistent chart coloring
@@ -114,13 +116,13 @@ export const cohortColorPalette = [
   "#14b8a6", // teal
   "#6366f1", // indigo
   "#ef4444", // red (repeat for more cohorts)
-];
+] as const;
 
 /**
  * Gets appropriate color for a cohort based on its index
  */
 export function getCohortColor(index: number): string {
-  return cohortColorPalette[index % cohortColorPalette.length];
+  return cohortColorPalette[index % cohortColorPalette.length] ?? "#000000";
 }
 
 /**
@@ -128,7 +130,7 @@ export function getCohortColor(index: number): string {
  */
 export function useResponsiveChart() {
   const [dimensions, setDimensions] = React.useState(() => {
-    if (!globalThis.window) {
+    if (globalThis.window == undefined) {
       return { width: 800, height: 400 };
     }
     return {
@@ -138,7 +140,7 @@ export function useResponsiveChart() {
   });
 
   React.useEffect(() => {
-    if (!globalThis.window) return;
+    if (globalThis.window == undefined) return;
 
     const handleResize = () => {
       setDimensions({
@@ -161,6 +163,3 @@ export function useResponsiveChart() {
 
   return { isMobile, chartDimensions };
 }
-
-// Add React import for the hook
-import React from "react";
