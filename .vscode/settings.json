@@ -13,12 +13,7 @@
   "typescript.preferences.useUnknownInCatchVariables": true,
   "typescript.validate.enable": true,
   "typescript.tsc.autoDetect": "on",
-  "eslint.validate": [
-    "javascript",
-    "javascriptreact", 
-    "typescript",
-    "typescriptreact"
-  ],
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
   "eslint.run": "onType",
   "eslint.alwaysShowStatus": true,
   "editor.codeActionsOnSave": {

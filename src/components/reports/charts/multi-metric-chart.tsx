@@ -20,7 +20,7 @@ interface CohortMetrics {
   retentionRate: number | null;
 }
 
-interface MultiMetricChartProps {
+export interface MultiMetricChartProps {
   data: CohortMetrics[];
   selectedMetrics?: ("dep2cost" | "roas" | "avgDepositSum" | "retentionRate")[];
   title?: string;

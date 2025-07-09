@@ -1,18 +1,20 @@
 # Report Factory System
 
 ## 🎯 Overview
+
 Modular reporting architecture supporting cohort analysis, funnel reports, retention analysis, and future report types through reusable components.
 
 ## 🏗️ Core Components
 
 ### Filter System
+
 Universal filter components with modal interface and active chips display:
 
 ```typescript
 // Filter Configuration
 interface FilterDefinition {
   key: string;
-  type: 'select' | 'multiselect' | 'date_range' | 'toggle';
+  type: "select" | "multiselect" | "date_range" | "toggle";
   label: string;
   required: boolean;
   options?: FilterOption[];
@@ -22,28 +24,29 @@ interface FilterDefinition {
 // Usage Pattern
 const cohortFilters: FilterDefinition[] = [
   {
-    key: 'partner_ids',
-    type: 'multiselect',
-    label: 'Partners',
+    key: "partner_ids",
+    type: "multiselect",
+    label: "Partners",
     required: true,
-    options: partnerOptions
+    options: partnerOptions,
   },
   {
-    key: 'date_range',
-    type: 'date_range', 
-    label: 'Cohort Period',
-    required: true
-  }
+    key: "date_range",
+    type: "date_range",
+    label: "Cohort Period",
+    required: true,
+  },
 ];
 ```
 
 ### Data Pipeline Architecture
+
 Modular processing pipeline for complex data transformations:
 
 ```typescript
 // Pipeline Flow
 1. Data Extraction  → PostgreSQL queries with filtering
-2. Transformation   → Arquero business logic processing  
+2. Transformation   → Arquero business logic processing
 3. Caching         → Multi-layer result caching
 4. Export          → CSV, Excel, PDF generation
 
@@ -60,27 +63,29 @@ const pipeline = await DataPipelineManager.execute({
 ```
 
 ### Plugin System
+
 Extensible architecture for adding new report types:
 
 ```typescript
 // Plugin Registration
 PluginRegistry.register({
-  id: 'cohort-analysis',
-  name: 'Cohort Analysis',
-  type: 'report',
+  id: "cohort-analysis",
+  name: "Cohort Analysis",
+  type: "report",
   dependencies: [],
   dataProcessor: CohortDataProcessor,
-  component: CohortReportComponent
+  component: CohortReportComponent,
 });
 
 // Plugin Usage
-const processor = PluginRegistry.getDataProcessor('cohort-analysis');
+const processor = PluginRegistry.getDataProcessor("cohort-analysis");
 const result = await processor.process(data, config);
 ```
 
 ## 📊 Report Components
 
 ### Universal Components
+
 - **ReportContext** - State management across report components
 - **ReportHeader** - Title, description, last updated, export actions
 - **FilterSystem** - Modal-based filter interface with active chips
@@ -88,6 +93,7 @@ const result = await processor.process(data, config);
 - **ExportButton** - Multi-format export functionality
 
 ### Report-Specific Components
+
 - **CohortHeatmap** - Triangular cohort visualization
 - **CohortBreakpoints** - Day/week mode selector
 - **MetricCards** - Key performance indicators
@@ -95,23 +101,24 @@ const result = await processor.process(data, config);
 ## 🔧 Usage Patterns
 
 ### Basic Report Implementation
+
 ```typescript
 // Report Page Component
 export default function CohortReportPage() {
   return (
     <ReportProvider reportType="cohort">
-      <ReportHeader 
+      <ReportHeader
         title="Cohort Analysis"
         description="Track player behavior over time"
       />
-      
+
       <FilterSystem filters={cohortFilters} />
-      
+
       <Suspense fallback={<ReportSkeleton />}>
         <CohortResultsTable />
         <CohortHeatmap />
       </Suspense>
-      
+
       <ExportButton formats={['csv', 'excel']} />
     </ReportProvider>
   );
@@ -119,19 +126,20 @@ export default function CohortReportPage() {
 ```
 
 ### Custom Data Processing
+
 ```typescript
 // Custom Transform Implementation
 export const customTransform: TransformFunction = {
-  type: 'custom',
+  type: "custom",
   process: async (data, config) => {
     return data
       .filter(config.filterPredicate)
-      .groupby('cohort_date')
+      .groupby("cohort_date")
       .summarize({
         total_players: op.count(),
-        avg_deposits: op.mean('deposits')
+        avg_deposits: op.mean("deposits"),
       });
-  }
+  },
 };
 
 // Register and Use
@@ -141,12 +149,14 @@ TransformBuilder.registerTransform(customTransform);
 ## 🚀 Performance Features
 
 ### Caching Strategy
+
 - **Query Cache**: PostgreSQL results (5 min TTL)
 - **Computation Cache**: Processed results (30 min TTL)
 - **Component Cache**: React query caching
 - **Tag-based Invalidation**: Smart cache clearing
 
 ### Optimization Techniques
+
 - **Incremental Loading**: Progressive data fetching
 - **Background Processing**: Heavy computations off main thread
 - **Memory Management**: Efficient data structure usage
@@ -155,24 +165,28 @@ TransformBuilder.registerTransform(customTransform);
 ## 🧪 Testing Coverage
 
 ### Filter System Tests (506 lines)
+
 - Modal open/close interactions
 - Filter validation and dependencies
 - Active filter chips functionality
 - Cross-filter state management
 
-### Plugin System Tests (258 lines)  
+### Plugin System Tests (258 lines)
+
 - Plugin registration/unregistration
 - Dependency validation
 - Data processor functionality
 - Integration safety checks
 
 ### State Management Tests (359 lines)
+
 - Zustand store operations
 - Persistence mechanisms
 - Performance with large datasets
 - Concurrent operation handling
 
 ### Integration Tests (392 lines)
+
 - Complete reporting workflows
 - Filter → Data → Display pipeline
 - Export functionality
@@ -181,6 +195,7 @@ TransformBuilder.registerTransform(customTransform);
 ## 🎯 Current Implementation Status
 
 ### ✅ Completed Components
+
 - **Filter System**: Modal interface, active chips, validation
 - **Data Pipeline**: Modular architecture with 7 specialized modules
 - **Plugin Registry**: Extensible system for report types
@@ -189,12 +204,14 @@ TransformBuilder.registerTransform(customTransform);
 - **Universal UI**: ReportHeader, context providers
 
 ### 🚧 In Development
+
 - **Cohort Analysis**: Core metrics and breakpoint handling
 - **Performance Optimization**: Advanced caching and query optimization
 - **Export Enhancements**: PDF generation, chart exports
 
 ### 📋 Planned Features
+
 - **Funnel Analysis**: Conversion tracking reports
-- **Retention Analysis**: Player lifecycle reports  
+- **Retention Analysis**: Player lifecycle reports
 - **Attribution Analysis**: Marketing effectiveness reports
-- **Real-time Updates**: Live data refresh capabilities 
+- **Real-time Updates**: Live data refresh capabilities

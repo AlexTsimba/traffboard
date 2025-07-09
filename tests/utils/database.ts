@@ -19,7 +19,7 @@ export class DatabaseHelper {
 
   static async cleanup(): Promise<void> {
     const prisma = this.getInstance();
-    
+
     // Clean up test data in reverse dependency order
     await prisma.authAttempt.deleteMany();
     await prisma.auditLog.deleteMany();

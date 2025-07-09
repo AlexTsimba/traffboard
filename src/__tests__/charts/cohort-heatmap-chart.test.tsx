@@ -17,9 +17,7 @@ vi.mock("@/components/ui/chart", () => ({
       {children}
     </div>
   ),
-  ChartTooltip: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="chart-tooltip">{children}</div>
-  ),
+  ChartTooltip: ({ children }: { children: React.ReactNode }) => <div data-testid="chart-tooltip">{children}</div>,
   ChartTooltipContent: ({ formatter, label }: { formatter?: Function; label?: string }) => (
     <div data-testid="tooltip-content" data-label={label}>
       Mock Tooltip Content
@@ -78,7 +76,7 @@ describe("CohortHeatmapChart", () => {
   describe("Basic Rendering", () => {
     it("renders the chart with default props", () => {
       render(<CohortHeatmapChart {...defaultProps} />);
-      
+
       expect(screen.getByText("Cohort Analysis Heatmap")).toBeInTheDocument();
       expect(screen.getByTestId("chart-container")).toBeInTheDocument();
     });
@@ -86,22 +84,16 @@ describe("CohortHeatmapChart", () => {
     it("renders with custom title and description", () => {
       const customTitle = "Custom Cohort Chart";
       const customDescription = "This is a custom description";
-      
-      render(
-        <CohortHeatmapChart
-          {...defaultProps}
-          title={customTitle}
-          description={customDescription}
-        />
-      );
-      
+
+      render(<CohortHeatmapChart {...defaultProps} title={customTitle} description={customDescription} />);
+
       expect(screen.getByText(customTitle)).toBeInTheDocument();
       expect(screen.getByText(customDescription)).toBeInTheDocument();
     });
 
     it("displays loading state", () => {
       render(<CohortHeatmapChart {...defaultProps} isLoading={true} />);
-      
+
       expect(screen.getByText("Loading chart...")).toBeInTheDocument();
       expect(screen.getByRole("status", { hidden: true })).toBeInTheDocument(); // spinner
     });
@@ -109,7 +101,7 @@ describe("CohortHeatmapChart", () => {
     it("displays error state", () => {
       const errorMessage = "Failed to load data";
       render(<CohortHeatmapChart {...defaultProps} error={errorMessage} />);
-      
+
       expect(screen.getByText(`Error loading chart: ${errorMessage}`)).toBeInTheDocument();
     });
   });
@@ -117,24 +109,24 @@ describe("CohortHeatmapChart", () => {
   describe("Data Visualization", () => {
     it("renders table headers correctly", () => {
       render(<CohortHeatmapChart {...defaultProps} />);
-      
+
       expect(screen.getByText("Cohort Date")).toBeInTheDocument();
       expect(screen.getByText("FTD Count")).toBeInTheDocument();
-      
+
       // Check breakpoint headers
-      mockBreakpoints.forEach(breakpoint => {
+      mockBreakpoints.forEach((breakpoint) => {
         expect(screen.getByText(`Day ${breakpoint}`)).toBeInTheDocument();
       });
     });
 
     it("displays cohort data in the correct format", () => {
       render(<CohortHeatmapChart {...defaultProps} />);
-      
+
       // Check if cohort dates are formatted correctly
       expect(screen.getByText("1/1/2024")).toBeInTheDocument();
       expect(screen.getByText("1/2/2024")).toBeInTheDocument();
       expect(screen.getByText("1/3/2024")).toBeInTheDocument();
-      
+
       // Check FTD counts
       expect(screen.getByText("100")).toBeInTheDocument();
       expect(screen.getByText("120")).toBeInTheDocument();
@@ -143,7 +135,7 @@ describe("CohortHeatmapChart", () => {
 
     it("formats retention rate values correctly", () => {
       render(<CohortHeatmapChart {...defaultProps} metric="retention_rate" />);
-      
+
       // Should display as percentages
       expect(screen.getByText("80.0%")).toBeInTheDocument();
       expect(screen.getByText("85.0%")).toBeInTheDocument();
@@ -175,9 +167,9 @@ describe("CohortHeatmapChart", () => {
           },
         },
       ];
-      
+
       render(<CohortHeatmapChart data={roasData} metric="roas" breakpoints={mockBreakpoints} />);
-      
+
       expect(screen.getByText("2.50x")).toBeInTheDocument();
       expect(screen.getByText("2.40x")).toBeInTheDocument();
     });
@@ -186,7 +178,7 @@ describe("CohortHeatmapChart", () => {
       // Create test data with explicit null values in valid positions
       const dataWithNulls: CohortData[] = [
         {
-          cohortDate: "2024-01-01", 
+          cohortDate: "2024-01-01",
           ftdCount: 100,
           breakpointValues: {
             1: 0.8,
@@ -197,9 +189,9 @@ describe("CohortHeatmapChart", () => {
           },
         },
       ];
-      
+
       render(<CohortHeatmapChart data={dataWithNulls} metric="retention_rate" breakpoints={mockBreakpoints} />);
-      
+
       // Should display "-" for null values in valid cell positions
       const dashElements = screen.getAllByText("-");
       expect(dashElements.length).toBeGreaterThan(0);
@@ -209,29 +201,20 @@ describe("CohortHeatmapChart", () => {
   describe("Interaction", () => {
     it("calls onCellClick when cell is clicked", async () => {
       const mockOnCellClick = vi.fn();
-      render(
-        <CohortHeatmapChart
-          {...defaultProps}
-          onCellClick={mockOnCellClick}
-        />
-      );
-      
+      render(<CohortHeatmapChart {...defaultProps} onCellClick={mockOnCellClick} />);
+
       // Find and click a cell with data
       const cellWithValue = screen.getByText("80.0%");
       fireEvent.click(cellWithValue);
-      
+
       await waitFor(() => {
-        expect(mockOnCellClick).toHaveBeenCalledWith(
-          "2024-01-01",
-          1,
-          0.8
-        );
+        expect(mockOnCellClick).toHaveBeenCalledWith("2024-01-01", 1, 0.8);
       });
     });
 
     it("displays hover effects on cells", () => {
       render(<CohortHeatmapChart {...defaultProps} />);
-      
+
       const cellWithValue = screen.getByText("80.0%");
       expect(cellWithValue).toHaveClass("cursor-pointer");
       expect(cellWithValue).toHaveClass("hover:scale-105");
@@ -241,7 +224,7 @@ describe("CohortHeatmapChart", () => {
   describe("Responsive Behavior", () => {
     it("applies triangular layout correctly", () => {
       render(<CohortHeatmapChart {...defaultProps} />);
-      
+
       // The triangular layout should limit cells based on cohort age
       // This is implemented in the component logic
       const chartContainer = screen.getByTestId("chart-container");
@@ -250,7 +233,7 @@ describe("CohortHeatmapChart", () => {
 
     it("handles empty data gracefully", () => {
       render(<CohortHeatmapChart {...defaultProps} data={[]} />);
-      
+
       expect(screen.getByText("Cohort Analysis Heatmap")).toBeInTheDocument();
       // Should still render the structure but with no data rows
     });
@@ -259,13 +242,13 @@ describe("CohortHeatmapChart", () => {
   describe("Chart Configuration", () => {
     it("sets up chart config correctly for different metrics", () => {
       const { rerender } = render(<CohortHeatmapChart {...defaultProps} metric="retention_rate" />);
-      
+
       let chartContainer = screen.getByTestId("chart-container");
       let config = JSON.parse(chartContainer.getAttribute("data-config") || "{}");
       expect(config.value.label).toBe("RETENTION_RATE");
-      
+
       rerender(<CohortHeatmapChart {...defaultProps} metric="roas" />);
-      
+
       chartContainer = screen.getByTestId("chart-container");
       config = JSON.parse(chartContainer.getAttribute("data-config") || "{}");
       expect(config.value.label).toBe("ROAS");
@@ -275,7 +258,7 @@ describe("CohortHeatmapChart", () => {
   describe("Accessibility", () => {
     it("has proper ARIA attributes", () => {
       render(<CohortHeatmapChart {...defaultProps} />);
-      
+
       // Check for accessible table structure
       expect(screen.getByText("Cohort Date")).toBeInTheDocument();
       expect(screen.getByText("FTD Count")).toBeInTheDocument();
@@ -283,19 +266,14 @@ describe("CohortHeatmapChart", () => {
 
     it("supports keyboard navigation", () => {
       const mockOnCellClick = vi.fn();
-      render(
-        <CohortHeatmapChart
-          {...defaultProps}
-          onCellClick={mockOnCellClick}
-        />
-      );
-      
+      render(<CohortHeatmapChart {...defaultProps} onCellClick={mockOnCellClick} />);
+
       const cellWithValue = screen.getByText("80.0%");
-      
+
       // Test keyboard interaction
       fireEvent.keyDown(cellWithValue, { key: "Enter" });
       fireEvent.click(cellWithValue); // Simulate the actual click that would happen
-      
+
       expect(mockOnCellClick).toHaveBeenCalled();
     });
   });
@@ -313,11 +291,11 @@ describe("CohortHeatmapChart", () => {
           30: Math.random(),
         },
       }));
-      
+
       const startTime = performance.now();
       render(<CohortHeatmapChart {...defaultProps} data={largeCohortData} />);
       const endTime = performance.now();
-      
+
       // Should render within reasonable time (adjust threshold as needed)
       expect(endTime - startTime).toBeLessThan(1000);
     });
@@ -335,28 +313,17 @@ describe("CohortHeatmapChart", () => {
           },
         },
       ];
-      
-      render(
-        <CohortHeatmapChart
-          data={incompleteData}
-          metric="retention_rate"
-          breakpoints={[1, 3, 7, 14, 30]}
-        />
-      );
-      
+
+      render(<CohortHeatmapChart data={incompleteData} metric="retention_rate" breakpoints={[1, 3, 7, 14, 30]} />);
+
       expect(screen.getByText("80.0%")).toBeInTheDocument();
       // Should handle missing breakpoints gracefully
     });
 
     it("handles invalid metric types gracefully", () => {
       // TypeScript should prevent this, but test runtime behavior
-      render(
-        <CohortHeatmapChart
-          {...defaultProps}
-          metric={"invalid_metric" as CohortMetric}
-        />
-      );
-      
+      render(<CohortHeatmapChart {...defaultProps} metric={"invalid_metric" as CohortMetric} />);
+
       // Should not crash and render something reasonable
       expect(screen.getByText("Cohort Analysis Heatmap")).toBeInTheDocument();
     });

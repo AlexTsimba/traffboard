@@ -13,20 +13,20 @@ export class DashboardPage extends BasePage {
 
   constructor(page: Page) {
     super(page);
-    
+
     // User dropdown trigger - это SidebarMenuButton который содержит Avatar и текст
     this.userDropdownTrigger = page.locator('[data-sidebar="menu-button"][data-size="lg"]');
     this.userAvatar = page.locator('.rounded-lg:has-text("AU"), .rounded-lg:has-text("TU")'); // Avatar fallback with initials
-    this.userName = page.locator('.truncate.font-medium');
-    this.userEmail = page.locator('.text-muted-foreground.truncate.text-xs');
-    
+    this.userName = page.locator(".truncate.font-medium");
+    this.userEmail = page.locator(".text-muted-foreground.truncate.text-xs");
+
     // Dropdown menu items
-    this.logoutButton = page.locator('text=Log out');
+    this.logoutButton = page.locator("text=Log out");
     this.preferencesLink = page.locator('a[href="/main/dashboard/preferences"]');
     this.administrationLink = page.locator('a[href="/main/dashboard/administration"]');
-    
+
     // Other dashboard elements
-    this.sidebarToggle = page.locator('text=Toggle Sidebar');
+    this.sidebarToggle = page.locator("text=Toggle Sidebar");
   }
 
   async goto(): Promise<void> {
@@ -44,17 +44,17 @@ export class DashboardPage extends BasePage {
     try {
       await this.openUserDropdown();
       await this.logoutButton.click();
-      
+
       // Wait for either navigation to login page or manual redirect
       await Promise.race([
         this.page.waitForURL(/\/main\/auth\/v1\/login/, { timeout: 10000 }),
-        this.page.waitForFunction(() => window.location.href.includes('/main/auth/v1/login'), { timeout: 10000 })
+        this.page.waitForFunction(() => window.location.href.includes("/main/auth/v1/login"), { timeout: 10000 }),
       ]);
     } catch (error) {
       console.warn("Logout timeout - checking current state");
       // Check if we ended up at login page despite timeout
       const currentUrl = this.page.url();
-      if (!currentUrl.includes('/main/auth/v1/login')) {
+      if (!currentUrl.includes("/main/auth/v1/login")) {
         throw new Error(`Logout failed - still at ${currentUrl}`);
       }
     }

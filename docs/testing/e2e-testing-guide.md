@@ -5,6 +5,7 @@ This guide provides proven patterns for writing reliable End-to-End tests that w
 > **✅ CI-Proven Patterns**: All patterns in this guide are verified working in GitHub Actions CI with 100% test pass rate.
 
 ## Table of Contents
+
 - [Quick Start](#quick-start)
 - [Proven Architecture](#proven-architecture)
 - [Page Object Model](#page-object-model)
@@ -15,6 +16,7 @@ This guide provides proven patterns for writing reliable End-to-End tests that w
 ## Quick Start
 
 ### Prerequisites
+
 ```bash
 # Install dependencies (already included in package.json)
 npm install
@@ -24,6 +26,7 @@ npx playwright install --with-deps chromium webkit
 ```
 
 ### Running Tests
+
 ```bash
 # Local development
 npm run test:e2e
@@ -41,6 +44,7 @@ npx playwright test auth.spec.ts
 ## Proven Architecture
 
 ### Directory Structure
+
 ```
 tests/
 ├── e2e/                    # Test files
@@ -60,28 +64,29 @@ tests/
 ```
 
 ### Configuration (playwright.config.ts)
+
 ```typescript
 export default defineConfig({
   testDir: "./tests/e2e",
-  timeout: 30_000,           // ✅ Proven: 30s works for CI
+  timeout: 30_000, // ✅ Proven: 30s works for CI
   expect: { timeout: 5_000 }, // ✅ Proven: 5s for assertions
-  fullyParallel: true,       // ✅ Performance boost
+  fullyParallel: true, // ✅ Performance boost
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0, // ✅ Retry on CI flakes
   workers: process.env.CI ? 1 : undefined, // ✅ Single worker for CI stability
-  
+
   use: {
     baseURL: process.env.PLAYWRIGHT_BASE_URL || "http://localhost:3000",
-    trace: "on-first-retry",    // ✅ Debug failed tests
+    trace: "on-first-retry", // ✅ Debug failed tests
     screenshot: "only-on-failure", // ✅ Visual debugging
-    video: "retain-on-failure",   // ✅ Video evidence
-    headless: !!process.env.CI,  // ✅ UI in dev, headless in CI
+    video: "retain-on-failure", // ✅ Video evidence
+    headless: !!process.env.CI, // ✅ UI in dev, headless in CI
   },
-  
+
   projects: [
     {
       name: "chromium",
-      use: { 
+      use: {
         ...devices["Desktop Chrome"],
         launchOptions: {
           args: ["--disable-dev-shm-usage", "--no-sandbox"], // ✅ CI stability
@@ -89,7 +94,7 @@ export default defineConfig({
       },
     },
     {
-      name: "webkit",      // ✅ Cross-browser testing
+      name: "webkit", // ✅ Cross-browser testing
       use: { ...devices["Desktop Safari"] },
     },
   ],
@@ -99,24 +104,27 @@ export default defineConfig({
   globalTeardown: require.resolve("./tests/utils/global-teardown.ts"),
 
   // ✅ CI Web Server - builds and starts app
-  webServer: process.env.CI ? {
-    command: "npm run build && npm run start",
-    port: 3000,
-    timeout: 120_000,        // ✅ 2min for build + start
-    reuseExistingServer: false,
-    env: {
-      NODE_ENV: "test",
-      DATABASE_URL: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL,
-      NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET || "test-secret-for-ci",
-      NEXTAUTH_URL: process.env.NEXTAUTH_URL || "http://localhost:3000",
-    },
-  } : undefined,
+  webServer: process.env.CI
+    ? {
+        command: "npm run build && npm run start",
+        port: 3000,
+        timeout: 120_000, // ✅ 2min for build + start
+        reuseExistingServer: false,
+        env: {
+          NODE_ENV: "test",
+          DATABASE_URL: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL,
+          NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET || "test-secret-for-ci",
+          NEXTAUTH_URL: process.env.NEXTAUTH_URL || "http://localhost:3000",
+        },
+      }
+    : undefined,
 });
 ```
 
 ## Page Object Model
 
 ### Base Page Pattern ✅
+
 ```typescript
 // tests/fixtures/base-page.ts
 import { Page } from "@playwright/test";
@@ -138,7 +146,7 @@ export class BasePage {
    */
   async waitForLoad(waitForNetwork: boolean = false): Promise<void> {
     await this.page.waitForLoadState("domcontentloaded");
-    
+
     if (waitForNetwork) {
       try {
         await this.page.waitForLoadState("networkidle", { timeout: 5000 });
@@ -163,6 +171,7 @@ export class BasePage {
 ```
 
 ### Login Page Pattern ✅
+
 ```typescript
 // tests/fixtures/login-page.ts
 import { Page, Locator, expect } from "@playwright/test";
@@ -178,8 +187,8 @@ export class LoginPage extends BasePage {
   constructor(page: Page) {
     super(page);
     // ✅ Use semantic selectors (ID, type, role)
-    this.emailInput = page.locator('input#email');
-    this.passwordInput = page.locator('input#password');
+    this.emailInput = page.locator("input#email");
+    this.passwordInput = page.locator("input#password");
     this.loginButton = page.locator('button[type="submit"]');
     this.rememberMeCheckbox = page.locator('button[role="checkbox"]');
     this.errorMessage = page.locator('[role="alert"], .text-destructive');
@@ -196,23 +205,23 @@ export class LoginPage extends BasePage {
   async login(email: string, password: string, rememberMe = false): Promise<void> {
     await this.emailInput.fill(email);
     await this.passwordInput.fill(password);
-    
+
     if (rememberMe) {
       await this.rememberMeCheckbox.click({ force: true });
     }
-    
+
     await this.loginButton.click();
-    
+
     // ✅ Race condition handling - wait for either success or error
     try {
       await Promise.race([
         this.page.waitForURL(/\/main\/dashboard/, { timeout: 15000 }),
-        this.page.waitForSelector('[role="alert"], .text-destructive', { timeout: 8000 })
+        this.page.waitForSelector('[role="alert"], .text-destructive', { timeout: 8000 }),
       ]);
     } catch (error) {
       console.warn("Login timeout - checking current state");
       const currentUrl = this.page.url();
-      if (!currentUrl.includes('/main/dashboard') && !await this.errorMessage.isVisible()) {
+      if (!currentUrl.includes("/main/dashboard") && !(await this.errorMessage.isVisible())) {
         throw new Error(`Login failed - unexpected state at ${currentUrl}`);
       }
     }
@@ -237,6 +246,7 @@ export class LoginPage extends BasePage {
 ## Test Patterns
 
 ### Clean Test Structure ✅
+
 ```typescript
 // tests/e2e/auth.spec.ts
 import { test, expect } from "@playwright/test";
@@ -301,17 +311,18 @@ test.describe("Authentication Flow", () => {
 ```
 
 ### Error Handling Patterns ✅
+
 ```typescript
 test("should handle login timeout gracefully", async ({ page }) => {
   const loginPage = new LoginPage(page);
-  
+
   // ✅ Mock slow API response
-  await page.route("**/api/auth/signin", route => {
+  await page.route("**/api/auth/signin", (route) => {
     setTimeout(() => route.fulfill({ status: 200 }), 20000);
   });
-  
+
   await loginPage.goto();
-  
+
   // ✅ Test should not hang - timeout and provide meaningful error
   try {
     await loginPage.login("admin@traffboard.com", "admin123");
@@ -322,23 +333,25 @@ test("should handle login timeout gracefully", async ({ page }) => {
 ```
 
 ### Reliable Selectors ✅
+
 ```typescript
 // ✅ Good: Semantic selectors
-page.locator('input#email')                    // ID selector
-page.locator('button[type="submit"]')          // Attribute selector  
-page.locator('button[role="checkbox"]')        // Role selector
-page.locator('[role="alert"]')                 // ARIA role
-page.getByRole('button', { name: 'Login' })    // Accessible selector
+page.locator("input#email"); // ID selector
+page.locator('button[type="submit"]'); // Attribute selector
+page.locator('button[role="checkbox"]'); // Role selector
+page.locator('[role="alert"]'); // ARIA role
+page.getByRole("button", { name: "Login" }); // Accessible selector
 
 // ❌ Avoid: Fragile selectors
-page.locator('.btn-primary')                   // CSS classes can change
-page.locator('div > span:nth-child(3)')       // Position dependent
-page.locator('#root > div > form > button')   // Deep hierarchies
+page.locator(".btn-primary"); // CSS classes can change
+page.locator("div > span:nth-child(3)"); // Position dependent
+page.locator("#root > div > form > button"); // Deep hierarchies
 ```
 
 ## CI Configuration
 
 ### GitHub Actions Integration ✅
+
 ```yaml
 # .github/workflows/ci.yml
 name: CI Pipeline
@@ -346,7 +359,7 @@ name: CI Pipeline
 jobs:
   test:
     runs-on: ubuntu-latest
-    
+
     services:
       postgres:
         image: postgres:15
@@ -363,23 +376,23 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
-      
+          node-version: "20"
+          cache: "npm"
+
       - name: Install dependencies
         run: npm ci
-      
+
       - name: Install Playwright
         run: npx playwright install --with-deps chromium webkit
-      
+
       - name: Setup database
         run: npx prisma db push
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/traffboard_test
-      
+
       - name: Run E2E tests
         run: npx playwright test
         env:
@@ -387,7 +400,7 @@ jobs:
           TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/traffboard_test
           NEXTAUTH_SECRET: test-secret-for-ci-environment
           NEXTAUTH_URL: http://localhost:3000
-      
+
       - name: Upload test results
         uses: actions/upload-artifact@v4
         if: always()
@@ -398,10 +411,11 @@ jobs:
 ```
 
 ### Environment Variables ✅
+
 ```bash
 # Required for CI
 TEST_DATABASE_URL=postgresql://postgres:postgres@localhost:5432/traffboard_test
-NEXTAUTH_SECRET=test-secret-for-ci-environment  
+NEXTAUTH_SECRET=test-secret-for-ci-environment
 NEXTAUTH_URL=http://localhost:3000
 NODE_ENV=test
 CI=true
@@ -413,6 +427,7 @@ PLAYWRIGHT_BASE_URL=http://localhost:3000
 ## Database Setup
 
 ### Global Setup Pattern ✅
+
 ```typescript
 // tests/utils/global-setup.ts
 import { FullConfig } from "@playwright/test";
@@ -442,6 +457,7 @@ export default globalSetup;
 ```
 
 ### Database Helper ✅
+
 ```typescript
 // tests/utils/database.ts
 import { PrismaClient } from "@prisma/client";
@@ -466,7 +482,7 @@ export class DatabaseHelper {
   // ✅ Clean up in dependency order
   static async cleanup(): Promise<void> {
     const prisma = this.getInstance();
-    
+
     await prisma.authAttempt.deleteMany();
     await prisma.auditLog.deleteMany();
     await prisma.twoFactorBackupCode.deleteMany();
@@ -528,6 +544,7 @@ export class DatabaseHelper {
 ## Writing New Tests
 
 ### Test Creation Checklist ✅
+
 ```typescript
 // 1. Create page object if needed
 class NewFeaturePage extends BasePage {
@@ -562,7 +579,7 @@ test.describe("New Feature", () => {
     // ✅ Test the feature
     await featurePage.goto();
     await featurePage.performAction();
-    
+
     // ✅ Assert expected results
     await expect(page.locator('[data-testid="success-message"]')).toBeVisible();
   });
@@ -572,6 +589,7 @@ test.describe("New Feature", () => {
 ### Do's and Don'ts ✅
 
 #### ✅ Do's
+
 - **Clear cookies** in `beforeEach` for clean state
 - **Use semantic selectors** (ID, role, data-testid)
 - **Wait for specific conditions** not generic timeouts
@@ -581,7 +599,8 @@ test.describe("New Feature", () => {
 - **Use Page Object Model** for reusable page interactions
 - **Seed predictable test data** in global setup
 
-#### ❌ Don'ts  
+#### ❌ Don'ts
+
 - **Don't wait for networkidle** by default (causes hangs)
 - **Don't use CSS class selectors** (fragile)
 - **Don't use hardcoded waits** (`page.waitForTimeout()`)
@@ -595,8 +614,10 @@ test.describe("New Feature", () => {
 ### Common Issues ✅
 
 #### Test Hangs/Timeouts
+
 **Cause**: Waiting for networkidle on pages with continuous API calls
-**Solution**: 
+**Solution**:
+
 ```typescript
 // ❌ Don't do this
 await page.waitForLoadState("networkidle");
@@ -607,8 +628,10 @@ await page.waitForSelector('[data-testid="specific-element"]');
 ```
 
 #### Flaky Tests in CI
+
 **Cause**: Race conditions, timing issues
 **Solution**:
+
 ```typescript
 // ✅ Use explicit waits
 await expect(element).toBeVisible();
@@ -624,8 +647,10 @@ retries: process.env.CI ? 2 : 0,
 ```
 
 #### Database Connection Errors
+
 **Cause**: Wrong DATABASE_URL or database not ready
 **Solution**:
+
 ```typescript
 // ✅ Check environment variables
 console.log('Database URL:', process.env.TEST_DATABASE_URL);
@@ -640,8 +665,10 @@ services:
 ```
 
 #### Login Not Working
+
 **Cause**: User not seeded or wrong credentials
 **Solution**:
+
 ```typescript
 // ✅ Check global setup logs
 console.log("✅ Test users seeded:", { admin: admin.email, user: user.email });
@@ -654,6 +681,7 @@ static async seedAdminUser(): Promise<{ id: string; email: string; password: str
 ```
 
 ### Debug Commands ✅
+
 ```bash
 # Run with browser UI for debugging
 npx playwright test --debug
@@ -671,6 +699,7 @@ npx playwright show-report tests/results/html
 ## Performance Tips ✅
 
 ### Optimize Test Speed
+
 ```typescript
 // ✅ Run tests in parallel
 fullyParallel: true,
@@ -686,6 +715,7 @@ workers: process.env.CI ? 1 : undefined, // Single worker in CI for stability
 ```
 
 ### Resource Management
+
 ```typescript
 // ✅ Clean up after tests
 test.afterEach(async ({ page }) => {
@@ -703,6 +733,7 @@ projects: [
 ## Security Considerations ✅
 
 ### Test Data Security
+
 ```typescript
 // ✅ Use dedicated test credentials
 const testCredentials = {
@@ -720,24 +751,27 @@ static async cleanup(): Promise<void> {
 ```
 
 ### Environment Isolation
+
 ```yaml
 # ✅ Separate test database
 TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/traffboard_test
 
-# ✅ Test-specific secrets  
+# ✅ Test-specific secrets
 NEXTAUTH_SECRET: test-secret-for-ci-environment
 ```
 
 ## Maintenance ✅
 
 ### Regular Tasks
+
 1. **Update selectors** when UI changes
-2. **Review test failures** and fix immediately  
+2. **Review test failures** and fix immediately
 3. **Update Playwright** and browsers regularly
 4. **Monitor test execution time** and optimize slow tests
 5. **Clean up obsolete tests** when features are removed
 
 ### Health Monitoring
+
 ```typescript
 // ✅ Add test metadata for monitoring
 test("critical user login @smoke", async ({ page }) => {

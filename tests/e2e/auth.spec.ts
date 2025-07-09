@@ -62,7 +62,7 @@ test.describe("Authentication Flow", () => {
 
     // Step 3: Verify error message appears
     await loginPage.expectErrorMessage();
-    
+
     // Step 4: Verify we're still on login page
     await loginPage.expectToBeOnLoginPage();
   });
@@ -101,13 +101,13 @@ test.describe("Authentication Flow", () => {
 
     // Step 2: Try to access login page while authenticated
     await loginPage.goto();
-    
+
     // Step 3: Wait for potential redirect or check if staying on login is expected behavior
     await page.waitForTimeout(2000); // Give time for any redirect logic
-    
+
     // Check current URL - if no redirect happens, that might be the expected behavior
     const currentUrl = page.url();
-    if (currentUrl.includes('/main/dashboard')) {
+    if (currentUrl.includes("/main/dashboard")) {
       // Redirect happened - verify we're on dashboard
       await dashboardPage.expectToBeOnDashboard();
     } else {

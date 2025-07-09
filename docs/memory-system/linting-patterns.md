@@ -3,10 +3,11 @@
 ## 🎯 Critical ESLint Rules (Updated Config)
 
 ### TypeScript Safety Rules
+
 ```json
 {
   "@typescript-eslint/no-unsafe-assignment": "off",
-  "@typescript-eslint/no-unsafe-member-access": "off", 
+  "@typescript-eslint/no-unsafe-member-access": "off",
   "@typescript-eslint/no-unsafe-call": "off",
   "@typescript-eslint/no-unsafe-return": "off",
   "@typescript-eslint/no-unsafe-argument": "off",
@@ -20,20 +21,25 @@
 ```
 
 ### Import Organization Rules
+
 ```json
 {
-  "import/order": ["warn", {
-    "groups": ["builtin", "external", "internal", "parent", "sibling", "index"],
-    "newlines-between": "always",
-    "alphabetize": {
-      "order": "asc",
-      "caseInsensitive": true
+  "import/order": [
+    "warn",
+    {
+      "groups": ["builtin", "external", "internal", "parent", "sibling", "index"],
+      "newlines-between": "always",
+      "alphabetize": {
+        "order": "asc",
+        "caseInsensitive": true
+      }
     }
-  }]
+  ]
 }
 ```
 
-### Code Quality Rules  
+### Code Quality Rules
+
 ```json
 {
   "unicorn/consistent-function-scoping": "recommended",
@@ -49,6 +55,7 @@
 ```
 
 ### Next.js Rules
+
 ```json
 {
   "@next/next/no-img-element": "error",
@@ -61,10 +68,11 @@
 ## ✅ Correct Patterns (Production-Ready)
 
 ### Database Queries (Pragmatic Approach)
+
 ```typescript
 // ✅ CORRECT: Prisma queries (unsafe rules disabled for flexibility)
 const users = await prisma.user.findMany({
-  select: { id: true, email: true, name: true }
+  select: { id: true, email: true, name: true },
 });
 
 // ✅ CORRECT: Error handling with require-await
@@ -80,6 +88,7 @@ const createUser = async (data: UserData) => {
 ```
 
 ### Import Organization (Alphabetized)
+
 ```typescript
 // ✅ CORRECT: Alphabetized imports with proper grouping
 import type { NextRequest } from "next/server";
@@ -92,12 +101,13 @@ import type { UserResponse } from "./types";
 ```
 
 ### Async/Await Patterns
+
 ```typescript
 // ✅ CORRECT: Always await (require-await rule)
 const updateUser = async (userId: string, data: UserData) => {
   await prisma.user.update({
     where: { id: userId },
-    data: { ...data, lastLoginAt: new Date() }
+    data: { ...data, lastLoginAt: new Date() },
   });
 };
 
@@ -119,6 +129,7 @@ const handleUserRole = (role: UserRole) => {
 ```
 
 ### Function Scoping (Recommended)
+
 ```typescript
 // ✅ CORRECT: Move to outer scope when possible
 const formatDate = (date: Date): string => {
@@ -132,6 +143,7 @@ const MyComponent = () => {
 ```
 
 ### Unused Imports Handling
+
 ```typescript
 // ✅ CORRECT: Clean imports (unused-imports plugin)
 import type { User } from "@prisma/client";
@@ -142,6 +154,7 @@ import { prisma } from "@/lib/prisma";
 ```
 
 ### Template Expressions (Warn Level)
+
 ```typescript
 // ✅ ACCEPTABLE: Numbers and booleans allowed
 const message = `User count: ${count}`;
@@ -154,6 +167,7 @@ const complex = `Result: ${user?.profile?.settings?.theme || "default"}`;
 ## ❌ Anti-Patterns to Avoid
 
 ### Async/Await Violations
+
 ```typescript
 // ❌ WRONG: Missing await (require-await will catch this)
 const createUser = async (data: UserData) => {
@@ -163,6 +177,7 @@ const createUser = async (data: UserData) => {
 ```
 
 ### Import Issues
+
 ```typescript
 // ❌ WRONG: Not alphabetized, wrong grouping
 import { prisma } from "@/lib/prisma";
@@ -174,18 +189,20 @@ import { unnecessary } from "some-lib"; // Will be auto-removed
 ```
 
 ### Function Scoping Issues
+
 ```typescript
 // ⚠️ WARN: Function inside component (but not error)
 const MyComponent = () => {
   const formatDate = (date: Date) => { // Warning but allowed
     return date.toLocaleDateString();
   };
-  
+
   return <div>{formatDate(new Date())}</div>;
 };
 ```
 
 ### Next.js Violations
+
 ```typescript
 // ❌ ERROR: Using img instead of Image
 <img src="/image.jpg" alt="Example" /> // Use next/image instead
@@ -195,13 +212,14 @@ const MyComponent = () => {
 ```
 
 ### Switch Statement Issues
+
 ```typescript
 // ❌ ERROR: Missing exhaustive check
 const handleRole = (role: UserRole) => {
   switch (role) {
     case "ADMIN":
       return "admin";
-    case "USER": 
+    case "USER":
       return "user";
     // Missing GUEST case - will error
   }
@@ -211,6 +229,7 @@ const handleRole = (role: UserRole) => {
 ## 🔧 Resolution Strategies
 
 ### For Missing Await
+
 ```typescript
 // Before: Missing await
 const user = prisma.user.create({ data });
@@ -220,6 +239,7 @@ const user = await prisma.user.create({ data });
 ```
 
 ### For Import Order
+
 ```typescript
 // Before: Wrong order
 import { prisma } from "@/lib/prisma";
@@ -235,6 +255,7 @@ import { prisma } from "@/lib/prisma";
 ```
 
 ### For Switch Exhaustiveness
+
 ```typescript
 // Before: Non-exhaustive
 const handleRole = (role: UserRole) => {
@@ -261,6 +282,7 @@ const handleRole = (role: UserRole) => {
 ```
 
 ### For Next.js Issues
+
 ```typescript
 // Before: Plain img tag
 <img src="/image.jpg" alt="Example" />
@@ -290,7 +312,7 @@ pnpm lint && pnpm typecheck && pnpm format:check
 
 1. **TypeScript Safety**: Unsafe rules are OFF for flexibility
 2. **Import Order**: WARN level (won't block CI)
-3. **Prettier**: WARN level (won't block CI)  
+3. **Prettier**: WARN level (won't block CI)
 4. **Function Scoping**: Recommended but not enforced
 5. **Unused Imports**: AUTO-REMOVED by plugin
 6. **Switch Exhaustiveness**: ERROR level (enforced)
@@ -298,4 +320,4 @@ pnpm lint && pnpm typecheck && pnpm format:check
 
 ---
 
-*Follow these patterns for clean, maintainable code that passes CI without token waste on fixes.*
+_Follow these patterns for clean, maintainable code that passes CI without token waste on fixes._

@@ -182,10 +182,7 @@ describe("Enhanced Cohort SQL with Window Functions", () => {
 
       expect(mockExecuteQuery).toHaveBeenCalledWith(
         expect.stringContaining("ROW_NUMBER() OVER"),
-        expect.arrayContaining([
-          config.dateRange.start.toISOString(),
-          config.dateRange.end.toISOString(),
-        ]),
+        expect.arrayContaining([config.dateRange.start.toISOString(), config.dateRange.end.toISOString()]),
         expect.objectContaining({ timeout: 120_000 }),
       );
 
@@ -200,12 +197,12 @@ describe("Enhanced Cohort SQL with Window Functions", () => {
       const result = await getCohortDataWithWindowFunctions(config);
 
       const [sqlQuery] = mockExecuteQuery.mock.calls[0];
-      
+
       // Should contain cumulative calculations
       expect(sqlQuery).toMatch(/cumulative_deposits/);
       expect(sqlQuery).toMatch(/cumulative_ngr/);
       expect(sqlQuery).toMatch(/ROWS UNBOUNDED PRECEDING/);
-      
+
       expect(result).toEqual(mockData);
     });
 
@@ -217,12 +214,12 @@ describe("Enhanced Cohort SQL with Window Functions", () => {
       const result = await getCohortDataWithWindowFunctions(config);
 
       const [sqlQuery] = mockExecuteQuery.mock.calls[0];
-      
+
       // Should contain retention rate calculations
       expect(sqlQuery).toMatch(/retention_rate/);
       expect(sqlQuery).toMatch(/growth_rate/);
       expect(sqlQuery).toMatch(/cohort_performance/);
-      
+
       expect(result).toEqual(mockData);
     });
 
@@ -234,11 +231,11 @@ describe("Enhanced Cohort SQL with Window Functions", () => {
       const result = await getCohortDataWithWindowFunctions(config);
 
       const [sqlQuery] = mockExecuteQuery.mock.calls[0];
-      
+
       // Should contain week-specific logic
       expect(sqlQuery).toMatch(/DATE_TRUNC\('week'/);
       expect(sqlQuery).toMatch(/INTERVAL '1 day'/);
-      
+
       expect(result).toEqual(mockData);
     });
 
@@ -260,10 +257,7 @@ describe("Enhanced Cohort SQL with Window Functions", () => {
 
       expect(mockExecuteQuery).toHaveBeenCalledWith(
         expect.stringContaining("player_lifecycle"),
-        expect.arrayContaining([
-          config.dateRange.start.toISOString(),
-          config.dateRange.end.toISOString(),
-        ]),
+        expect.arrayContaining([config.dateRange.start.toISOString(), config.dateRange.end.toISOString()]),
         expect.objectContaining({ timeout: 180_000 }),
       );
 
@@ -278,18 +272,18 @@ describe("Enhanced Cohort SQL with Window Functions", () => {
       const result = await getRetentionAnalysis(config);
 
       const [sqlQuery] = mockExecuteQuery.mock.calls[0];
-      
+
       // Should contain running totals
       expect(sqlQuery).toMatch(/running_deposits/);
       expect(sqlQuery).toMatch(/running_ngr/);
       expect(sqlQuery).toMatch(/ROWS UNBOUNDED PRECEDING/);
-      
+
       // Should contain lifecycle tracking
       expect(sqlQuery).toMatch(/prev_activity_date/);
       expect(sqlQuery).toMatch(/next_activity_date/);
       expect(sqlQuery).toMatch(/LAG\(/);
       expect(sqlQuery).toMatch(/LEAD\(/);
-      
+
       expect(result).toEqual(mockData);
     });
 
@@ -301,13 +295,13 @@ describe("Enhanced Cohort SQL with Window Functions", () => {
       const result = await getRetentionAnalysis(config);
 
       const [sqlQuery] = mockExecuteQuery.mock.calls[0];
-      
+
       // Should contain percentile calculations
       expect(sqlQuery).toMatch(/PERCENTILE_CONT\(0\.5\)/);
       expect(sqlQuery).toMatch(/PERCENTILE_CONT\(0\.95\)/);
       expect(sqlQuery).toMatch(/median_deposits/);
       expect(sqlQuery).toMatch(/p95_deposits/);
-      
+
       expect(result).toEqual(mockData);
     });
 
@@ -323,10 +317,34 @@ describe("Enhanced Cohort SQL with Window Functions", () => {
     it("should execute breakpoint performance analysis", async () => {
       const config = createTestCohortConfig("day", "dep2cost");
       const mockBreakpointStats = [
-        { breakpoint: 1, avg_cohort_size: 1000, avg_active_players: 800, avg_retention_rate: 80, retention_rate_stddev: 5 },
-        { breakpoint: 7, avg_cohort_size: 1000, avg_active_players: 600, avg_retention_rate: 60, retention_rate_stddev: 8 },
-        { breakpoint: 14, avg_cohort_size: 1000, avg_active_players: 400, avg_retention_rate: 40, retention_rate_stddev: 10 },
-        { breakpoint: 30, avg_cohort_size: 1000, avg_active_players: 200, avg_retention_rate: 20, retention_rate_stddev: 12 },
+        {
+          breakpoint: 1,
+          avg_cohort_size: 1000,
+          avg_active_players: 800,
+          avg_retention_rate: 80,
+          retention_rate_stddev: 5,
+        },
+        {
+          breakpoint: 7,
+          avg_cohort_size: 1000,
+          avg_active_players: 600,
+          avg_retention_rate: 60,
+          retention_rate_stddev: 8,
+        },
+        {
+          breakpoint: 14,
+          avg_cohort_size: 1000,
+          avg_active_players: 400,
+          avg_retention_rate: 40,
+          retention_rate_stddev: 10,
+        },
+        {
+          breakpoint: 30,
+          avg_cohort_size: 1000,
+          avg_active_players: 200,
+          avg_retention_rate: 20,
+          retention_rate_stddev: 12,
+        },
       ];
       const mockPerformanceMetrics = [
         {
@@ -346,17 +364,11 @@ describe("Enhanced Cohort SQL with Window Functions", () => {
       expect(mockExecutePipeline).toHaveBeenCalledWith([
         expect.objectContaining({
           sql: expect.stringContaining("breakpoint_performance"),
-          params: expect.arrayContaining([
-            config.dateRange.start.toISOString(),
-            config.dateRange.end.toISOString(),
-          ]),
+          params: expect.arrayContaining([config.dateRange.start.toISOString(), config.dateRange.end.toISOString()]),
         }),
         expect.objectContaining({
           sql: expect.stringContaining("total_cohorts"),
-          params: expect.arrayContaining([
-            config.dateRange.start.toISOString(),
-            config.dateRange.end.toISOString(),
-          ]),
+          params: expect.arrayContaining([config.dateRange.start.toISOString(), config.dateRange.end.toISOString()]),
         }),
       ]);
 
@@ -368,20 +380,14 @@ describe("Enhanced Cohort SQL with Window Functions", () => {
 
     it("should handle breakpoint analysis pipeline errors", async () => {
       const config = createTestCohortConfig("day", "dep2cost");
-      mockExecutePipeline.mockResolvedValueOnce([
-        new Error("Breakpoint query failed"),
-        [],
-      ]);
+      mockExecutePipeline.mockResolvedValueOnce([new Error("Breakpoint query failed"), []]);
 
       await expect(getBreakpointPerformanceAnalysis(config)).rejects.toThrow("Breakpoint query failed");
     });
 
     it("should handle performance metrics pipeline errors", async () => {
       const config = createTestCohortConfig("day", "dep2cost");
-      mockExecutePipeline.mockResolvedValueOnce([
-        [],
-        new Error("Performance metrics query failed"),
-      ]);
+      mockExecutePipeline.mockResolvedValueOnce([[], new Error("Performance metrics query failed")]);
 
       await expect(getBreakpointPerformanceAnalysis(config)).rejects.toThrow("Performance metrics query failed");
     });
@@ -462,7 +468,13 @@ describe("Enhanced Cohort SQL with Window Functions", () => {
     });
 
     it("should estimate high complexity for complex queries", () => {
-      const config = createTestCohortConfig("day", "dep2cost", new Date("2024-01-01"), new Date("2024-12-31"), [1, 3, 7, 14, 30, 60, 90]);
+      const config = createTestCohortConfig(
+        "day",
+        "dep2cost",
+        new Date("2024-01-01"),
+        new Date("2024-12-31"),
+        [1, 3, 7, 14, 30, 60, 90],
+      );
       const filters = createTestFilters();
 
       const result = estimateEnhancedQueryPerformance(config, filters);
@@ -514,10 +526,10 @@ describe("Enhanced Cohort SQL with Window Functions", () => {
       const result = await getCohortDataWithWindowFunctions(config, filters);
 
       const [sqlQuery] = mockExecuteQuery.mock.calls[0];
-      
+
       expect(sqlQuery).toMatch(/pd\."partnerId" = 'partner123'/);
       expect(sqlQuery).toMatch(/pd\."playerCountry" = 'US'/);
-      
+
       expect(result).toEqual(mockData);
     });
 
@@ -530,10 +542,10 @@ describe("Enhanced Cohort SQL with Window Functions", () => {
       const result = await getRetentionAnalysis(config, filters);
 
       const [sqlQuery] = mockExecuteQuery.mock.calls[0];
-      
+
       expect(sqlQuery).toMatch(/pd\."partnerId" = 'partner123'/);
       expect(sqlQuery).toMatch(/pd\."playerCountry" = 'US'/);
-      
+
       expect(result).toEqual(mockData);
     });
   });

@@ -80,7 +80,7 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/traffboard_test
 
       - name: 📋 Lint check
-        run: pnpm lint --ignore-pattern="**/__tests__/**" --ignore-pattern="**/*.test.*" --ignore-pattern="**/*.spec.*"
+        run: pnpm lint
 
       - name: 🔍 Type check
         run: pnpm typecheck
@@ -94,7 +94,7 @@ jobs:
       - name: 🏗️ Build check
         run: pnpm build
 
-  # E2E Testing job 
+  # E2E Testing job
   e2e:
     name: 🎭 E2E Tests
     runs-on: ubuntu-latest

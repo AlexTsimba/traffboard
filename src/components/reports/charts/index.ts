@@ -33,7 +33,8 @@ export type { BreakpointChartProps } from "./breakpoint-chart";
 export * from "./responsive-utils";
 
 // Re-export commonly used chart types from reports
-export type { CohortData, CohortCell, CohortMetric, CohortConfig, ChartConfig } from "@/types/reports";
+export type { CohortData, CohortCell, CohortMetric, CohortConfig } from "@/types/reports";
+export type { ChartConfig } from "@/components/ui/chart";
 
 /**
  * Chart component registry for dynamic loading

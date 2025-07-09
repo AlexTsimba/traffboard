@@ -20,7 +20,7 @@ export class BasePage {
    */
   async waitForLoad(waitForNetwork: boolean = false): Promise<void> {
     await this.page.waitForLoadState("domcontentloaded");
-    
+
     // Only wait for network idle if explicitly requested
     // This prevents tests from hanging due to continuous API calls
     if (waitForNetwork) {

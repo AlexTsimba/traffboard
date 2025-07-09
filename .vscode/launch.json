@@ -9,7 +9,7 @@
       "cwd": "${workspaceFolder}"
     },
     {
-      "name": "CI-Local Quick Check", 
+      "name": "CI-Local Quick Check",
       "type": "node-terminal",
       "request": "launch",
       "command": "./scripts/ci-local/quick-check.sh",

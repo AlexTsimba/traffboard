@@ -25,11 +25,11 @@ export default defineConfig({
     video: "retain-on-failure",
     headless: !!process.env.CI,
   },
-  
+
   projects: [
     {
       name: "chromium",
-      use: { 
+      use: {
         ...devices["Desktop Chrome"],
         // Disable dev tools for consistent testing
         launchOptions: {

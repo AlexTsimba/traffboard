@@ -1,6 +1,7 @@
 # TraffBoard System Architecture
 
 ## 🎯 Tech Stack
+
 - **Framework**: Next.js 15 (App Router) + React 19 + TypeScript
 - **Database**: PostgreSQL + Prisma ORM
 - **Authentication**: NextAuth.js v5 with role-based access
@@ -11,6 +12,7 @@
 ## 🏗️ Application Structure
 
 ### Frontend Architecture
+
 ```
 src/
 ├── app/                    # Next.js App Router
@@ -30,6 +32,7 @@ src/
 ```
 
 ### Report Factory Modular Design
+
 ```
 src/lib/reports/
 ├── data-pipeline.ts       # Main orchestrator
@@ -47,16 +50,17 @@ src/lib/reports/
 ## 🔄 Data Flow Patterns
 
 ### Server Action Pattern
+
 ```typescript
 // Server Action (src/lib/data/)
 export async function getReportData(filters: FilterState) {
   const { user } = await requireAuth();
-  
+
   const data = await prisma.playerData.findMany({
     where: buildWhereClause(filters, user.permissions),
     // ... optimized query
   });
-  
+
   return processReportData(data, filters);
 }
 
@@ -68,6 +72,7 @@ async function ReportPage() {
 ```
 
 ### Pipeline Processing Strategy
+
 1. **PostgreSQL**: Heavy filtering, basic aggregations
 2. **Arquero**: Business logic, dynamic calculations
 3. **React**: UI rendering, interactions
@@ -76,12 +81,14 @@ async function ReportPage() {
 ## 🔐 Security Architecture
 
 ### Authentication Flow
+
 - **NextAuth.js v5** with custom providers
 - **Role-based access control** (admin, analyst, viewer)
 - **Route protection** via middleware
 - **API security** through server actions only
 
 ### Data Access Layer (DAL)
+
 ```typescript
 // Secure data access pattern
 export async function requireAuth() {
@@ -100,12 +107,14 @@ export async function getPlayerData(filters: FilterState) {
 ## 📊 Database Design
 
 ### Core Tables
+
 - **PlayerData**: Main analytics table (millions of rows)
 - **User**: Authentication and role management
 - **Partner**: Partner metadata and configurations
 - **SavedReports**: Persistent report configurations
 
 ### Performance Optimizations
+
 - **Composite indexes** for common query patterns
 - **Partial indexes** for filtered data
 - **Connection pooling** via Prisma
@@ -114,12 +123,14 @@ export async function getPlayerData(filters: FilterState) {
 ## 🧪 Testing Strategy
 
 ### Test Architecture
+
 - **Unit Tests**: Individual components and utilities
-- **Integration Tests**: Database operations and API flows  
+- **Integration Tests**: Database operations and API flows
 - **E2E Tests**: Complete user workflows
 - **Performance Tests**: Large dataset handling
 
 ### Quality Gates
+
 1. **TypeScript** strict mode compilation
 2. **ESLint** + Prettier formatting
 3. **Vitest** test suite (87+ tests)
@@ -128,13 +139,15 @@ export async function getPlayerData(filters: FilterState) {
 ## 🚀 Deployment & Performance
 
 ### Optimization Techniques
+
 - **Server Components** for data-heavy operations
 - **Streaming** for progressive loading
 - **Caching** at multiple layers
 - **Code splitting** for optimal bundle sizes
 
 ### Scalability Considerations
+
 - **Modular architecture** for team scaling
 - **Plugin system** for feature extensions
 - **Database optimization** for data growth
-- **Caching strategies** for performance scaling 
+- **Caching strategies** for performance scaling

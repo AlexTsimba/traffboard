@@ -3,11 +3,13 @@
 ## 🚀 Setup
 
 ### Prerequisites
-- Node.js 18+ 
+
+- Node.js 18+
 - PostgreSQL 14+
 - pnpm 8+
 
 ### Installation
+
 ```bash
 # Clone and install
 git clone <repo>
@@ -29,6 +31,7 @@ pnpm dev
 ## 🔧 Common Commands
 
 ### Development
+
 ```bash
 pnpm dev          # Start dev server (localhost:3000)
 pnpm build        # Production build
@@ -49,6 +52,7 @@ pnpm test:watch   # Watch mode testing
 ```
 
 ### Code Generation
+
 ```bash
 pnpm db:generate  # Generate Prisma client
 pnpm ui:add <component>  # Add shadcn/ui component
@@ -57,12 +61,13 @@ pnpm ui:add <component>  # Add shadcn/ui component
 ## 🏗️ Project Structure
 
 ### Key Directories
+
 ```
 src/
 ├── app/                 # Next.js pages (App Router)
 ├── components/          # React components
 │   ├── ui/             # shadcn/ui primitives
-│   ├── auth/           # Authentication components  
+│   ├── auth/           # Authentication components
 │   ├── admin/          # Admin interface
 │   └── reports/        # Report Factory components
 ├── lib/                # Core utilities
@@ -73,6 +78,7 @@ src/
 ```
 
 ### Important Files
+
 - `auth.config.ts` - NextAuth.js configuration
 - `prisma/schema.prisma` - Database schema
 - `middleware.ts` - Route protection
@@ -81,6 +87,7 @@ src/
 ## 🧭 Development Workflow
 
 ### Feature Development
+
 1. **Create branch**: `git checkout -b feature/task-name`
 2. **Write tests first**: Create failing tests for new functionality
 3. **Implement feature**: Make tests pass
@@ -89,11 +96,12 @@ src/
 6. **Push**: `git push origin feature/task-name`
 
 ### Testing Strategy
+
 ```bash
 # Unit tests for utilities
 src/lib/__tests__/
 
-# Component tests  
+# Component tests
 src/components/__tests__/
 
 # Integration tests
@@ -106,10 +114,12 @@ tests/e2e/
 ## 🔑 Authentication
 
 ### Default Users (after seeding)
+
 - **Admin**: `admin@traffboard.com` / `admin123`
 - **Analyst**: `analyst@traffboard.com` / `analyst123`
 
 ### Roles & Permissions
+
 - **Admin**: Full system access, user management
 - **Analyst**: Report access, limited admin features
 - **Viewer**: Read-only report access
@@ -117,20 +127,24 @@ tests/e2e/
 ## 📊 Data Management
 
 ### CSV Import
+
 1. Navigate to `/admin/data-management`
 2. Upload CSV files (players, traffic, conversions)
 3. Map columns to schema fields
 4. Process and validate data
 
 ### Demo Data
+
 Use seeded demo data for development:
+
 - **Partners**: Demo partners with realistic data
-- **Players**: 1000+ sample player records  
+- **Players**: 1000+ sample player records
 - **Traffic**: Sample traffic conversion data
 
 ## 🧪 Testing
 
 ### Test Commands
+
 ```bash
 pnpm test                    # Full test suite
 pnpm test:unit              # Unit tests only
@@ -140,6 +154,7 @@ pnpm test:coverage         # Test coverage report
 ```
 
 ### Writing Tests
+
 ```typescript
 // Component test example
 import { render, screen } from '@testing-library/react';
@@ -151,7 +166,7 @@ test('renders correctly', () => {
   expect(screen.getByText('Expected Text')).toBeInTheDocument();
 });
 
-// Integration test example  
+// Integration test example
 test('database operation', async () => {
   const result = await createUser({ email: 'test@test.com' });
   expect(result.email).toBe('test@test.com');
@@ -163,6 +178,7 @@ test('database operation', async () => {
 ### Common Issues
 
 **Database connection fails**
+
 ```bash
 # Check PostgreSQL is running
 pg_isready
@@ -172,6 +188,7 @@ pnpm db:reset
 ```
 
 **Build errors**
+
 ```bash
 # Clear cache and reinstall
 rm -rf .next node_modules
@@ -180,6 +197,7 @@ pnpm build
 ```
 
 **Test failures**
+
 ```bash
 # Run single test file
 pnpm test src/path/to/test.test.ts
@@ -189,6 +207,7 @@ pnpm test --reporter=verbose
 ```
 
 **Type errors**
+
 ```bash
 # Regenerate Prisma client
 pnpm db:generate
@@ -198,6 +217,7 @@ pnpm type-check
 ```
 
 ### Environment Issues
+
 - Ensure `.env.local` has all required variables
 - Check Node.js version compatibility (18+)
 - Verify PostgreSQL version (14+)
@@ -209,4 +229,4 @@ pnpm type-check
 2. **Run tests**: Understand test patterns
 3. **Check admin**: Visit `/admin` with admin credentials
 4. **Review architecture**: Read `docs/ARCHITECTURE.md`
-5. **Start developing**: Pick a task and follow TDD workflow 
+5. **Start developing**: Pick a task and follow TDD workflow

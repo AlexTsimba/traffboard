@@ -16,7 +16,7 @@ interface CohortData {
   breakpointValues: Record<number, number | null>;
 }
 
-interface BreakpointChartProps {
+export interface BreakpointChartProps {
   data: CohortData[];
   metric: "dep2cost" | "roas" | "avgDepositSum" | "retentionRate";
   breakpoints: number[];
@@ -32,25 +32,25 @@ const metricConfigs = {
     label: "DEP2COST",
     color: "#ef4444",
     format: (value: number) => `$${value.toFixed(2)}`,
-    yAxisDomain: [0, "auto"] as const,
+    yAxisDomain: [0, "auto"] as [number, string],
   },
   roas: {
     label: "ROAS",
     color: "#22c55e",
     format: (value: number) => `${value.toFixed(2)}x`,
-    yAxisDomain: [0, "auto"] as const,
+    yAxisDomain: [0, "auto"] as [number, string],
   },
   avgDepositSum: {
     label: "AVG DEPOSIT SUM",
     color: "#3b82f6",
     format: (value: number) => `$${value.toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
-    yAxisDomain: [0, "auto"] as const,
+    yAxisDomain: [0, "auto"] as [number, string],
   },
   retentionRate: {
     label: "RETENTION RATE",
     color: "#8b5cf6",
     format: (value: number) => `${(value * 100).toFixed(1)}%`,
-    yAxisDomain: [0, 1] as const,
+    yAxisDomain: [0, 1] as [number, number],
   },
 };
 
@@ -79,6 +79,7 @@ export function BreakpointChart({
 }: BreakpointChartProps) {
   const [cohortFilter, setCohortFilter] = useState<"all" | "selected" | "top" | "recent">("all");
   const [topCount, setTopCount] = useState(5);
+  const [chartType, _setChartType] = useState<"line" | "bar">("line");
 
   const metricConfig = metricConfigs[metric];
 
@@ -103,17 +104,19 @@ export function BreakpointChart({
         break;
       }
       case "recent": {
-        const sortedByDate = filtered.toSorted((a, b) => new Date(b.cohortDate).getTime() - new Date(a.cohortDate).getTime());
+        const sortedByDate = filtered.toSorted(
+          (a, b) => new Date(b.cohortDate).getTime() - new Date(a.cohortDate).getTime(),
+        );
         filtered = sortedByDate.slice(0, topCount);
         break;
       }
       case "selected": {
-        // For now, just return all - in real implementation would check selection state
+        // For now, just return all - implementation will add selection filtering logic when needed
         break;
       }
       case "all":
       default: {
-        // "all" or any other case - no filtering
+        // "all" or any other case - no filtering needed
         break;
       }
     }

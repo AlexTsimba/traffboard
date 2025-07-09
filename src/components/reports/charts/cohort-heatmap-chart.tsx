@@ -3,9 +3,9 @@
 import React, { useMemo } from "react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { ChartContainer, type ChartConfig } from "@/components/ui/chart";
 import { cn } from "@/lib/utils";
-import type { CohortData, CohortCell, CohortMetric, ChartConfig } from "@/types/reports";
+import type { CohortData, CohortCell, CohortMetric } from "@/types/reports";
 
 export interface CohortHeatmapChartProps {
   /** Cohort data array containing cohort dates and breakpoint values */
@@ -197,24 +197,17 @@ export function CohortHeatmapChart({
                       }
 
                       return (
-                        <ChartTooltip key={cell.breakpoint}>
-                          <div
-                            className={cn(
-                              "hover:ring-primary/50 flex h-8 cursor-pointer items-center justify-center rounded-sm text-xs font-medium transition-all hover:scale-105 hover:ring-2",
-                              cell.heatmapClass,
-                            )}
-                            onClick={() => onCellClick?.(cohort.cohortDate, cell.breakpoint, cell.value)}
-                          >
-                            {cell.displayValue}
-                          </div>
-                          <ChartTooltipContent
-                            formatter={(value) => [
-                              formatValue(Number(value), metric),
-                              metric.replace("_", " ").toUpperCase(),
-                            ]}
-                            label={`Cohort: ${new Date(cohort.cohortDate).toLocaleDateString()}, Day ${cell.breakpoint}`}
-                          />
-                        </ChartTooltip>
+                        <div
+                          key={cell.breakpoint}
+                          className={cn(
+                            "hover:ring-primary/50 flex h-8 cursor-pointer items-center justify-center rounded-sm text-xs font-medium transition-all hover:scale-105 hover:ring-2",
+                            cell.heatmapClass,
+                          )}
+                          onClick={() => onCellClick?.(cohort.cohortDate, cell.breakpoint, cell.value)}
+                          title={`Cohort: ${new Date(cohort.cohortDate).toLocaleDateString()}, Day ${cell.breakpoint} - ${formatValue(cell.value ?? 0, metric)}`}
+                        >
+                          {cell.displayValue}
+                        </div>
                       );
                     })}
                   </div>

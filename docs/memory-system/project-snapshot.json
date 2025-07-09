@@ -8,7 +8,7 @@
   "tech_stack": {
     "frontend": {
       "framework": "Next.js 15",
-      "react": "React 19", 
+      "react": "React 19",
       "typescript": "TypeScript strict mode",
       "ui": "shadcn/ui + Tailwind CSS",
       "forms": "React Hook Form + Zod",
@@ -22,7 +22,7 @@
     },
     "testing": {
       "unit": "Vitest",
-      "e2e": "Playwright", 
+      "e2e": "Playwright",
       "database": "Real PostgreSQL via Docker"
     },
     "quality": {
@@ -65,7 +65,7 @@
   },
   "development_commands": {
     "start": "npm run dev",
-    "build": "npm run build", 
+    "build": "npm run build",
     "test": "npm run test",
     "lint": "npm run lint",
     "lint_fix": "npm run lint -- --fix",
@@ -74,7 +74,7 @@
     "database": {
       "generate": "npm run db:generate",
       "push": "npm run db:push",
-      "migrate": "npm run db:migrate", 
+      "migrate": "npm run db:migrate",
       "studio": "npm run db:studio",
       "seed": "npm run db:seed"
     }
@@ -82,7 +82,7 @@
   "snapshot_timestamp": "2025-01-06T16:30:00Z",
   "memory_update_triggers": [
     "package.json changes",
-    "ESLint config updates", 
+    "ESLint config updates",
     "Database schema changes",
     "Major architectural decisions",
     "Dependency updates"
