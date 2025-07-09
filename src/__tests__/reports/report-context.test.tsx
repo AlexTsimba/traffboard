@@ -7,7 +7,17 @@
 
 import { renderHook, act } from "@testing-library/react";
 import React from "react";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
+
+// Mock Next.js navigation hooks
+vi.mock("next/navigation", () => ({
+  useSearchParams: () => new URLSearchParams(),
+  useRouter: () => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+  }),
+  usePathname: () => "/test",
+}));
 
 import {
   ReportProvider,

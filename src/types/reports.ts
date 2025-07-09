@@ -85,6 +85,7 @@ export type FilterType =
   | "text"
   | "select"
   | "multiselect"
+  | "autocomplete"
   | "date"
   | "daterange"
   | "number"

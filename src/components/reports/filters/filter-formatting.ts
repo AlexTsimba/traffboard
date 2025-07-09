@@ -98,7 +98,8 @@ export function formatFilterValue(value: FilterValue, type: FilterType): string 
     case "numberrange": {
       return formatNumberRangeValue(value);
     }
-    case "multiselect": {
+    case "multiselect":
+    case "autocomplete": {
       return formatMultiselectValue(value);
     }
     case "boolean": {
@@ -107,6 +108,9 @@ export function formatFilterValue(value: FilterValue, type: FilterType): string 
     case "text":
     case "select":
     case "number": {
+      return formatGenericValue(value);
+    }
+    default: {
       return formatGenericValue(value);
     }
   }

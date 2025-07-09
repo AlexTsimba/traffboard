@@ -17,6 +17,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { FilterDefinition, FilterValue } from "@/types/reports";
 
+import { AutocompleteFilterInput } from "./autocomplete-filter-input";
+
 // =============================================================================
 // SHARED INTERFACE
 // =============================================================================
@@ -302,6 +304,9 @@ export function FilterInput({ filter, value, onChange }: FilterInputProps) {
     }
     case "multiselect": {
       return <MultiselectFilterInput {...inputProps} />;
+    }
+    case "autocomplete": {
+      return <AutocompleteFilterInput {...inputProps} />;
     }
     case "date": {
       return <DateFilterInput {...inputProps} />;

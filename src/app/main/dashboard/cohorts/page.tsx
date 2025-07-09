@@ -19,26 +19,18 @@ const createCohortFilterDefinitions = (): FilterDefinition[] => {
     {
       id: "partners",
       label: "Partners",
-      type: "multiselect",
+      type: "autocomplete",
       group: "segments",
       order: 10,
-      options: [
-        { label: "Partner A", value: "partner_a" },
-        { label: "Partner B", value: "partner_b" },
-        { label: "Partner C", value: "partner_c" },
-      ],
+      placeholder: "Search partners...",
     },
     {
       id: "campaigns",
       label: "Campaigns",
-      type: "multiselect",
+      type: "autocomplete",
       group: "segments",
       order: 11,
-      options: [
-        { label: "Campaign Alpha", value: "campaign_alpha" },
-        { label: "Campaign Beta", value: "campaign_beta" },
-        { label: "Campaign Gamma", value: "campaign_gamma" },
-      ],
+      placeholder: "Search campaigns...",
     },
     {
       id: "countries",

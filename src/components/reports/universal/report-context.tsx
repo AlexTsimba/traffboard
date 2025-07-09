@@ -187,7 +187,7 @@ function reportReducer(state: ReportContextState, action: ReportAction): ReportC
       // Import formatFilterValue locally to avoid circular dependencies
       const formatFilterValue = (value: FilterValue, type: string): string => {
         if (value == null) return "";
-        
+
         if (type === "daterange" && typeof value === "object" && value !== null && "start" in value && "end" in value) {
           const dateRange = value as { start: Date | string; end: Date | string };
           const formatOptions = { day: "numeric", month: "long" } as const;
@@ -195,11 +195,11 @@ function reportReducer(state: ReportContextState, action: ReportAction): ReportC
           const endDate = new Date(dateRange.end).toLocaleDateString("en-US", formatOptions);
           return `${startDate} - ${endDate}`;
         }
-        
+
         return typeof value === "object" ? JSON.stringify(value) : String(value);
       };
 
-            // Convert filters to applied filters with proper formatting
+      // Convert filters to applied filters with proper formatting
       const appliedFilters: AppliedFilter[] = Object.entries(action.payload)
         .filter(([, value]) => value != null && value !== "")
         .map(([id, value]) => {
