@@ -90,7 +90,9 @@
         "title": "Cohort Analysis Data Engine: PostgreSQL-Arquero Pipeline",
         "description": "Develop a data engine that leverages a PostgreSQL-Arquero pipeline for efficient cohort calculations, including breakpoint mapping, metric processing (DEP2COST, ROAS, AVG DEPOSIT SUM, RETENTION RATE), and performance optimization. The engine must support DAY_BREAKPOINTS=[1,3,5,7,14,17,21,24,27,30] and WEEK_BREAKPOINTS=[7,14,21,28,35,42], with week mode starting Monday and viewing Sunday. Retention rate must be calculated as active_players/initial_cohort_size*100. All pipeline components, including advanced window functions, breakpoint calculations, and metric processing, are now fully implemented and tested. The solution exceeds original requirements with comprehensive test coverage and robust performance.",
         "status": "in-progress",
-        "dependencies": [1],
+        "dependencies": [
+          1
+        ],
         "priority": "medium",
         "details": "The PostgreSQL-Arquero pipeline for cohort analysis is now fully realized, featuring advanced SQL extraction with window functions, precise breakpoint mapping, and complete metric calculations (DEP2COST, ROAS, AVG DEPOSIT SUM, RETENTION RATE). The implementation supports both day and week breakpoints, with week mode logic correctly starting on Monday and viewing Sunday. The pipeline leverages PostgreSQL pipeline mode for efficient batch processing and integrates seamlessly with Arquero for transformation and aggregation. All components have been validated with comprehensive test coverage, ensuring accuracy, reliability, and high performance for large datasets. The system is extensible, secure, and fully compatible with the report factory foundation.",
         "testStrategy": "1. Confirm end-to-end correctness of the PostgreSQL-Arquero pipeline by running cohort analyses on representative datasets, verifying extraction, transformation, and aggregation for all breakpoints and metrics. 2. Benchmark pipeline performance at scale, validating throughput and latency improvements from pipelining and SQL optimization. 3. Validate robust error handling and synchronization under fault injection scenarios. 4. Ensure all metric calculations (DEP2COST, ROAS, AVG DEPOSIT SUM, RETENTION RATE) and breakpoint mappings (including week mode) are accurate and reproducible. 5. Verify seamless integration with the report factory by generating reports from processed cohort data. All tests have been executed with comprehensive coverage, confirming the pipeline's correctness and robustness.",
@@ -165,7 +167,9 @@
         "title": "Universal UI Component Library for Reports",
         "description": "Develop a universal, reusable UI component library using shadcn/ui patterns for all report types, focusing on composable filters, data tables (TanStack Table), charts (Recharts), responsive layouts, loading states, error handling, and theming support.",
         "status": "pending",
-        "dependencies": [1],
+        "dependencies": [
+          1
+        ],
         "priority": "medium",
         "details": "Leverage shadcn/ui's open code and compositional approach to build a robust set of accessible, customizable React components tailored for reporting needs. Audit requirements for universal report filters, data tables (using TanStack Table), chart containers (using Recharts), responsive layout primitives, loading indicators, and error boundaries. Use shadcn/ui's headless and composable philosophy to create base components that are easily extensible and support theming. Implement filters with flexible input types, tables with sorting and pagination, chart wrappers compatible with Recharts, and ensure all components handle loading and error states gracefully. All components must be responsive, accessible, and themeable. Document usage patterns, variants, and provide Figma assets for design consistency. Integrate with the report factory architecture to ensure seamless data and state flow between components and the underlying data pipeline.",
         "testStrategy": "1. Render each component in isolation and within composed report layouts, verifying visual consistency, responsiveness, and theming across devices. 2. Test filter, table (TanStack Table), and chart (Recharts) components with mock and real data, ensuring correct data binding, interactivity, accessibility (keyboard navigation, ARIA roles), and proper handling of loading and error states. 3. Validate integration with the report factory by generating sample reports using the new components. 4. Review Figma assets for design fidelity and ensure documentation covers usage, customization, and error/loading state handling.",
@@ -184,7 +188,7 @@
             "title": "Advanced Table Features and Cohort Layout",
             "description": "Enhance existing TanStack Table implementation with cohort-specific features. Add triangular table layout for cohort data, advanced sorting/filtering for breakpoints, row selection with bulk operations, and performance optimizations for large datasets. Build on existing data-table.tsx foundation.",
             "details": "",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 3
           },
@@ -231,7 +235,10 @@
         "title": "Cohort-Specific UI Implementation",
         "description": "Develop a cohort analysis interface featuring a TanStack Table with triangular cohort visualization, heatmap cells, breakpoint selectors, metric toggles (DEP2COST, ROAS, AVG DEPOSIT SUM, RETENTION RATE), a cohort configuration panel, and interactive features for in-depth cohort exploration. All metric toggles and header controls must exactly match the demo structure, with updated metric names and labels throughout the UI.",
         "status": "pending",
-        "dependencies": [1, 3],
+        "dependencies": [
+          1,
+          3
+        ],
         "priority": "medium",
         "details": "Implement a React-based cohort analysis UI that leverages TanStack Table for rendering cohort data in a triangular format, supporting advanced features such as sorting, filtering, and pagination. Integrate heatmap visualization directly into the table cells to display cohort metrics over time, with dynamic color scaling based on metric intensity. Add responsive breakpoint selectors (e.g., dropdowns or segmented controls) to allow users to adjust cohort time intervals (daily, weekly, monthly), updating both the table and heatmap accordingly. Implement metric toggles enabling users to switch between DEP2COST, ROAS, AVG DEPOSIT SUM, and RETENTION RATE metrics, ensuring real-time updates to the visualization. All metric toggle controls and header labels must exactly match the demo structure. Include a cohort configuration panel for users to define cohort grouping logic and filters. Ensure all UI elements are accessible, responsive, and styled consistently with the component library from Task 3. Coordinate with the data engine to fetch and display real cohort data, handling loading and error states gracefully. Use compositional patterns to allow future extensibility for additional visualizations or controls. Provide interactive features such as cell tooltips, cohort highlighting, and drill-down actions.",
         "testStrategy": "1. Render the cohort analysis interface with mock and real data, verifying correct integration of TanStack Table with triangular cohort visualization and heatmap cells. 2. Test breakpoint selectors and metric toggles (DEP2COST, ROAS, AVG DEPOSIT SUM, RETENTION RATE) to ensure they update the displayed data and visualizations in real time, and that all labels and controls match the demo structure. 3. Validate the cohort configuration panel for correct cohort grouping and filtering. 4. Validate accessibility by checking keyboard navigation, ARIA attributes, and screen reader compatibility. 5. Confirm responsive layout across devices and browsers. 6. Simulate loading and error states to ensure graceful UI degradation. 7. Test interactive features such as tooltips, cohort highlighting, and drill-down actions. 8. Conduct user acceptance testing with sample cohort scenarios to verify usability and correctness of cohort breakdowns and visualizations.",
@@ -315,7 +322,10 @@
         "title": "Saved Cohorts & State Management Implementation",
         "description": "Implement a robust saved cohorts system with Zustand state management, cohort persistence, saved reports UI, collaboration features, a tab system for multiple open cohorts, URL sharing, and report templates to enhance the application's functionality and user experience.",
         "status": "pending",
-        "dependencies": [1, 3],
+        "dependencies": [
+          1,
+          3
+        ],
         "priority": "medium",
         "details": "### Implementation Steps\n\n1. **Cohort Persistence**: Develop a system to save and load cohorts from a database or local storage. This involves creating API endpoints for storing and retrieving cohort data and integrating these endpoints with the application's frontend. Ensure that cohorts can be persisted and restored across sessions.\n\n2. **State Management with Zustand**: Set up Zustand for managing global state across the application, including:\n   - Cohort data (supporting multiple open cohorts via a tab system)\n   - User preferences\n   - Report settings\n   - Saved reports and templates\n   Implement actions and selectors to update and retrieve state efficiently. Use middleware for state persistence, logging, and asynchronous actions as needed[1][2].\n\n3. **Saved Reports System & Templates**: Design a feature to save, manage, and template reports generated from cohort analyses. This includes:\n   - Creating a database schema to store report metadata, content, and templates\n   - Implementing UI components to list, view, manage, and create reports from templates\n\n4. **Collaboration Features**: Implement features that allow users to share cohorts and reports with others. This includes:\n   - Integrating authentication and authorization to manage access permissions\n   - Creating a sharing mechanism via email, direct links, or URL sharing for cohorts and reports\n\n5. **Tab System for Multiple Open Cohorts**: Implement a tabbed interface in the UI to allow users to have multiple cohorts open simultaneously. Ensure that each tab's state is managed independently within Zustand and persists as needed.\n\n6. **URL Sharing**: Enable users to share the current state of a cohort or report via a unique URL, allowing others to access or collaborate on the same data view.\n\n### Technical Approach\n\n- Use **Zustand** for state management to ensure efficient data sharing across components without prop drilling[1][2].\n- Leverage **React hooks** to integrate Zustand with the application's UI components.\n- For cohort persistence, use a backend framework like **Node.js** with **PostgreSQL** for database operations.\n- Implement **middleware** in Zustand to handle asynchronous actions, state logging, and persistence for debugging and reliability[2].\n- Design the UI to support tabbed navigation for cohorts and a clear interface for managing saved reports and templates.\n\n### Code Example\n\n```javascript\nimport { create } from 'zustand';\nimport { persist, devtools } from 'zustand/middleware';\n\nconst useCohortStore = create(\n  devtools(\n    persist(\n      (set) => ({\n        cohorts: [],\n        openTabs: [], // Array of cohort IDs or objects representing open tabs\n        addCohort: (newCohort) => set((state) => ({ cohorts: [...state.cohorts, newCohort] })),\n        removeCohort: (cohortId) => set((state) => ({ cohorts: state.cohorts.filter(cohort => cohort.id !== cohortId) })),\n        openTab: (cohortId) => set((state) => ({ openTabs: [...state.openTabs, cohortId] })),\n        closeTab: (cohortId) => set((state) => ({ openTabs: state.openTabs.filter(id => id !== cohortId) })),\n        // ...other actions for reports, templates, sharing, etc.\n      }),\n      { name: 'cohort-storage' }\n    )\n  )\n);\n```\n",
         "testStrategy": "1. **Cohort Persistence Test**: Verify that cohorts are correctly saved and loaded from the database or local storage by testing the API endpoints and frontend integration. Confirm that cohorts persist across sessions and can be restored.\n2. **State Management Test**: Use the Redux DevTools extension to monitor state changes and ensure that Zustand updates components correctly, including tab state and report templates.\n3. **Saved Reports & Templates Test**: Validate that reports and templates are saved, retrieved, and instantiated correctly by checking the database and UI listing. Test creating new reports from templates.\n4. **Collaboration Features Test**: Test sharing functionality by verifying that shared cohorts and reports (including via URL) are accessible to authorized users and that permissions are enforced.\n5. **Tab System Test**: Ensure that multiple cohorts can be opened, closed, and switched between via the tab UI, and that each tab maintains its own state.\n6. **URL Sharing Test**: Confirm that sharing a cohort or report via URL correctly loads the intended state for other users.",
@@ -326,7 +336,9 @@
         "title": "Performance Optimization & Caching Implementation",
         "description": "Implement intelligent query caching, progressive loading, background data refresh, performance monitoring, and optimization suggestions to improve application speed and responsiveness. Include robust cache invalidation strategies and resource monitoring.",
         "status": "pending",
-        "dependencies": [5],
+        "dependencies": [
+          5
+        ],
         "priority": "medium",
         "details": "Start by profiling the application's current performance using tools such as Lighthouse, Web Vitals, or custom logging to identify bottlenecks. Implement intelligent caching at multiple layers: \n- Use browser caching for static assets by setting appropriate cache-control and expires headers, and leverage Service Workers and the Cache API for selective caching of API responses and assets[1][4]. \n- Apply intelligent query caching for frequently accessed or computationally expensive data, such as cohort queries and saved reports, using algorithms like LRU or LFU to manage cache storage efficiently[2]. \n- Integrate cache invalidation strategies to ensure data freshness, including TTL (Time to Live) values and event-driven invalidation on data changes[2]. \n- Enable background data refresh to keep cached data up-to-date without blocking the user interface. \n- Integrate a CDN to serve static files and images, reducing latency for global users[3]. \n- Apply code-splitting and lazy loading for JavaScript bundles and heavy UI components, ensuring only necessary code is loaded initially. \n- Optimize images by compressing and resizing them, and use modern formats (e.g., WebP). \n- Minify and bundle CSS/JS files to reduce HTTP requests and payload size. \n- Monitor performance in production with real-time analytics, error tracking, and resource monitoring, setting up alerts for slow queries, high latency, or cache misses. \n- Provide optimization suggestions based on monitoring insights. \n- Regularly review and optimize database queries, especially those related to cohort and report data. \n- Document all optimizations, cache strategies, and provide fallback mechanisms for users with limited connectivity.",
         "testStrategy": "1. Use performance profiling tools (Lighthouse, WebPageTest) to benchmark before and after optimizations, ensuring measurable improvements in load time and interactivity. 2. Verify caching headers and Service Worker strategies are correctly set for static assets and API responses, and that server-side and query caches are invalidated appropriately on data changes. 3. Test CDN integration by accessing the app from different geographic locations and confirming reduced latency. 4. Confirm that code-splitting and lazy loading work by monitoring network requests and ensuring only necessary bundles are loaded on initial render. 5. Check that images are served in optimized formats and sizes. 6. Simulate slow network conditions to ensure progressive loading, background data refresh, and fallback mechanisms function correctly. 7. Monitor production performance, resource usage, and error logs to catch regressions or missed optimizations. 8. Validate that optimization suggestions are generated and actionable.",
@@ -337,7 +349,11 @@
         "title": "Integration Testing & Quality Assurance",
         "description": "Conduct comprehensive integration testing and quality assurance, including end-to-end cohort workflows, data accuracy validation, performance benchmarking, accessibility compliance, cross-browser testing, and user acceptance testing with real gambling industry scenarios. Ensure the application functions seamlessly and meets all requirements across different environments and user contexts.",
         "status": "pending",
-        "dependencies": [4, 5, 6],
+        "dependencies": [
+          4,
+          5,
+          6
+        ],
         "priority": "medium",
         "details": "### Implementation Steps\n\n1. **End-to-End Cohort Workflow Testing**: Execute integration tests covering the entire cohort analysis workflow, including cohort creation, modification, saving, and data retrieval, ensuring all components interact correctly.\n\n2. **Data Accuracy Validation**: Validate that cohort analysis results and related data outputs are accurate and consistent with expected business logic, especially for gambling industry-specific scenarios.\n\n3. **Performance Benchmarking**: Use tools such as Lighthouse, WebPageTest, Apache JMeter, or BrowserStack App Performance to evaluate application speed, responsiveness, and stability under various loads and network conditions. Simulate real-world usage patterns and compare performance before and after optimizations[1][2][3].\n\n4. **Accessibility Compliance**: Assess the application for accessibility compliance (e.g., WCAG 2.1), ensuring that all users, including those with disabilities, can effectively use the application.\n\n5. **Cross-Browser and Device Testing**: Test the application on multiple browsers (Chrome, Firefox, Safari, Edge) and devices (desktop, tablet, mobile) to ensure consistent functionality and appearance across environments.\n\n6. **User Acceptance Testing (UAT)**: Conduct UAT sessions with stakeholders and real users from the gambling industry, using realistic scenarios to validate that the application meets business needs and user expectations.\n\n7. **Integration Validation**: Define clear acceptance criteria and involve stakeholders in the review and sign-off process for all integration points.\n\n### Technical Approach\n- Utilize automated testing frameworks for integration and regression tests where possible.\n- Leverage open-source and commercial performance testing tools (e.g., JMeter, BrowserStack App Performance) for benchmarking and analysis[1][2][3].\n- Incorporate accessibility testing tools and manual reviews.\n- Collect and analyze user feedback from UAT to refine the user experience.\n- Document all test cases, scenarios, and results for traceability and future reference.\n\n### Dependencies\nThis task depends on the completion of tasks that implement core functionalities and optimizations, such as cohort analysis UI, saved cohorts, state management, and performance optimizations.",
         "testStrategy": "1. **End-to-End Integration Test Execution**: Run comprehensive integration tests for all cohort workflows, logging results and identifying any interface or data flow issues.\n2. **Data Accuracy Checks**: Compare cohort analysis outputs against expected results for a variety of gambling industry scenarios to ensure correctness.\n3. **Performance Benchmarking**: Use tools like JMeter, Lighthouse, or BrowserStack App Performance to measure and compare performance metrics under different loads and network conditions[1][2][3].\n4. **Accessibility Verification**: Use automated and manual accessibility testing to confirm compliance with relevant standards (e.g., WCAG 2.1).\n5. **Cross-Browser and Device Verification**: Systematically test across supported browsers and devices, documenting any inconsistencies or issues.\n6. **User Acceptance Testing**: Facilitate UAT sessions with real users and stakeholders from the gambling industry, gathering feedback and validating that the application meets business requirements.",
@@ -403,7 +419,10 @@
         "title": "Critical Repository Refactoring for Cohort Analysis Foundation",
         "description": "Refactor the TraffBoard repository to address architectural blockers for cohort analysis, including API endpoint consolidation, legacy code removal, database schema cleanup, and foundational architecture preparation. The repository must use consistent 'conversion' terminology throughout all code, interfaces, and endpoints, with all legacy 'traffic' references fully eliminated. Incorporate lessons from the recent critical E2E performance bug investigation: ensure robust API client error handling, avoid test strategies that rely on network idle state when persistent API polling is present, and implement diagnostic logging for authentication and 2FA flows. All fixes and diagnostics related to E2E test reliability and authentication flows must be integrated into the refactoring process.",
         "status": "pending",
-        "dependencies": [1, 3],
+        "dependencies": [
+          1,
+          3
+        ],
         "priority": "high",
         "details": "Conduct a comprehensive audit of the TraffBoard codebase to identify and document all remaining legacy modules, redundant API endpoints, and outdated database schema elements that could impede cohort analysis development. Ensure all API endpoints related to reporting and cohort data are consolidated and standardized, following RESTful naming conventions and consistent request/response formats[1][4]. Remove any remaining obsolete or deprecated code, libraries, and configuration files, with careful regression testing to avoid breaking existing functionality. Review and refactor the database schema to eliminate unused tables, columns, and relationships, and to optimize for cohort-based queries (e.g., adding necessary indexes, normalizing tables for cohort metrics). Prepare the foundational architecture by modularizing core services, establishing clear boundaries for data access layers, and documenting new interfaces and data contracts. Ensure all changes are backward compatible with ongoing work in Tasks 1-7, and provide migration scripts and documentation for seamless team adoption. All 'traffic' terminology and legacy code must remain fully removed, with 'conversion' naming standardized across the codebase. Integrate robust error handling and circuit breaker patterns in API clients, especially for authentication and 2FA endpoints. Avoid test wait strategies that depend on network idle state when persistent polling is present. Add diagnostic logging to authentication and 2FA flows to support future debugging and monitoring.",
         "testStrategy": "1. Run the full test suite before and after refactoring to ensure no regressions or breaking changes. 2. Use API contract testing tools (e.g., Postman, Swagger) to verify endpoint consolidation, RESTful naming, and response consistency[1][4]. 3. Validate that all legacy code and schema elements targeted for removal are fully eliminated and that no references remain. 4. Benchmark key cohort-related queries before and after schema cleanup to confirm performance improvements. 5. Review migration scripts and documentation with the team to ensure clarity and ease of adoption. 6. Confirm that all code, interfaces, and endpoints use 'conversion' terminology exclusively, with no residual 'traffic' references. 7. Run E2E tests to verify that authentication and 2FA flows no longer cause timeouts or infinite retries. 8. Check diagnostic logs to confirm that repeated form submissions or API polling are not occurring unexpectedly. 9. Ensure test database users are properly seeded for authentication scenarios. 10. Consider and, if feasible, implement API rate limiting for authentication endpoints to prevent abuse and further test flakiness.",
@@ -413,7 +432,9 @@
             "title": "Legacy Code and Configuration Removal",
             "description": "Identify and remove any remaining obsolete or deprecated code, libraries, and configuration files that reference 'traffic' or are no longer relevant after the API consolidation. Confirm that all code and documentation use 'conversion' naming exclusively.",
             "status": "pending",
-            "dependencies": [1],
+            "dependencies": [
+              1
+            ],
             "details": "",
             "testStrategy": ""
           },
@@ -422,7 +443,9 @@
             "title": "API Endpoint Standardization and Documentation",
             "description": "Review all reporting and cohort-related API endpoints to ensure they follow RESTful naming conventions, use consistent 'conversion' terminology, and provide standardized request/response formats. Update or create API documentation to reflect these changes.",
             "status": "pending",
-            "dependencies": [1],
+            "dependencies": [
+              1
+            ],
             "details": "",
             "testStrategy": ""
           },
@@ -431,7 +454,10 @@
             "title": "Foundational Architecture Preparation",
             "description": "Modularize core services, establish clear boundaries for data access layers, and document new interfaces and data contracts. Ensure all foundational architecture is ready for cohort analysis and is free of legacy 'traffic' dependencies.",
             "status": "pending",
-            "dependencies": [2, 3],
+            "dependencies": [
+              2,
+              3
+            ],
             "details": "",
             "testStrategy": ""
           },
@@ -458,7 +484,9 @@
             "title": "Diagnostic Log Review and Rate Limiting Assessment",
             "description": "Review diagnostic logs from authentication and 2FA flows to confirm that repeated form submissions or API polling are not occurring unexpectedly. Ensure test database users are properly seeded for authentication scenarios. Assess the feasibility and impact of adding API rate limiting to authentication endpoints to prevent abuse and further test flakiness.",
             "status": "pending",
-            "dependencies": [9],
+            "dependencies": [
+              9
+            ],
             "details": "",
             "testStrategy": ""
           },
@@ -503,7 +531,7 @@
     ],
     "metadata": {
       "created": "2025-07-01T22:28:10.873Z",
-      "updated": "2025-07-08T20:40:54.521Z",
+      "updated": "2025-07-09T05:53:50.067Z",
       "description": "Tasks for master context"
     }
   }

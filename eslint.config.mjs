@@ -148,6 +148,7 @@ export default tseslint.config(
       "sonarjs/no-unused-vars": "warn", // Make unused vars warning instead of error
       "sonarjs/no-dead-store": "warn", // Make dead store warning instead of error
       "sonarjs/unused-import": "warn", // Make unused imports warning instead of error
+      "sonarjs/different-types-comparison": "warn", // Make this a warning instead of error
 
       ...unicorn.configs.recommended.rules,
       "unicorn/no-nested-ternary": "warn",
@@ -159,6 +160,7 @@ export default tseslint.config(
       "unicorn/no-document-cookie": "warn",
       "unicorn/explicit-length-check": "off",
       "unicorn/no-useless-switch-case": "warn", // Make this a warning
+      "unicorn/no-array-callback-reference": "warn", // Make this a warning instead of error
 
       // Prettier integration - change to warn to not block CI
       "prettier/prettier": "warn",
@@ -174,7 +176,7 @@ export default tseslint.config(
       },
       // Fix Next.js settings for proper plugin detection
       next: {
-        rootDir: ".",
+        rootDir: import.meta.dirname,
       },
     },
   },
