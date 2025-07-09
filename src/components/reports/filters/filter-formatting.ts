@@ -24,8 +24,8 @@ function formatDateValue(value: FilterValue): string {
 
 function formatDateRangeValue(value: FilterValue): string {
   if (typeof value === "object" && value !== null && "start" in value && "end" in value) {
-    const dateRange = value as { start: Date; end: Date };
-    const formatOptions = { day: "numeric", month: "long", year: "numeric" } as const;
+    const dateRange = value as { start: Date | string; end: Date | string };
+    const formatOptions = { day: "numeric", month: "long" } as const;
     const startDate = new Date(dateRange.start).toLocaleDateString("en-US", formatOptions);
     const endDate = new Date(dateRange.end).toLocaleDateString("en-US", formatOptions);
     return `${startDate} - ${endDate}`;

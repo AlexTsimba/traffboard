@@ -20,6 +20,41 @@ import type { FilterModalProps, FilterChipsProps, FilterDefinition, FilterValue 
 import { FilterInput } from "./filter-inputs";
 
 // =============================================================================
+// DATE PRESET UTILITIES
+// =============================================================================
+
+function getThisWeek() {
+  const today = new Date();
+  const dayOfWeek = today.getDay();
+  const monday = new Date(today);
+  monday.setDate(today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1));
+  return { start: monday, end: today }; // Заканчивается сегодня
+}
+
+function getThisMonth() {
+  const today = new Date();
+  const start = new Date(today.getFullYear(), today.getMonth(), 1);
+  return { start, end: today }; // Заканчивается сегодня
+}
+
+function getLastWeek() {
+  const today = new Date();
+  const dayOfWeek = today.getDay();
+  const lastMonday = new Date(today);
+  lastMonday.setDate(today.getDate() - dayOfWeek - 6 + (dayOfWeek === 0 ? -6 : 1));
+  const lastSunday = new Date(lastMonday);
+  lastSunday.setDate(lastMonday.getDate() + 6);
+  return { start: lastMonday, end: lastSunday }; // Полная прошлая неделя
+}
+
+function getLastMonth() {
+  const today = new Date();
+  const start = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+  const end = new Date(today.getFullYear(), today.getMonth(), 0);
+  return { start, end }; // Полный прошлый месяц
+}
+
+// =============================================================================
 // FILTER BUTTON COMPONENT
 // =============================================================================
 
@@ -143,6 +178,66 @@ export function FilterModal({
                   />
                 ))}
               </div>
+
+              {/* Date Range Presets */}
+              {filters.some((filter) => filter.type === "daterange") && (
+                <div className="mt-4">
+                  <div className="flex flex-wrap gap-2">
+                    <Badge
+                      variant="outline"
+                      className="cursor-pointer transition-colors hover:bg-gray-100"
+                      onClick={() => {
+                        const thisWeek = getThisWeek();
+                        const dateRangeFilter = filters.find((f) => f.type === "daterange");
+                        if (dateRangeFilter) {
+                          handleFilterChange(dateRangeFilter.id, thisWeek);
+                        }
+                      }}
+                    >
+                      This Week
+                    </Badge>
+                    <Badge
+                      variant="outline"
+                      className="cursor-pointer transition-colors hover:bg-gray-100"
+                      onClick={() => {
+                        const lastWeek = getLastWeek();
+                        const dateRangeFilter = filters.find((f) => f.type === "daterange");
+                        if (dateRangeFilter) {
+                          handleFilterChange(dateRangeFilter.id, lastWeek);
+                        }
+                      }}
+                    >
+                      Last Week
+                    </Badge>
+                    <Badge
+                      variant="outline"
+                      className="cursor-pointer transition-colors hover:bg-gray-100"
+                      onClick={() => {
+                        const thisMonth = getThisMonth();
+                        const dateRangeFilter = filters.find((f) => f.type === "daterange");
+                        if (dateRangeFilter) {
+                          handleFilterChange(dateRangeFilter.id, thisMonth);
+                        }
+                      }}
+                    >
+                      This Month
+                    </Badge>
+                    <Badge
+                      variant="outline"
+                      className="cursor-pointer transition-colors hover:bg-gray-100"
+                      onClick={() => {
+                        const lastMonth = getLastMonth();
+                        const dateRangeFilter = filters.find((f) => f.type === "daterange");
+                        if (dateRangeFilter) {
+                          handleFilterChange(dateRangeFilter.id, lastMonth);
+                        }
+                      }}
+                    >
+                      Last Month
+                    </Badge>
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </div>

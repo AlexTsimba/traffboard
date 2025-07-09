@@ -8,7 +8,8 @@
 
 "use client";
 
-import React, { createContext, useContext, useReducer, type ReactNode } from "react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import React, { createContext, useContext, useReducer, useEffect, type ReactNode } from "react";
 
 import type {
   BaseReportConfig,
@@ -183,19 +184,37 @@ function reportReducer(state: ReportContextState, action: ReportAction): ReportC
     }
 
     case "APPLY_FILTERS": {
-      // Convert filters to applied filters (simplified for now)
+      // Import formatFilterValue locally to avoid circular dependencies
+      const formatFilterValue = (value: FilterValue, type: string): string => {
+        if (value == null) return "";
+        
+        if (type === "daterange" && typeof value === "object" && value !== null && "start" in value && "end" in value) {
+          const dateRange = value as { start: Date | string; end: Date | string };
+          const formatOptions = { day: "numeric", month: "long" } as const;
+          const startDate = new Date(dateRange.start).toLocaleDateString("en-US", formatOptions);
+          const endDate = new Date(dateRange.end).toLocaleDateString("en-US", formatOptions);
+          return `${startDate} - ${endDate}`;
+        }
+        
+        return typeof value === "object" ? JSON.stringify(value) : String(value);
+      };
+
+            // Convert filters to applied filters with proper formatting
       const appliedFilters: AppliedFilter[] = Object.entries(action.payload)
         .filter(([, value]) => value != null && value !== "")
-        .map(([id, value]) => ({
-          id,
-          definition: {
+        .map(([id, value]) => {
+          const filterType = id === "dateRange" ? "daterange" : "text";
+          return {
             id,
-            label: id,
-            type: "text",
-          },
-          value,
-          displayText: typeof value === "object" ? JSON.stringify(value) : String(value),
-        }));
+            definition: {
+              id,
+              label: id,
+              type: filterType,
+            },
+            value,
+            displayText: formatFilterValue(value, filterType),
+          };
+        });
 
       return {
         ...state,
@@ -306,11 +325,49 @@ interface ReportProviderProps {
 }
 
 export function ReportProvider({ children, initialReports = [], theme }: ReportProviderProps) {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
   const [state, dispatch] = useReducer(reportReducer, {
     ...initialState,
     activeReports: initialReports,
     theme: theme ? { ...initialState.theme, ...theme } : initialState.theme,
   });
+
+  // Load filters from URL on mount
+  useEffect(() => {
+    const filtersParam = searchParams.get("filters");
+    if (filtersParam) {
+      try {
+        const filters = JSON.parse(decodeURIComponent(filtersParam));
+        dispatch({ type: "APPLY_FILTERS", payload: filters });
+      } catch (error) {
+        console.warn("Failed to parse filters from URL:", error);
+      }
+    }
+  }, [searchParams]);
+
+  // Save filters to URL when they change
+  useEffect(() => {
+    const hasFilters = state.filterState.appliedFilters.length > 0;
+    const currentFilters: Record<string, FilterValue> = {};
+
+    for (const filter of state.filterState.appliedFilters) {
+      currentFilters[filter.id] = filter.value;
+    }
+
+    const params = new URLSearchParams(searchParams);
+
+    if (hasFilters) {
+      params.set("filters", encodeURIComponent(JSON.stringify(currentFilters)));
+    } else {
+      params.delete("filters");
+    }
+
+    const newURL = `${pathname}?${params.toString()}`;
+    router.replace(newURL, { scroll: false });
+  }, [state.filterState.appliedFilters, searchParams, router, pathname]);
 
   return <ReportContext.Provider value={{ state, dispatch }}>{children}</ReportContext.Provider>;
 }
