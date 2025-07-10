@@ -5,12 +5,91 @@ import { useState, useMemo, useTransition } from "react";
 
 import { EnhancedFilterModal } from "@/components/reports/filters/enhanced-filter-modal";
 import { FilterButton, FilterChips, createFilterComposer } from "@/components/reports/filters/filter-system";
+import { formatFilterValue } from "@/components/reports/filters/filter-formatting";
 import { ReportHeader } from "@/components/reports/universal/report-header";
 import {
   createCohortSpecificFilters,
   getDefaultCohortSpecificValues,
 } from "@/lib/reports/cohort/cohort-specific-filters";
 import type { FilterDefinition, FilterValue, AppliedFilter } from "@/types/reports";
+
+// Helper functions for building applied filters
+const buildDateRangeFilter = (
+  searchParams: URLSearchParams,
+  generalFilterDefinitions: FilterDefinition[]
+): AppliedFilter | null => {
+  const dateStart = searchParams.get("dateStart");
+  const dateEnd = searchParams.get("dateEnd");
+  if (!dateStart || !dateEnd) return null;
+
+  const dateRangeDefinition = generalFilterDefinitions.find((def) => def.id === "dateRange");
+  if (!dateRangeDefinition) return null;
+
+  return {
+    id: "dateRange",
+    definition: dateRangeDefinition,
+    value: { start: new Date(dateStart), end: new Date(dateEnd) },
+    displayText: `${formatFilterValue(new Date(dateStart), "date")} - ${formatFilterValue(new Date(dateEnd), "date")}`,
+  };
+};
+
+const buildMultiselectFilter = (
+  searchParams: URLSearchParams,
+  generalFilterDefinitions: FilterDefinition[],
+  filterId: string
+): AppliedFilter | null => {
+  const value = searchParams.get(filterId);
+  if (!value) return null;
+
+  const definition = generalFilterDefinitions.find((def) => def.id === filterId);
+  if (!definition) return null;
+
+  return {
+    id: filterId,
+    definition,
+    value: value.split(","),
+    displayText: value.split(",").join(", "),
+  };
+};
+
+// Helper functions for URL parameters
+const clearFilterParams = (params: URLSearchParams) => {
+  const filterKeys = [
+    "dateStart", "dateEnd", "partners", "campaigns", "countries", 
+    "os", "cohortStep", "metric", "breakpoints", "showMetadata", "exportFormat"
+  ];
+  for (const key of filterKeys) {
+    params.delete(key);
+  }
+};
+
+const setGeneralFilterParams = (params: URLSearchParams, generalFilters: Record<string, FilterValue>) => {
+  for (const [key, value] of Object.entries(generalFilters)) {
+    if (key === "dateRange" && value && typeof value === "object") {
+      const dateRange = value as { start: string | Date; end: string | Date };
+      const startISO = typeof dateRange.start === "string" ? dateRange.start : dateRange.start.toISOString();
+      const endISO = typeof dateRange.end === "string" ? dateRange.end : dateRange.end.toISOString();
+      params.set("dateStart", startISO);
+      params.set("dateEnd", endISO);
+    } else if (Array.isArray(value) && value.length > 0) {
+      params.set(key, value.join(","));
+    } else if (typeof value === "string" && value.trim()) {
+      params.set(key, value);
+    }
+  }
+};
+
+const setSpecificFilterParams = (params: URLSearchParams, specificFilters: Record<string, FilterValue>) => {
+  for (const [key, value] of Object.entries(specificFilters)) {
+    if (Array.isArray(value) && value.length > 0) {
+      params.set(key, value.join(","));
+    } else if (typeof value === "boolean") {
+      params.set(key, value.toString());
+    } else if (typeof value === "string" && value.trim()) {
+      params.set(key, value);
+    }
+  }
+};
 
 interface CohortFiltersProps {
   currentFilters: {
@@ -64,109 +143,14 @@ export function CohortFilters({ currentFilters: _currentFilters }: CohortFilters
     const filters: AppliedFilter[] = [];
 
     // 1. Date Range (первый и самый важный)
-    const dateStart = searchParams.get("dateStart");
-    const dateEnd = searchParams.get("dateEnd");
-    if (dateStart && dateEnd) {
-      const dateRangeDefinition = generalFilterDefinitions.find((def) => def.id === "dateRange");
-      if (dateRangeDefinition) {
-        filters.push({
-          id: "dateRange",
-          definition: dateRangeDefinition,
-          value: { start: new Date(dateStart), end: new Date(dateEnd) },
-          displayText: `${formatDateConsistently(dateStart)} - ${formatDateConsistently(dateEnd)}`,
-        });
-      }
-    }
+    const dateRangeFilter = buildDateRangeFilter(searchParams, generalFilterDefinitions);
+    if (dateRangeFilter) filters.push(dateRangeFilter);
 
-    // 2. Partners
-    const partners = searchParams.get("partners");
-    if (partners) {
-      const partnersDefinition = generalFilterDefinitions.find((def) => def.id === "partners");
-      if (partnersDefinition) {
-        filters.push({
-          id: "partners",
-          definition: partnersDefinition,
-          value: partners.split(","),
-          displayText: partners.split(",").join(", "),
-        });
-      }
-    }
-
-    // 3. Campaigns
-    const campaigns = searchParams.get("campaigns");
-    if (campaigns) {
-      const campaignsDefinition = generalFilterDefinitions.find((def) => def.id === "campaigns");
-      if (campaignsDefinition) {
-        filters.push({
-          id: "campaigns",
-          definition: campaignsDefinition,
-          value: campaigns.split(","),
-          displayText: campaigns.split(",").join(", "),
-        });
-      }
-    }
-
-    // 4. Countries
-    const countries = searchParams.get("countries");
-    if (countries) {
-      const countriesDefinition = generalFilterDefinitions.find((def) => def.id === "countries");
-      if (countriesDefinition) {
-        filters.push({
-          id: "countries",
-          definition: countriesDefinition,
-          value: countries.split(","),
-          displayText: countries.split(",").join(", "),
-        });
-      }
-    }
-
-    // 5. OS (последний)
-    const os = searchParams.get("os");
-    if (os) {
-      const osDefinition = generalFilterDefinitions.find((def) => def.id === "os");
-      if (osDefinition) {
-        filters.push({
-          id: "os",
-          definition: osDefinition,
-          value: os.split(","),
-          displayText: os.split(",").join(", "),
-        });
-      }
-    }
-
-    // 6. Добавляем специфичные фильтры когорт в чипсы
-    const cohortStep = searchParams.get("cohortStep");
-    if (cohortStep && cohortStep !== "day") {
-      // показываем только если не дефолт
-      const cohortStepDefinition = cohortSpecificFilters.filters.find((def) => def.id === "cohortStep");
-      if (cohortStepDefinition) {
-        filters.push({
-          id: "cohortStep",
-          definition: cohortStepDefinition,
-          value: cohortStep,
-          displayText: cohortStep === "week" ? "Weekly" : "Daily",
-        });
-      }
-    }
-
-    const metric = searchParams.get("metric");
-    if (metric && metric !== "retention") {
-      // показываем только если не дефолт
-      const metricDefinition = cohortSpecificFilters.filters.find((def) => def.id === "metric");
-      const metricLabels = {
-        retention: "Retention",
-        dep2cost: "Dep2Cost",
-        roas: "ROAS",
-        adpu: "ADPU",
-      };
-      if (metricDefinition) {
-        filters.push({
-          id: "metric",
-          definition: metricDefinition,
-          value: metric,
-          displayText: metricLabels[metric as keyof typeof metricLabels] || metric,
-        });
-      }
+    // 2-5. Multiselect filters
+    const multiselectFilters = ["partners", "campaigns", "countries", "os"];
+    for (const filterId of multiselectFilters) {
+      const filter = buildMultiselectFilter(searchParams, generalFilterDefinitions, filterId);
+      if (filter) filters.push(filter);
     }
 
     return filters;
@@ -222,43 +206,11 @@ export function CohortFilters({ currentFilters: _currentFilters }: CohortFilters
     const params = new URLSearchParams(searchParams);
 
     // Очищаем старые параметры
-    params.delete("dateStart");
-    params.delete("dateEnd");
-    params.delete("partners");
-    params.delete("campaigns");
-    params.delete("countries");
-    params.delete("os");
-    params.delete("cohortStep");
-    params.delete("metric");
-    params.delete("breakpoints");
-    params.delete("showMetadata");
-    params.delete("exportFormat");
+    clearFilterParams(params);
 
-    // Устанавливаем общие фильтры
-    for (const [key, value] of Object.entries(generalFilters)) {
-      if (key === "dateRange" && value && typeof value === "object") {
-        const dateRange = value as { start: string | Date; end: string | Date };
-        const startISO = typeof dateRange.start === "string" ? dateRange.start : dateToISOString(dateRange.start);
-        const endISO = typeof dateRange.end === "string" ? dateRange.end : dateToISOString(dateRange.end);
-        params.set("dateStart", startISO);
-        params.set("dateEnd", endISO);
-      } else if (Array.isArray(value) && value.length > 0) {
-        params.set(key, value.join(","));
-      } else if (typeof value === "string" && value.trim()) {
-        params.set(key, value);
-      }
-    }
-
-    // Устанавливаем специфичные фильтры
-    for (const [key, value] of Object.entries(specificFilters)) {
-      if (Array.isArray(value) && value.length > 0) {
-        params.set(key, value.join(","));
-      } else if (typeof value === "boolean") {
-        params.set(key, value.toString());
-      } else if (typeof value === "string" && value.trim()) {
-        params.set(key, value);
-      }
-    }
+    // Устанавливаем общие и специфичные фильтры
+    setGeneralFilterParams(params, generalFilters);
+    setSpecificFilterParams(params, specificFilters);
 
     startTransition(() => {
       router.push(`?${params.toString()}`);
