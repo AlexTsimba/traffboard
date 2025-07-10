@@ -17,31 +17,22 @@ import type { FilterDefinition, FilterValue, FilterType, AppliedFilter } from "@
 function formatUserFriendlyDate(date: Date): string {
   const now = new Date();
   const sameYear = date.getFullYear() === now.getFullYear();
-  
+
   // If same year, show "Month Day" format, otherwise "Month Year"
-  if (sameYear) {
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric' 
-    });
-  } else {
-    return date.toLocaleDateString('en-US', { 
-      month: 'long', 
-      year: 'numeric' 
-    });
-  }
+  return sameYear
+    ? date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      })
+    : date.toLocaleDateString("en-US", {
+        month: "long",
+        year: "numeric",
+      });
 }
 
 /**
  * Format date to simple DD-MM-YYYY format (kept for backward compatibility)
  */
-function formatSimpleDate(date: Date): string {
-  const day = date.getDate().toString().padStart(2, "0");
-  const month = (date.getMonth() + 1).toString().padStart(2, "0");
-  const year = date.getFullYear();
-  return `${day}-${month}-${year}`;
-}
-
 function formatDateValue(value: FilterValue): string {
   if (value instanceof Date) {
     return formatUserFriendlyDate(value);
@@ -54,29 +45,28 @@ function formatDateRangeValue(value: FilterValue): string {
     const dateRange = value as { start: Date | string; end: Date | string };
     const startDate = new Date(dateRange.start);
     const endDate = new Date(dateRange.end);
-    
+
     // Smart date range formatting
     const startFormatted = formatUserFriendlyDate(startDate);
     const endFormatted = formatUserFriendlyDate(endDate);
-    
+
     // If same month and year, show "June 1-30, 2025"
-    if (startDate.getFullYear() === endDate.getFullYear() && 
-        startDate.getMonth() === endDate.getMonth()) {
-      const monthYear = startDate.toLocaleDateString('en-US', { 
-        month: 'long', 
-        year: 'numeric' 
+    if (startDate.getFullYear() === endDate.getFullYear() && startDate.getMonth() === endDate.getMonth()) {
+      const monthYear = startDate.toLocaleDateString("en-US", {
+        month: "long",
+        year: "numeric",
       });
       return `${monthYear} (${startDate.getDate()}-${endDate.getDate()})`;
     }
-    
+
     // If same year, show "Jan 15 - Mar 20, 2025"
     if (startDate.getFullYear() === endDate.getFullYear()) {
       const year = startDate.getFullYear();
-      const startMonth = startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-      const endMonth = endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const startMonth = startDate.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      const endMonth = endDate.toLocaleDateString("en-US", { month: "short", day: "numeric" });
       return `${startMonth} - ${endMonth}, ${year}`;
     }
-    
+
     // Different years, show full format
     return `${startFormatted} - ${endFormatted}`;
   }

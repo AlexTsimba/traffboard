@@ -166,7 +166,7 @@ export function DateRangeFilterInput({ value, onChange }: FilterInputProps) {
         const start = new Date();
         start.setDate(start.getDate() - 6);
         return { start, end };
-      }
+      },
     },
     {
       label: "Last 30 days",
@@ -175,7 +175,7 @@ export function DateRangeFilterInput({ value, onChange }: FilterInputProps) {
         const start = new Date();
         start.setDate(start.getDate() - 29);
         return { start, end };
-      }
+      },
     },
     {
       label: "This month",
@@ -184,7 +184,7 @@ export function DateRangeFilterInput({ value, onChange }: FilterInputProps) {
         const start = new Date(now.getFullYear(), now.getMonth(), 1);
         const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
         return { start, end };
-      }
+      },
     },
     {
       label: "Last month",
@@ -193,11 +193,11 @@ export function DateRangeFilterInput({ value, onChange }: FilterInputProps) {
         const start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
         const end = new Date(now.getFullYear(), now.getMonth(), 0);
         return { start, end };
-      }
-    }
+      },
+    },
   ];
 
-  const handlePresetClick = (preset: typeof presets[0]) => {
+  const handlePresetClick = (preset: (typeof presets)[0]) => {
     const range = preset.getValue();
     onChange(range);
   };
@@ -239,15 +239,17 @@ export function DateRangeFilterInput({ value, onChange }: FilterInputProps) {
           </PopoverContent>
         </Popover>
       </div>
-      
+
       {/* Date Range Presets */}
       <div className="flex flex-wrap gap-1">
         {presets.map((preset) => (
           <button
             key={preset.label}
             type="button"
-            onClick={() => handlePresetClick(preset)}
-            className="px-2 py-1 text-xs rounded border border-border hover:bg-muted transition-colors"
+            onClick={() => {
+              handlePresetClick(preset);
+            }}
+            className="border-border hover:bg-muted rounded border px-2 py-1 text-xs transition-colors"
           >
             {preset.label}
           </button>

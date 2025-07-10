@@ -32,6 +32,9 @@ export function buildPrismaWhereClause(filter: AppliedFilter): Record<string, un
       break;
     }
 
+    case "radio":
+    case "autocomplete":
+    case "checkbox":
     case "date":
     case "number":
     case "boolean":

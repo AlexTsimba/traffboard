@@ -608,7 +608,7 @@ export interface ReportTheme {
 /**
  * Filter tab types for organizing filters in modal
  */
-export type FilterTabType = 'general' | 'report-specific';
+export type FilterTabType = "general" | "report-specific";
 
 /**
  * Enhanced filter definition with tab categorization
@@ -645,8 +645,8 @@ export interface EnhancedFilterModalProps {
  * Cohort-specific filter values
  */
 export interface CohortSpecificFilters {
-  cohortStep: 'day' | 'week';
-  metric: 'retention' | 'dep2cost' | 'roas' | 'adpu';
+  cohortStep: "day" | "week";
+  metric: "retention" | "dep2cost" | "roas" | "adpu";
   breakpoints?: number[];
   customDateRange?: boolean;
 }

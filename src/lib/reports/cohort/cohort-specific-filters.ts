@@ -12,28 +12,28 @@ export function createCohortSpecificFilters(): ReportSpecificFilterConfig {
       group: "cohort-settings",
       options: [
         { value: "day", label: "Daily Cohorts" },
-        { value: "week", label: "Weekly Cohorts" }
+        { value: "week", label: "Weekly Cohorts" },
       ],
       defaultValue: "day",
       validation: {
-        required: true
-      }
+        required: true,
+      },
     },
     {
       id: "metric",
       label: "Primary Metric",
       type: "select",
-      group: "cohort-settings", 
+      group: "cohort-settings",
       options: [
         { value: "retention", label: "Retention Rate" },
         { value: "dep2cost", label: "Deposit to Cost" },
         { value: "roas", label: "Return on Ad Spend" },
-        { value: "adpu", label: "Average Deposit Per User" }
+        { value: "adpu", label: "Average Deposit Per User" },
       ],
       defaultValue: "retention",
       validation: {
-        required: true
-      }
+        required: true,
+      },
     },
     {
       id: "breakpoints",
@@ -50,17 +50,17 @@ export function createCohortSpecificFilters(): ReportSpecificFilterConfig {
         { value: "21", label: "Day 21" },
         { value: "24", label: "Day 24" },
         { value: "27", label: "Day 27" },
-        { value: "30", label: "Day 30" }
+        { value: "30", label: "Day 30" },
       ],
       defaultValue: ["1", "7", "14", "30"],
-      placeholder: "Select breakpoints to analyze..."
+      placeholder: "Select breakpoints to analyze...",
     },
     {
       id: "showMetadata",
-      label: "Show Performance Metadata", 
+      label: "Show Performance Metadata",
       type: "checkbox",
       group: "display-options",
-      defaultValue: true
+      defaultValue: true,
     },
     {
       id: "exportFormat",
@@ -70,18 +70,18 @@ export function createCohortSpecificFilters(): ReportSpecificFilterConfig {
       options: [
         { value: "csv", label: "CSV" },
         { value: "excel", label: "Excel" },
-        { value: "json", label: "JSON" }
+        { value: "json", label: "JSON" },
       ],
-      defaultValue: "csv"
-    }
+      defaultValue: "csv",
+    },
   ];
 
   return {
     reportType: "Cohort",
-    filters: cohortFilters.map(filter => ({
+    filters: cohortFilters.map((filter) => ({
       ...filter,
-      tab: 'report-specific' as const
-    }))
+      tab: "report-specific" as const,
+    })),
   };
 }
 
@@ -90,18 +90,18 @@ export function createCohortSpecificFilters(): ReportSpecificFilterConfig {
  */
 export function getDefaultCohortSpecificValues() {
   return {
-    cohortStep: 'day',
-    metric: 'retention', 
-    breakpoints: ['1', '7', '14', '30'],
+    cohortStep: "day",
+    metric: "retention",
+    breakpoints: ["1", "7", "14", "30"],
     showMetadata: true,
-    exportFormat: 'csv'
+    exportFormat: "csv",
   };
 }
 
 /**
  * Validate cohort-specific filter values
  */
-export function validateCohortSpecificFilters(values: Record<string, any>): string[] {
+export function validateCohortSpecificFilters(values: Record<string, unknown>): string[] {
   const errors: string[] = [];
 
   if (!values.cohortStep) {

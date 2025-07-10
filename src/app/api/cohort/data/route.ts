@@ -68,6 +68,7 @@ function processUIFilters(filters: AppliedFilter[], fallbackDateRange: { start: 
 // =============================================================================
 
 export async function POST(request: NextRequest): Promise<NextResponse<CohortDataResponse>> {
+  const startTime = Date.now();
   try {
     const body: CohortDataRequest = await request.json();
 
@@ -76,7 +77,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<CohortDat
     // Get date range from request body or use default
     const defaultDateRange = {
       start: new Date("2024-01-01").toISOString(),
-      end: new Date("2024-12-31").toISOString()
+      end: new Date("2024-12-31").toISOString(),
     };
 
     const requestDateRange = body.dateRange || defaultDateRange;
@@ -97,7 +98,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<CohortDat
     const startDate = new Date(requestDateRange.start);
     const endDate = new Date(requestDateRange.end);
 
-    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+    if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
       console.log("❌ Invalid date format:", requestDateRange);
       return NextResponse.json(
         {
@@ -134,7 +135,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<CohortDat
     console.log("⚙️ Cohort config:", cohortConfig);
 
     // Initialize cohort processor with optimized settings for API
-    const processor = new CohortProcessor(cohortConfig, {
+    const _processor = new CohortProcessor(cohortConfig, {
       maxCohorts: 200,
       parallelProcessing: true,
       usePipelineMode: validatedFilters.length > 5, // Use pipeline for complex filters
@@ -166,10 +167,9 @@ export async function POST(request: NextRequest): Promise<NextResponse<CohortDat
         WHERE pd."signUpDate" >= $1::timestamp 
           AND pd."signUpDate" <= $2::timestamp
       `;
-      
+
       const queryParams: unknown[] = [dateRange.start.toISOString(), dateRange.end.toISOString()];
-      let paramIndex = 2;
-      
+
       // Apply filter conditions if any exist
       if (sqlConditions.length > 0) {
         for (const condition of sqlConditions) {
@@ -178,7 +178,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<CohortDat
           query += ` AND ${condition}`;
         }
       }
-      
+
       // Complete the query
       query += `
         GROUP BY DATE_TRUNC('day', pd."signUpDate")
@@ -189,21 +189,21 @@ export async function POST(request: NextRequest): Promise<NextResponse<CohortDat
       console.log("🔍 Executing filtered query...");
       console.log("📝 Query:", query);
       console.log("📝 Params:", queryParams);
-      
+
       // Use Prisma's raw query with proper filter conditions
       const { PrismaClient } = await import("@prisma/client");
       const prisma = new PrismaClient();
-      
+
       const filteredResult = await prisma.$queryRawUnsafe(query, ...queryParams);
 
       console.log("✅ Filtered query successful:", filteredResult);
 
       // Convert BigInt values to regular numbers for JSON serialization
-      const serializedResult = Array.isArray(filteredResult) 
-        ? filteredResult.map(row => {
-            const serialized: any = {};
+      const serializedResult = Array.isArray(filteredResult)
+        ? filteredResult.map((row) => {
+            const serialized: Record<string, unknown> = {};
             for (const [key, value] of Object.entries(row as Record<string, unknown>)) {
-              serialized[key] = typeof value === 'bigint' ? Number(value) : value;
+              serialized[key] = typeof value === "bigint" ? Number(value) : value;
             }
             return serialized;
           })
@@ -214,16 +214,15 @@ export async function POST(request: NextRequest): Promise<NextResponse<CohortDat
         data: Array.isArray(serializedResult) ? serializedResult : [serializedResult],
         metadata: {
           totalCohorts: Array.isArray(serializedResult) ? serializedResult.length : 0,
-          processingTime: Date.now() - Date.now(),
+          processingTime: Date.now() - startTime,
           breakpointsUsed: body.breakpoints || [1, 4, 7, 10, 14, 17, 21, 24, 28],
           queryHash: "filtered_cohort_query",
           appliedFilters: validatedFilters.length,
           sqlConditions: sqlConditions,
           dateRangeUsed: dateRange,
-          note: "Enhanced query with proper filter application"
+          note: "Enhanced query with proper filter application",
         },
       });
-
     } catch (queryError) {
       console.error("❌ Filtered query failed:", queryError);
       throw queryError;
@@ -250,7 +249,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<CohortDat
 // HEALTH CHECK
 // =============================================================================
 
-export async function GET(): Promise<NextResponse> {
+export function GET(): NextResponse {
   return NextResponse.json({
     status: "healthy",
     endpoint: "/api/cohort/data",
