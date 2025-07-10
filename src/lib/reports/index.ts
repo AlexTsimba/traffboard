@@ -36,7 +36,7 @@ export {
 } from "@/components/reports/filters/filter-system";
 
 // Universal components
-export { ReportHeader, SimpleReportHeader } from "@/components/reports/universal/report-header";
+export { ReportHeader } from "@/components/reports/universal/report-header";
 
 // Plugin system
 export {

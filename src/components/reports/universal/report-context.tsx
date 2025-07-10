@@ -188,7 +188,7 @@ function reportReducer(state: ReportContextState, action: ReportAction): ReportC
       const formatFilterValue = (value: FilterValue, type: string): string => {
         if (value == null) return "";
 
-        if (type === "daterange" && typeof value === "object" && value !== null && "start" in value && "end" in value) {
+        if (type === "daterange" && typeof value === "object" && value != null && "start" in value && "end" in value) {
           const dateRange = value as { start: Date | string; end: Date | string };
           const formatOptions = { day: "numeric", month: "long" } as const;
           const startDate = new Date(dateRange.start).toLocaleDateString("en-US", formatOptions);

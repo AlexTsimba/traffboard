@@ -55,7 +55,7 @@ function buildCohortQuery(config: CohortConfig, filters: AppliedFilter[]): strin
         ${cohortDateFunc} as cohort_date,
         pd."playerId",
         pd."signUpDate"
-      FROM "PlayerData" pd
+      FROM player_data pd
       WHERE pd."signUpDate" >= $1::timestamp
         AND pd."signUpDate" <= $2::timestamp
         ${whereClause}
@@ -71,7 +71,7 @@ function buildCohortQuery(config: CohortConfig, filters: AppliedFilter[]): strin
         activity."casinoRealNgr",
         activity."fixedPerPlayer"
       FROM cohort_base cb
-      JOIN "PlayerData" activity ON cb."playerId" = activity."playerId"
+      JOIN player_data activity ON cb."playerId" = activity."playerId"
       WHERE activity."date" >= cb."signUpDate"
         AND activity."date" <= $2::timestamp
     ),
@@ -120,7 +120,7 @@ function buildSingleFilterCondition(filter: AppliedFilter): string | null {
   if (filter.id === "minDeposit" && typeof filter.value === "number") {
     return `pd."playerId" IN (
       SELECT DISTINCT "playerId" 
-      FROM "PlayerData" 
+      FROM player_data 
       WHERE "depositsSum" >= ${filter.value}
     )`;
   }

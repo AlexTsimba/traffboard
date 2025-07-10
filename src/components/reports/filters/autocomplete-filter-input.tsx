@@ -7,10 +7,9 @@
 
 "use client";
 
-import { Check, ChevronsUpDown, X } from "lucide-react";
+import { Check, ChevronsUpDown } from "lucide-react";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -56,6 +55,8 @@ export function AutocompleteFilterInput({ filter, value, onChange }: Autocomplet
   const filterType = useMemo(() => {
     if (filter.id === "partners") return "partners";
     if (filter.id === "campaigns") return "campaigns";
+    if (filter.id === "countries") return "countries";
+    if (filter.id === "os") return "os";
     return "partners";
   }, [filter.id]);
 
@@ -96,15 +97,6 @@ export function AutocompleteFilterInput({ filter, value, onChange }: Autocomplet
     [selectedValues, onChange],
   );
 
-  // Handle value removal
-  const handleRemove = useCallback(
-    (optionValue: string) => {
-      const newValues = selectedValues.filter((v) => v !== optionValue);
-      onChange(newValues.length > 0 ? newValues : null);
-    },
-    [selectedValues, onChange],
-  );
-
   // Effect for fetching options when search changes
   useEffect(() => {
     void fetchOptions(search);
@@ -122,26 +114,6 @@ export function AutocompleteFilterInput({ filter, value, onChange }: Autocomplet
 
   return (
     <div className="space-y-2">
-      {/* Selected values as removable badges */}
-      {selectedValues.length > 0 && (
-        <div className="flex flex-wrap gap-1">
-          {selectedValues.map((selectedValue) => {
-            const option = options.find((opt) => opt.value === selectedValue);
-            return (
-              <Badge key={selectedValue} variant="secondary" className="gap-1">
-                {option?.label ?? selectedValue}
-                <X
-                  className="hover:text-destructive ml-1 h-3 w-3 cursor-pointer"
-                  onClick={() => {
-                    handleRemove(selectedValue);
-                  }}
-                />
-              </Badge>
-            );
-          })}
-        </div>
-      )}
-
       {/* Main combobox */}
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>

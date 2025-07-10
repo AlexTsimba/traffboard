@@ -1,140 +1,180 @@
-"use client";
+import { Suspense } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ReportHeader } from "@/components/reports/universal/report-header";
+import { CohortDataService } from "@/lib/reports/cohort/cohort-data-service";
+import { CohortTable } from "./components/cohort-table";
+import { CohortFiltersWrapper } from "./components/cohort-filters-wrapper";
+import { CohortMetadata } from "./components/cohort-metadata";
 
-import { useMemo } from "react";
+// Types for cohort metrics
+type CohortMetric = 'dep2cost' | 'roas' | 'adpu' | 'retention';
 
-import { FilterButton, FilterModal, FilterChips } from "@/components/reports/filters/filter-system";
-import { ReportProvider, useFilters } from "@/components/reports/universal/report-context";
-import type { FilterDefinition, FilterValue } from "@/types/reports";
+interface PageProps {
+  searchParams: Promise<{
+    metric?: CohortMetric;
+    dateStart?: string;
+    dateEnd?: string;
+    partners?: string;
+    campaigns?: string;
+    countries?: string;
+    os?: string;
+    mode?: 'day' | 'week';
+  }>;
+}
 
-// Simple filter definitions for cohort analysis
-const createCohortFilterDefinitions = (): FilterDefinition[] => {
-  return [
-    {
-      id: "dateRange",
-      label: "Date Range",
-      type: "daterange",
-      group: "timeframe",
-      order: 0,
-    },
-    {
-      id: "partners",
-      label: "Partners",
-      type: "autocomplete",
-      group: "segments",
-      order: 10,
-      placeholder: "Search partners...",
-    },
-    {
-      id: "campaigns",
-      label: "Campaigns",
-      type: "autocomplete",
-      group: "segments",
-      order: 11,
-      placeholder: "Search campaigns...",
-    },
-    {
-      id: "countries",
-      label: "Countries",
-      type: "multiselect",
-      group: "segments",
-      order: 12,
-      options: [
-        { label: "United States", value: "us" },
-        { label: "United Kingdom", value: "uk" },
-        { label: "Germany", value: "de" },
-        { label: "France", value: "fr" },
-      ],
-    },
-  ];
-};
-
-// Component that uses filters
-function CohortAnalysisContent() {
-  // Universal Filter System integration
-  const {
-    filterState,
-    appliedFilters,
-    hasActiveFilters,
-    openFilterDialog,
-    closeFilterDialog,
-    applyFilters,
-    clearFilters,
-    removeFilter,
-  } = useFilters();
-
-  const filterDefinitions = useMemo(() => createCohortFilterDefinitions(), []);
-
-  // Extract applied filter values for processing
-  const currentFilters = useMemo(() => {
-    const result: Record<string, FilterValue> = {};
-    for (const filter of appliedFilters) {
-      result[filter.id] = filter.value;
-    }
-    return result;
-  }, [appliedFilters]);
+// Server Component для страницы когорт
+export default async function CohortsPage({ searchParams }: PageProps) {
+  // В Next.js 15 searchParams теперь Promise
+  const params = await searchParams;
+  
+  // Извлекаем параметры с дефолтными значениями
+  const metric = params.metric || 'retention';
+  const mode = params.mode || 'day';
+  
+  const filters = {
+    dateStart: params.dateStart || new Date('2024-01-01').toISOString(),
+    dateEnd: params.dateEnd || new Date('2024-12-31').toISOString(),
+    partners: params.partners?.split(',') || [],
+    campaigns: params.campaigns?.split(',') || [],
+    countries: params.countries?.split(',') || [],
+    os: params.os?.split(',') || [],
+  };
 
   return (
     <div className="@container/main flex flex-col gap-4 md:gap-6">
-      {/* Header with Filter Button */}
-      <div className="flex items-center justify-between">
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">Cohorts</h1>
-          <p className="text-muted-foreground">Cohort analysis and user retention tracking</p>
+      {/* Universal Report Header с Client Component wrapper */}
+      <CohortFiltersWrapper currentFilters={filters} />
+
+      {/* Tabs Layout следуя Report-Factory-Architecture-Guide */}
+      <Tabs value={metric} className="w-full">
+        <div className="flex items-center justify-between">
+          <div />
+          <TabsList className="ml-auto">
+            <TabsTrigger value="retention">Retention</TabsTrigger>
+            <TabsTrigger value="dep2cost">Dep2Cost</TabsTrigger>
+            <TabsTrigger value="roas">ROAS</TabsTrigger>
+            <TabsTrigger value="adpu">ADPU</TabsTrigger>
+          </TabsList>
         </div>
 
-        {/* Filter Button from Report Factory */}
-        <div className="flex items-center gap-3">
-          <FilterButton onClick={openFilterDialog} hasActiveFilters={hasActiveFilters} />
+        {/* Tab Content с pt-2 padding как в паттерне */}
+        <div className="pt-2">
+          <Suspense fallback={<CohortLoadingSkeleton />}>
+            <TabsContent value="retention" className="mt-0">
+              <CohortMetricSection 
+                metric="retention" 
+                filters={filters} 
+                mode={mode} 
+              />
+            </TabsContent>
+            <TabsContent value="dep2cost" className="mt-0">
+              <CohortMetricSection 
+                metric="dep2cost" 
+                filters={filters} 
+                mode={mode} 
+              />
+            </TabsContent>
+            <TabsContent value="roas" className="mt-0">
+              <CohortMetricSection 
+                metric="roas" 
+                filters={filters} 
+                mode={mode} 
+              />
+            </TabsContent>
+            <TabsContent value="adpu" className="mt-0">
+              <CohortMetricSection 
+                metric="adpu" 
+                filters={filters} 
+                mode={mode} 
+              />
+            </TabsContent>
+          </Suspense>
         </div>
-      </div>
-
-      {/* Applied Filters Display */}
-      {hasActiveFilters && (
-        <FilterChips
-          appliedFilters={appliedFilters}
-          onRemoveFilter={removeFilter}
-          onClearAll={clearFilters}
-          className="pb-2"
-        />
-      )}
-
-      {/* Filter Modal */}
-      <FilterModal
-        isOpen={filterState.isOpen}
-        onClose={closeFilterDialog}
-        onSubmit={applyFilters}
-        onClear={clearFilters}
-        filterDefinitions={filterDefinitions}
-        currentFilters={currentFilters}
-        title="Filter Cohort Analysis"
-      />
-
-      {/* Main Content Area */}
-      <div className="rounded-lg border">
-        <div className="p-6">
-          <h3 className="mb-4 text-lg font-semibold">Cohort Analysis</h3>
-          <div className="text-muted-foreground py-12 text-center">
-            <p className="text-lg">Cohort analysis functionality coming soon</p>
-            <p className="text-sm">Advanced cohort tracking and visualization will be available here</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Debug section to show active filters */}
-      {hasActiveFilters && (
-        <div className="rounded-lg border p-4">
-          <h4 className="mb-2 text-sm font-medium">Active Filters (Debug)</h4>
-          <pre className="text-muted-foreground text-xs">{JSON.stringify(currentFilters, null, 2)}</pre>
-        </div>
-      )}
+      </Tabs>
     </div>
   );
 }
 
-export default function CohortsPage() {
+// Server Component для отдельной метрики
+async function CohortMetricSection({
+  metric,
+  filters,
+  mode
+}: {
+  metric: CohortMetric;
+  filters: any;
+  mode: 'day' | 'week';
+}) {
+  try {
+    // Используем существующий Cohort Data Engine из Task 2
+    const cohortService = new CohortDataService();
+    const breakpoints = mode === 'day' 
+      ? [1, 3, 5, 7, 14, 17, 21, 24, 27, 30]
+      : [7, 14, 21, 28, 35, 42];
+      
+    const result = await cohortService.getCohortData({
+      metric,
+      filters,
+      mode,
+      breakpoints
+    });
+
+    if (!result.success) {
+      return (
+        <div className="rounded-lg border p-6 text-center">
+          <div className="text-red-500 mb-2">
+            <h3 className="font-medium">Error loading {metric} data</h3>
+            <p className="text-sm">{result.error}</p>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-4">
+        {/* Metadata */}
+        {result.metadata && (
+          <CohortMetadata metadata={result.metadata} mode={mode} />
+        )}
+
+        {/* Cohort Table */}
+        <div className="rounded-lg border">
+          <CohortTable 
+            data={result.data || []} 
+            metric={metric}
+            mode={mode}
+          />
+        </div>
+      </div>
+    );
+  } catch (error) {
+    return (
+      <div className="rounded-lg border p-6 text-center">
+        <div className="text-red-500">
+          <h3 className="font-medium">Server Error</h3>
+          <p className="text-sm">
+            {error instanceof Error ? error.message : 'Unknown error occurred'}
+          </p>
+        </div>
+      </div>
+    );
+  }
+}
+
+// Loading skeleton
+function CohortLoadingSkeleton() {
   return (
-    <ReportProvider>
-      <CohortAnalysisContent />
-    </ReportProvider>
+    <div className="space-y-4">
+      <div className="h-8 bg-muted rounded animate-pulse" />
+      <div className="rounded-lg border">
+        <div className="p-6">
+          <div className="space-y-2">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="h-12 bg-muted rounded animate-pulse" />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

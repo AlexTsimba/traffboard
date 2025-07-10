@@ -1,108 +1,49 @@
+import { ReactNode } from 'react';
+
+interface ReportHeaderProps {
+  title: string;
+  description?: string;
+  filterButton: ReactNode;
+  filterChips?: ReactNode;
+}
+
 /**
  * Universal Report Header Component
- *
- * Provides a standardized header for all reports with filter button,
- * export functionality, and action buttons. Follows the demo layout
- * with filter button in top-right corner.
+ * 
+ * Standardized header layout for all reports following Report-Factory-Architecture-Guide:
+ * - Title and description on the left
+ * - Filter button on the right 
+ * - Filter chips on separate full-width row below
  */
-
-"use client";
-
-import { Download } from "lucide-react";
-import React from "react";
-
-import { FilterButton } from "@/components/reports/filters/filter-system";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import type { ReportHeaderProps } from "@/types/reports";
-
-export function ReportHeader({
-  title,
-  description,
-  onFilterClick,
-  onExportClick,
-  actions,
-  className,
-}: Readonly<ReportHeaderProps>) {
-  const handleExport = (_format: string) => {
-    // Export functionality will be implemented in export system
-    onExportClick();
-  };
-
+export function ReportHeader({ 
+  title, 
+  description, 
+  filterButton, 
+  filterChips 
+}: ReportHeaderProps) {
   return (
-    <div className={`flex items-center justify-between border-b bg-white p-4 ${className ?? ""}`}>
-      <div className="flex-1">
-        <h1 className="text-xl font-semibold text-gray-900">{title}</h1>
-        {description && <p className="mt-1 text-sm text-gray-600">{description}</p>}
+    <div className="space-y-3">
+      {/* Header Row: Title + Filter Button */}
+      <div className="flex items-center justify-between">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-bold tracking-tight">{title}</h1>
+          {description && (
+            <p className="text-muted-foreground">{description}</p>
+          )}
+        </div>
+        
+        {/* Filter Button (right-aligned) */}
+        <div className="flex items-center">
+          {filterButton}
+        </div>
       </div>
 
-      <div className="flex items-center gap-2">
-        {actions}
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm">
-              <Download className="mr-1 h-4 w-4" />
-              Export
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem
-              onClick={() => {
-                handleExport("csv");
-              }}
-            >
-              Export as CSV
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => {
-                handleExport("excel");
-              }}
-            >
-              Export as Excel
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => {
-                handleExport("pdf");
-              }}
-            >
-              Export as PDF
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => {
-                handleExport("png");
-              }}
-            >
-              Export as Image
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        <FilterButton onClick={onFilterClick} />
-      </div>
-    </div>
-  );
-}
-
-/**
- * Simplified report header for basic use cases
- */
-interface SimpleReportHeaderProps {
-  readonly title: string;
-  readonly onFilterClick: () => void;
-  readonly className?: string;
-}
-
-export function SimpleReportHeader({ title, onFilterClick, className }: SimpleReportHeaderProps) {
-  return (
-    <div className={`flex items-center justify-between border-b bg-white p-4 ${className ?? ""}`}>
-      <h1 className="text-xl font-semibold text-gray-900">{title}</h1>
-      <FilterButton onClick={onFilterClick} />
+      {/* Filter Chips Row: Full width, left-aligned */}
+      {filterChips && (
+        <div className="w-full">
+          {filterChips}
+        </div>
+      )}
     </div>
   );
 }

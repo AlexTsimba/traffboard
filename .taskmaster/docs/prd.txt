@@ -1,155 +1,44 @@
-# TraffBoard - Product Requirements Document (Updated)
-## Status: 50% Complete - Critical Issues Identified
+# TraffBoard Universal Filter System with DEP2COST Implementation
 
-### Executive Summary
-TraffBoard is a traffic management and conversion tracking platform built with Next.js 15, TypeScript, and PostgreSQL. While the architecture is solid and authentication is fully implemented, critical gaps exist between UI and data integration that must be addressed before deployment.
+## Product Overview
+Build a production-ready cohort analysis report with DEP2COST metric and universal attribution-aware filter system that serves as foundation for all future reports (Financial, Marketing, etc.).
 
-### Current Technology Stack
-- **Frontend**: Next.js 15 (App Router), TypeScript, Tailwind CSS, shadcn/ui
-- **Backend**: Next.js API Routes, Server Actions, Prisma ORM
-- **Database**: PostgreSQL (Docker local, configurable for production)
-- **Authentication**: NextAuth.js with 2FA (TOTP)
-- **Testing**: Vitest (currently failing)
-- **Deployment**: DigitalOcean App Platform (configured)
+## Core Requirements
 
-### Architecture Status: ✅ COMPLETE (90%)
-- Data Access Layer (DAL) pattern implemented
-- Clean separation of concerns
-- Server-side rendering with client components
-- Proper TypeScript configuration
-- Modern React patterns (hooks, context)
+### Universal Attribution System
+- Attribution dropdown in General Filters tab: "FTD Date" vs "Registration Date" 
+- Attribution affects all data grouping across any report type
+- Dynamic SQL GROUP BY field selection (signUpDate vs firstDepositDate)
+- Foundation for Financial and Marketing reports
 
-### Feature Status Overview
+### Filter System Enhancement
+- Fix broken cascading filters: Partner → Campaign → Country
+- Add third "Params" tab with tagOs, tagSource, tagSub2, tagWebId filters
+- Universal API endpoint: /api/universal/filter-options
+- Real-time cascading with attribution support
 
-#### 1. Authentication & Security: ✅ COMPLETE (95%)
-**Status**: Fully implemented and working
-- ✅ NextAuth.js configuration with credentials provider
-- ✅ Email/password authentication
-- ✅ TOTP-based 2FA with QR code generation
-- ✅ Role-based access control (user/superuser)
-- ✅ Protected routes middleware
-- ✅ Session management
-- ✅ Secure password hashing (bcrypt)
+### DEP2COST Implementation  
+- Replace mock data with real calculations
+- Formula: sum(depositsSum) / sum(fixedPerPlayer) per breakpoint
+- Attribution-based cohort grouping
+- Percentage formatting (e.g., "20.5%")
+- Support day/week breakpoints: [1,3,5,7,14,17,21,24,27,30] and [7,14,21,28,35,42]
 
-#### 2. User Management: ✅ COMPLETE (85%)
-**Status**: Admin functionality complete
-- ✅ User CRUD operations
-- ✅ Role assignment
-- ✅ Account activation/deactivation
-- ✅ Profile management
-- ✅ Audit logging
-- ⚠️ Minor: Some UI polish needed
+### Data Pipeline Integration
+- Uncomment and fix existing CohortProcessor
+- PostgreSQL-Arquero pipeline with attribution support  
+- Performance target: sub-3 second query times
+- Support all filter types through universal API
 
-#### 3. CSV Data Processing: ⚠️ PARTIAL (60%)
-**Status**: Backend complete, UI incomplete
-- ✅ CSV parsing engine with validation
-- ✅ Data transformation and normalization
-- ✅ Batch processing capabilities
-- ✅ Error handling and reporting
-- ✅ API endpoints for upload/processing
-- ❌ **CRITICAL**: Upload UI not connected to API
-- ❌ **CRITICAL**: No user feedback during processing
+## Success Criteria
+- Working DEP2COST tab with real data and attribution switching
+- Universal filter system ready for Financial/Marketing reports
+- All cascading filters functional
+- Zero TypeScript errors, all tests pass
+- Demo-ready within 3 days
 
-#### 4. Dashboard & Analytics: ❌ CRITICAL ISSUE (20%)
-**Status**: UI exists but shows mock data
-- ✅ Beautiful dashboard UI components
-- ✅ Chart components (interactive)
-- ✅ Metric cards and KPIs
-- ✅ Backend analytics functions
-- ❌ **CRITICAL**: All data is static/mock
-- ❌ **CRITICAL**: No connection to real database
-- ❌ **CRITICAL**: Charts show fake data
-
-#### 5. Filtering & Search: ⚠️ PARTIAL (40%)
-**Status**: Backend ready, UI not connected
-- ✅ Advanced filtering logic in backend
-- ✅ Search functionality
-- ✅ API endpoints with filter support
-- ✅ Filter UI components exist
-- ❌ **CRITICAL**: UI filters not connected to API
-- ❌ **CRITICAL**: No real-time filtering
-
-#### 6. Reporting System: ⚠️ PARTIAL (30%)
-**Status**: Framework exists, needs implementation
-- ✅ Report generation backend logic
-- ✅ Data aggregation functions
-- ✅ Export capabilities (planned)
-- ❌ **CRITICAL**: No working reports UI
-- ❌ **CRITICAL**: No PDF/Excel export
-
-#### 7. System Health & Monitoring: ❌ CRITICAL ISSUE (30%)
-**Status**: Partially implemented but broken
-- ✅ Health check endpoint exists
-- ✅ Database connectivity check
-- ❌ **CRITICAL**: Health checks failing in tests
-- ❌ **CRITICAL**: Monitoring not working
-- ❌ **CRITICAL**: Deployment health checks will fail
-
-### Testing Status: ❌ CRITICAL ISSUE (10%)
-**Current State**: 18 out of 19 tests failing
-- ❌ Syntax errors in test files
-- ❌ Import issues with server-only modules
-- ❌ Mock configuration problems
-- ❌ API test failures
-- ❌ Component test failures
-
-### Deployment Readiness: ⚠️ PARTIAL (70%)
-**Status**: Configuration ready, but blockers exist
-- ✅ DigitalOcean App Platform configuration
-- ✅ Environment variables setup
-- ✅ GitHub integration configured
-- ✅ Database configuration ready
-- ❌ **BLOCKER**: Health checks failing
-- ❌ **BLOCKER**: No .env.example file
-
-### Critical Path to Deployment
-
-#### Phase 1: Critical Fixes (Days 1-2)
-**Priority**: MUST FIX - Deployment blockers
-1. Fix health check API endpoint
-2. Fix basic test suite (at least 50% passing)
-3. Connect dashboard to real data
-4. Create .env.example file
-
-#### Phase 2: Core Functionality (Days 3-7)
-**Priority**: HIGH - Core business value
-1. Implement working CSV upload UI
-2. Connect filters to real data
-3. Create functional reports
-4. Add loading states and error handling
-
-#### Phase 3: Polish & Deploy (Days 8-10)
-**Priority**: MEDIUM - Production readiness
-1. Add comprehensive error boundaries
-2. Implement proper logging
-3. Performance optimization
-4. Staging deployment and testing
-
-### Success Metrics
-- All health checks passing
-- At least 80% test coverage on critical paths
-- Real data flowing through entire pipeline
-- Successful CSV upload and processing
-- Functional filtering and reporting
-- Zero-downtime deployment capability
-
-### Risk Assessment
-**HIGH RISK**: 
-- Mock data throughout application
-- Broken test suite
-- Disconnected UI components
-
-**MEDIUM RISK**:
-- Performance with large datasets
-- Error handling in production
-- User experience polish
-
-**LOW RISK**:
-- Authentication security
-- Database schema
-- Deployment configuration
-
-### Recommendation
-**DO NOT DEPLOY** in current state. The application appears feature-complete but has critical integration gaps. Focus on connecting existing UI to existing backend APIs before considering deployment.
-
-Estimated time to deployment-ready: **6-10 days of focused development**.
+## Technical Foundation
+- Current: 80% implementation complete with existing UI components
+- Stack: Next.js 15 + React 19 + TypeScript + PostgreSQL + Prisma
+- Architecture: Server Components with PostgreSQL-Arquero pipeline
+- Testing: Real PostgreSQL integration, comprehensive validation

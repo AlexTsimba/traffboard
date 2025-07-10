@@ -7,6 +7,14 @@
 
 import type { FilterDefinition } from "@/types/reports";
 
+// Helper function to get "This month" date range
+function getThisMonthRange() {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth(), 1);
+  const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  return { start, end };
+}
+
 // =============================================================================
 // COMMON FILTER DEFINITIONS
 // =============================================================================
@@ -16,15 +24,48 @@ export const COMMON_FILTERS = {
     id: "dateRange",
     label: "Date Range",
     type: "daterange" as const,
-    group: "time",
+    group: "a-timeframe",
     order: 0,
+    defaultValue: getThisMonthRange(),
+  },
+  PARTNERS: {
+    id: "partners",
+    label: "Partners",
+    type: "autocomplete" as const,
+    group: "b-partners",
+    order: 10,
+    placeholder: "Search partners...",
+  },
+  CAMPAIGNS: {
+    id: "campaigns",
+    label: "Campaigns",
+    type: "autocomplete" as const,
+    group: "c-campaigns",
+    order: 20,
+    placeholder: "Search campaigns...",
+  },
+  COUNTRIES: {
+    id: "countries",
+    label: "Countries",
+    type: "autocomplete" as const,
+    group: "d-location",
+    order: 30,
+    placeholder: "Search countries...",
+  },
+  OS: {
+    id: "os",
+    label: "Operating System",
+    type: "autocomplete" as const,
+    group: "d-location",
+    order: 31,
+    placeholder: "Search OS...",
   },
   PARTNER_ID: {
     id: "partnerId",
     label: "Partner",
     type: "select" as const,
     group: "general",
-    order: 10,
+    order: 20,
     options: [
       { label: "Partner A", value: "partner_a" },
       { label: "Partner B", value: "partner_b" },
@@ -35,7 +76,7 @@ export const COMMON_FILTERS = {
     label: "Search",
     type: "text" as const,
     group: "general",
-    order: 20,
+    order: 30,
     placeholder: "Search...",
   },
   TRAFFIC_SOURCE: {
@@ -43,7 +84,7 @@ export const COMMON_FILTERS = {
     label: "Traffic Source",
     type: "select" as const,
     group: "analytics",
-    order: 30,
+    order: 40,
     options: [
       { label: "Organic", value: "organic" },
       { label: "Direct", value: "direct" },

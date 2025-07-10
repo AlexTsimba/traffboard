@@ -90,7 +90,9 @@ export type FilterType =
   | "daterange"
   | "number"
   | "numberrange"
-  | "boolean";
+  | "boolean"
+  | "radio"
+  | "checkbox";
 
 /**
  * Filter option for select/multiselect types
@@ -142,6 +144,8 @@ export interface AppliedFilter {
   definition: FilterDefinition;
   value: FilterValue;
   displayText: string;
+  label?: string;
+  displayValue?: string;
 }
 
 /**
@@ -600,4 +604,49 @@ export interface ReportTheme {
       xl: string;
     };
   };
+}
+/**
+ * Filter tab types for organizing filters in modal
+ */
+export type FilterTabType = 'general' | 'report-specific';
+
+/**
+ * Enhanced filter definition with tab categorization
+ */
+export interface EnhancedFilterDefinition extends FilterDefinition {
+  tab: FilterTabType;
+  category?: string;
+}
+
+/**
+ * Report-specific filter configuration
+ */
+export interface ReportSpecificFilterConfig {
+  reportType: string;
+  filters: EnhancedFilterDefinition[];
+}
+
+/**
+ * Enhanced filter modal props with tab support
+ */
+export interface EnhancedFilterModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (generalFilters: Record<string, FilterValue>, specificFilters: Record<string, FilterValue>) => void;
+  onClear: () => void;
+  generalFilters: FilterDefinition[];
+  specificFilters?: ReportSpecificFilterConfig;
+  currentGeneralFilters: Record<string, FilterValue>;
+  currentSpecificFilters?: Record<string, FilterValue>;
+  title?: string;
+}
+
+/**
+ * Cohort-specific filter values
+ */
+export interface CohortSpecificFilters {
+  cohortStep: 'day' | 'week';
+  metric: 'retention' | 'dep2cost' | 'roas' | 'adpu';
+  breakpoints?: number[];
+  customDateRange?: boolean;
 }

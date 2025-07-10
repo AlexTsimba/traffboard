@@ -1,61 +1,25 @@
 # Task ID: 4
-# Title: Cohort-Specific UI Implementation
+# Title: Universal System Validation and Deploy
 # Status: pending
-# Dependencies: 1, 3
+# Dependencies: 3
 # Priority: medium
-# Description: Develop a cohort analysis interface featuring a TanStack Table with triangular cohort visualization, heatmap cells, breakpoint selectors, metric toggles (DEP2COST, ROAS, AVG DEPOSIT, PLAYER COUNT), a cohort configuration panel, and interactive features for in-depth cohort exploration.
+# Description: End-to-end testing of attribution with all filter combinations. Validate universal API works for cohort report type. Performance optimization and deployment preparation. Document attribution integration pattern for future reports.
 # Details:
-Implement a React-based cohort analysis UI that leverages TanStack Table for rendering cohort data in a triangular format, supporting advanced features such as sorting, filtering, and pagination. Integrate heatmap visualization directly into the table cells to display cohort metrics over time, with dynamic color scaling based on metric intensity. Add responsive breakpoint selectors (e.g., dropdowns or segmented controls) to allow users to adjust cohort time intervals (daily, weekly, monthly), updating both the table and heatmap accordingly. Implement metric toggles enabling users to switch between DEP2COST, ROAS, AVG DEPOSIT, and PLAYER COUNT metrics, ensuring real-time updates to the visualization. Include a cohort configuration panel for users to define cohort grouping logic and filters. Ensure all UI elements are accessible, responsive, and styled consistently with the component library from Task 3. Coordinate with the data engine to fetch and display real cohort data, handling loading and error states gracefully. Use compositional patterns to allow future extensibility for additional visualizations or controls. Provide interactive features such as cell tooltips, cohort highlighting, and drill-down actions.
+
 
 # Test Strategy:
-1. Render the cohort analysis interface with mock and real data, verifying correct integration of TanStack Table with triangular cohort visualization and heatmap cells. 2. Test breakpoint selectors and metric toggles (DEP2COST, ROAS, AVG DEPOSIT, PLAYER COUNT) to ensure they update the displayed data and visualizations in real time. 3. Validate the cohort configuration panel for correct cohort grouping and filtering. 4. Validate accessibility by checking keyboard navigation, ARIA attributes, and screen reader compatibility. 5. Confirm responsive layout across devices and browsers. 6. Simulate loading and error states to ensure graceful UI degradation. 7. Test interactive features such as tooltips, cohort highlighting, and drill-down actions. 8. Conduct user acceptance testing with sample cohort scenarios to verify usability and correctness of cohort breakdowns and visualizations.
+User test: Switch attribution → all data recalculates correctly. Complete flow: open cohorts → apply multiple filters → see updated DEP2COST data.
 
 # Subtasks:
-## 1. Design Triangular Cohort Table Layout [pending]
+## 1. End-to-End Attribution Testing [pending]
 ### Dependencies: None
-### Description: Design and implement the TanStack Table layout to support triangular cohort visualization, ensuring correct alignment of heatmap cells and cohort metrics.
+### Description: Test attribution with all filter combinations. Validate universal API works for cohort report type. Performance check: sub-3 second query times with attribution switching.
 ### Details:
 
 
-## 2. Integrate Heatmap Visualization in Table Cells [pending]
+## 2. Production Readiness [pending]
 ### Dependencies: None
-### Description: Embed heatmap color scaling into the cohort table cells, dynamically reflecting metric intensity for each cohort/time period intersection.
-### Details:
-
-
-## 3. Implement Breakpoint Selectors [pending]
-### Dependencies: None
-### Description: Add responsive controls (dropdowns or segmented controls) for users to select cohort time intervals (daily, weekly, monthly), updating the table and heatmap accordingly.
-### Details:
-
-
-## 4. Add Metric Toggles [pending]
-### Dependencies: None
-### Description: Implement toggles for DEP2COST, ROAS, AVG DEPOSIT, and PLAYER COUNT metrics, ensuring real-time updates to the cohort visualization.
-### Details:
-
-
-## 5. Build Cohort Configuration Panel [pending]
-### Dependencies: None
-### Description: Develop a configuration panel allowing users to define cohort grouping logic and apply filters before visualization.
-### Details:
-
-
-## 6. Ensure Responsive and Accessible UI [pending]
-### Dependencies: None
-### Description: Validate that all UI elements are responsive and accessible, following best practices for keyboard navigation, ARIA attributes, and screen reader compatibility.
-### Details:
-
-
-## 7. Implement Interactive Features [pending]
-### Dependencies: None
-### Description: Add interactive features such as cell tooltips, cohort highlighting, and drill-down actions for deeper cohort exploration.
-### Details:
-
-
-## 8. Integrate with Data Engine [pending]
-### Dependencies: None
-### Description: Connect the UI to the data engine to fetch and display real cohort data, handling loading and error states gracefully.
+### Description: Final performance optimization, comprehensive testing, error handling validation. Document attribution integration pattern for future reports. Prepare for demo and deployment.
 ### Details:
 
 

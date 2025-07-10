@@ -47,11 +47,33 @@ function getLastWeek() {
   return { start: lastMonday, end: lastSunday }; // Полная прошлая неделя
 }
 
+function getLast30Days() {
+  const today = new Date();
+  const start = new Date(today);
+  start.setDate(today.getDate() - 29); // включая сегодня — всего 30 дней
+  return { start, end: today };
+}
+
 function getLastMonth() {
   const today = new Date();
   const start = new Date(today.getFullYear(), today.getMonth() - 1, 1);
   const end = new Date(today.getFullYear(), today.getMonth(), 0);
   return { start, end }; // Полный прошлый месяц
+}
+
+// =============================================================================
+// GROUP LABEL MAPPING
+// =============================================================================
+
+function getGroupDisplayLabel(groupName: string): string {
+  const groupLabels: Record<string, string> = {
+    "a-timeframe": "Date Range",
+    "b-partners": "Partners",
+    "c-campaigns": "Campaigns",
+    "d-location": "Other",
+  };
+  // eslint-disable-next-line security/detect-object-injection
+  return groupLabels[groupName] ?? groupName;
 }
 
 // =============================================================================
@@ -161,12 +183,16 @@ export function FilterModal({
             <div key={groupName}>
               {groupedFilters.size > 1 && (
                 <>
-                  <h3 className="text-sm font-medium text-gray-900 capitalize">{groupName}</h3>
+                  <h3 className="text-foreground mt-1 mb-2 text-base font-semibold">
+                    {getGroupDisplayLabel(groupName)}
+                  </h3>
                   <Separator className="mb-4" />
                 </>
               )}
 
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div
+                className={`grid gap-4 ${groupName === "d-location" ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1"}`}
+              >
                 {filters.map((filter) => (
                   <FilterInput
                     key={filter.id}
@@ -221,6 +247,19 @@ export function FilterModal({
                       }}
                     >
                       This Month
+                    </Badge>
+                    <Badge
+                      variant="outline"
+                      className="cursor-pointer transition-colors hover:bg-gray-100"
+                      onClick={() => {
+                        const thisMonth = getLast30Days();
+                        const dateRangeFilter = filters.find((f) => f.type === "daterange");
+                        if (dateRangeFilter) {
+                          handleFilterChange(dateRangeFilter.id, thisMonth);
+                        }
+                      }}
+                    >
+                      Last 30 Days
                     </Badge>
                     <Badge
                       variant="outline"

@@ -104,15 +104,21 @@ export function MultiselectFilterInput({ filter, value, onChange }: FilterInputP
 // DATE INPUT COMPONENT
 // =============================================================================
 
+/**
+ * Format date to simple DD-MM-YYYY format
+ */
+function formatSimpleDate(date: Date): string {
+  const day = date.getDate().toString().padStart(2, "0");
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const year = date.getFullYear();
+  return `${day}-${month}-${year}`;
+}
+
 export function DateFilterInput({ filter, value, onChange }: FilterInputProps) {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Input
-          readOnly
-          placeholder={filter.placeholder}
-          value={value instanceof Date ? value.toLocaleDateString() : ""}
-        />
+        <Input readOnly placeholder={filter.placeholder} value={value instanceof Date ? formatSimpleDate(value) : ""} />
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0">
         <Calendar
@@ -151,55 +157,102 @@ export function DateRangeFilterInput({ value, onChange }: FilterInputProps) {
     }
   };
 
-  return (
-    <div className="grid grid-cols-2 gap-2">
-      <Popover>
-        <PopoverTrigger asChild>
-          <Input
-            readOnly
-            placeholder="Start date"
-            value={
-              dateRange?.start
-                ? new Date(dateRange.start).toLocaleDateString("en-US", {
-                    day: "numeric",
-                    month: "long",
-                  })
-                : ""
-            }
-          />
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0">
-          <Calendar
-            mode="single"
-            selected={dateRange?.start ? new Date(dateRange.start) : undefined}
-            onSelect={handleStartChange}
-          />
-        </PopoverContent>
-      </Popover>
+  // Date range presets
+  const presets = [
+    {
+      label: "Last 7 days",
+      getValue: () => {
+        const end = new Date();
+        const start = new Date();
+        start.setDate(start.getDate() - 6);
+        return { start, end };
+      }
+    },
+    {
+      label: "Last 30 days",
+      getValue: () => {
+        const end = new Date();
+        const start = new Date();
+        start.setDate(start.getDate() - 29);
+        return { start, end };
+      }
+    },
+    {
+      label: "This month",
+      getValue: () => {
+        const now = new Date();
+        const start = new Date(now.getFullYear(), now.getMonth(), 1);
+        const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        return { start, end };
+      }
+    },
+    {
+      label: "Last month",
+      getValue: () => {
+        const now = new Date();
+        const start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        const end = new Date(now.getFullYear(), now.getMonth(), 0);
+        return { start, end };
+      }
+    }
+  ];
 
-      <Popover>
-        <PopoverTrigger asChild>
-          <Input
-            readOnly
-            placeholder="End date"
-            value={
-              dateRange?.end
-                ? new Date(dateRange.end).toLocaleDateString("en-US", {
-                    day: "numeric",
-                    month: "long",
-                  })
-                : ""
-            }
-          />
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0">
-          <Calendar
-            mode="single"
-            selected={dateRange?.end ? new Date(dateRange.end) : undefined}
-            onSelect={handleEndChange}
-          />
-        </PopoverContent>
-      </Popover>
+  const handlePresetClick = (preset: typeof presets[0]) => {
+    const range = preset.getValue();
+    onChange(range);
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="grid grid-cols-2 gap-2">
+        <Popover>
+          <PopoverTrigger asChild>
+            <Input
+              readOnly
+              placeholder="Start date"
+              value={dateRange?.start ? formatSimpleDate(new Date(dateRange.start)) : ""}
+            />
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0">
+            <Calendar
+              mode="single"
+              selected={dateRange?.start ? new Date(dateRange.start) : undefined}
+              onSelect={handleStartChange}
+            />
+          </PopoverContent>
+        </Popover>
+
+        <Popover>
+          <PopoverTrigger asChild>
+            <Input
+              readOnly
+              placeholder="End date"
+              value={dateRange?.end ? formatSimpleDate(new Date(dateRange.end)) : ""}
+            />
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0">
+            <Calendar
+              mode="single"
+              selected={dateRange?.end ? new Date(dateRange.end) : undefined}
+              onSelect={handleEndChange}
+            />
+          </PopoverContent>
+        </Popover>
+      </div>
+      
+      {/* Date Range Presets */}
+      <div className="flex flex-wrap gap-1">
+        {presets.map((preset) => (
+          <button
+            key={preset.label}
+            type="button"
+            onClick={() => handlePresetClick(preset)}
+            className="px-2 py-1 text-xs rounded border border-border hover:bg-muted transition-colors"
+          >
+            {preset.label}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
@@ -322,6 +375,11 @@ export function FilterInput({ filter, value, onChange }: FilterInputProps) {
     }
     case "boolean": {
       return <BooleanFilterInput {...inputProps} />;
+    }
+    case "radio":
+    case "checkbox": {
+      // TODO: Implement radio and checkbox components
+      return <div>Radio/Checkbox input not implemented yet</div>;
     }
     default: {
       return <TextFilterInput {...inputProps} />;

@@ -1,55 +1,25 @@
 # Task ID: 2
-# Title: Cohort Analysis Data Engine: PostgreSQL-Arquero Pipeline
+# Title: Fix Filter System and Add Params
 # Status: pending
 # Dependencies: 1
-# Priority: medium
-# Description: Develop a data engine that leverages a PostgreSQL-Arquero pipeline for efficient cohort calculations, including breakpoint mapping, metric processing (DEP2COST, ROAS, AVG DEPOSIT, PLAYER COUNT), and performance optimization. The engine must support DAY_BREAKPOINTS=[1,3,5,7,14,17,21,24,27,30] and WEEK_BREAKPOINTS=[7,14,21,28,35,42], with week mode starting Monday and viewing Sunday.
+# Priority: high
+# Description: Fix broken cascading filters (Partner → Campaign → Country) and add third Params tab with tagOs, tagSource, tagSub2, tagWebId filters. Implement working cascading with attribution support through universal API.
 # Details:
-Implement a robust data pipeline connecting PostgreSQL with Arquero for cohort analysis. Establish a secure and reusable PostgreSQL integration, managing credentials and connection parameters according to best practices[1][3][4]. Design optimized SQL queries using window functions to extract raw event/user data, focusing on cohort-defining attributes and time-based breakpoints. Support DAY_BREAKPOINTS=[1,3,5,7,14,17,21,24,27,30] and WEEK_BREAKPOINTS=[7,14,21,28,35,42], ensuring week mode starts Monday and views Sunday. Use PostgreSQL pipeline mode to batch and asynchronously process multiple queries, reducing network latency and improving throughput—manage error handling and synchronization points to avoid pipeline aborts[2]. Transform and aggregate the extracted data in Arquero, mapping breakpoints (e.g., signup dates, feature adoption) and calculating cohort metrics: DEP2COST, ROAS, AVG DEPOSIT, and PLAYER COUNT. Optimize the pipeline for large datasets by minimizing round-trips, leveraging parallelism where possible, and tuning memory usage. Provide clear interfaces for metric definitions and breakpoint configuration to support extensibility. Integrate with the report factory foundation to ensure compatibility with the broader reporting framework.
+
 
 # Test Strategy:
-1. Validate the PostgreSQL-Arquero pipeline by running end-to-end cohort analyses on sample datasets, confirming correct extraction, transformation, and aggregation for all specified breakpoints and metrics. 2. Benchmark pipeline performance with varying data volumes, measuring latency and throughput improvements from pipelining and SQL optimization. 3. Test error handling by injecting faults and verifying that pipeline aborts and synchronization behave as expected. 4. Confirm that breakpoint mapping (including week mode logic) and metric calculations (DEP2COST, ROAS, AVG DEPOSIT, PLAYER COUNT) produce accurate and reproducible results. 5. Ensure seamless integration with the report factory by generating reports using the processed cohort data.
+User test: Select partner → campaigns dropdown shows only that partner's campaigns. Third Params tab visible with tag filters working.
 
 # Subtasks:
-## 1. Establish Secure PostgreSQL Integration [pending]
+## 1. Fix Cascading Filters [pending]
 ### Dependencies: None
-### Description: Set up a secure, reusable PostgreSQL connection with proper credential management and parameterization.
+### Description: Debug and fix Partner → Campaign → Country filtering via universal API. Implement proper cascading with attribution support. Add loading states and debouncing.
 ### Details:
 
 
-## 2. Design SQL Extraction with Window Functions and Breakpoints [pending]
+## 2. Params Filter Tab [pending]
 ### Dependencies: None
-### Description: Develop optimized SQL queries using window functions to extract cohort-defining attributes and support DAY_BREAKPOINTS and WEEK_BREAKPOINTS. Ensure week mode starts Monday and views Sunday.
-### Details:
-
-
-## 3. Implement PostgreSQL Pipeline Mode for Batch Processing [pending]
-### Dependencies: None
-### Description: Utilize PostgreSQL pipeline mode to batch and asynchronously process multiple queries, handling errors and synchronization points to avoid pipeline aborts.
-### Details:
-
-
-## 4. Arquero Transformation and Metric Calculation [pending]
-### Dependencies: None
-### Description: Transform and aggregate extracted data in Arquero, mapping breakpoints and calculating DEP2COST, ROAS, AVG DEPOSIT, and PLAYER COUNT metrics.
-### Details:
-
-
-## 5. Performance Optimization for Large Datasets [pending]
-### Dependencies: None
-### Description: Optimize the pipeline for large datasets by minimizing round-trips, leveraging parallelism, and tuning memory usage.
-### Details:
-
-
-## 6. Interface for Metric Definitions and Breakpoint Configuration [pending]
-### Dependencies: None
-### Description: Provide clear interfaces for defining metrics and configuring breakpoints to support extensibility.
-### Details:
-
-
-## 7. Integration with Report Factory [pending]
-### Dependencies: None
-### Description: Ensure compatibility and seamless integration with the report factory foundation for downstream reporting.
+### Description: Add third Params tab to filter modal. Implement tagOs, tagSource, tagSub2, tagWebId autocomplete filters. Extend universal API to support params with attribution.
 ### Details:
 
 
