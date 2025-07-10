@@ -4,8 +4,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useMemo, useTransition } from "react";
 
 import { EnhancedFilterModal } from "@/components/reports/filters/enhanced-filter-modal";
-import { FilterButton, FilterChips, createFilterComposer } from "@/components/reports/filters/filter-system";
 import { formatFilterValue } from "@/components/reports/filters/filter-formatting";
+import { FilterButton, FilterChips, createFilterComposer } from "@/components/reports/filters/filter-system";
 import { ReportHeader } from "@/components/reports/universal/report-header";
 import {
   createCohortSpecificFilters,
@@ -16,7 +16,7 @@ import type { FilterDefinition, FilterValue, AppliedFilter } from "@/types/repor
 // Helper functions for building applied filters
 const buildDateRangeFilter = (
   searchParams: URLSearchParams,
-  generalFilterDefinitions: FilterDefinition[]
+  generalFilterDefinitions: FilterDefinition[],
 ): AppliedFilter | null => {
   const dateStart = searchParams.get("dateStart");
   const dateEnd = searchParams.get("dateEnd");
@@ -36,7 +36,7 @@ const buildDateRangeFilter = (
 const buildMultiselectFilter = (
   searchParams: URLSearchParams,
   generalFilterDefinitions: FilterDefinition[],
-  filterId: string
+  filterId: string,
 ): AppliedFilter | null => {
   const value = searchParams.get(filterId);
   if (!value) return null;
@@ -55,8 +55,17 @@ const buildMultiselectFilter = (
 // Helper functions for URL parameters
 const clearFilterParams = (params: URLSearchParams) => {
   const filterKeys = [
-    "dateStart", "dateEnd", "partners", "campaigns", "countries", 
-    "os", "cohortStep", "metric", "breakpoints", "showMetadata", "exportFormat"
+    "dateStart",
+    "dateEnd",
+    "partners",
+    "campaigns",
+    "countries",
+    "os",
+    "cohortStep",
+    "metric",
+    "breakpoints",
+    "showMetadata",
+    "exportFormat",
   ];
   for (const key of filterKeys) {
     params.delete(key);

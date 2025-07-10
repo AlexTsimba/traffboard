@@ -1,4 +1,4 @@
-import type { CohortMetric, AppliedFilter, FilterValue } from "@/types/reports";
+import type { CohortMetric, AppliedFilter, FilterValue, DateRange } from "@/types/reports";
 
 // Service для интеграции с существующим PostgreSQL-Arquero pipeline
 export class CohortDataService {
@@ -170,10 +170,10 @@ export class CohortDataService {
 
   private convertToFilterValues(filters: Record<string, unknown>): Record<string, FilterValue> {
     return {
-      partners: filters.partners || [],
-      campaigns: filters.campaigns || [],
-      countries: filters.countries || [],
-      os: filters.os || [],
+      partners: Array.isArray(filters.partners) ? filters.partners : [],
+      campaigns: Array.isArray(filters.campaigns) ? filters.campaigns : [],
+      countries: Array.isArray(filters.countries) ? filters.countries : [],
+      os: Array.isArray(filters.os) ? filters.os : [],
     };
   }
 
@@ -181,24 +181,30 @@ export class CohortDataService {
     const appliedFilters: AppliedFilter[] = [];
 
     // Date Range Filter
-    appliedFilters.push({
-      id: "dateRange",
-      definition: {
+    if (filters.dateStart && filters.dateEnd) {
+      const startDate = new Date(filters.dateStart as string | number | Date);
+      const endDate = new Date(filters.dateEnd as string | number | Date);
+
+      appliedFilters.push({
         id: "dateRange",
+        definition: {
+          id: "dateRange",
+          label: "Date Range",
+          type: "daterange",
+        },
+        value: {
+          start: startDate,
+          end: endDate,
+        } as DateRange,
+        displayText: `${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`,
         label: "Date Range",
-        type: "daterange",
-      },
-      value: {
-        start: filters.dateStart,
-        end: filters.dateEnd,
-      },
-      displayText: `${new Date(filters.dateStart).toLocaleDateString()} - ${new Date(filters.dateEnd).toLocaleDateString()}`,
-      label: "Date Range",
-      displayValue: `${new Date(filters.dateStart).toLocaleDateString()} - ${new Date(filters.dateEnd).toLocaleDateString()}`,
-    });
+        displayValue: `${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`,
+      });
+    }
 
     // Partners Filter
-    if (filters.partners?.length > 0) {
+    const partnersArray = Array.isArray(filters.partners) ? (filters.partners as string[]) : [];
+    if (partnersArray.length > 0) {
       appliedFilters.push({
         id: "partners",
         definition: {
@@ -206,15 +212,16 @@ export class CohortDataService {
           label: "Partners",
           type: "multiselect",
         },
-        value: filters.partners,
-        displayText: filters.partners.join(", "),
+        value: partnersArray,
+        displayText: partnersArray.join(", "),
         label: "Partners",
-        displayValue: filters.partners.join(", "),
+        displayValue: partnersArray.join(", "),
       });
     }
 
     // Campaigns Filter
-    if (filters.campaigns?.length > 0) {
+    const campaignsArray = Array.isArray(filters.campaigns) ? (filters.campaigns as string[]) : [];
+    if (campaignsArray.length > 0) {
       appliedFilters.push({
         id: "campaigns",
         definition: {
@@ -222,15 +229,16 @@ export class CohortDataService {
           label: "Campaigns",
           type: "multiselect",
         },
-        value: filters.campaigns,
-        displayText: filters.campaigns.join(", "),
+        value: campaignsArray,
+        displayText: campaignsArray.join(", "),
         label: "Campaigns",
-        displayValue: filters.campaigns.join(", "),
+        displayValue: campaignsArray.join(", "),
       });
     }
 
     // Countries Filter
-    if (filters.countries?.length > 0) {
+    const countriesArray = Array.isArray(filters.countries) ? (filters.countries as string[]) : [];
+    if (countriesArray.length > 0) {
       appliedFilters.push({
         id: "countries",
         definition: {
@@ -238,15 +246,16 @@ export class CohortDataService {
           label: "Countries",
           type: "multiselect",
         },
-        value: filters.countries,
-        displayText: filters.countries.join(", "),
+        value: countriesArray,
+        displayText: countriesArray.join(", "),
         label: "Countries",
-        displayValue: filters.countries.join(", "),
+        displayValue: countriesArray.join(", "),
       });
     }
 
     // OS Filter
-    if (filters.os?.length > 0) {
+    const osArray = Array.isArray(filters.os) ? (filters.os as string[]) : [];
+    if (osArray.length > 0) {
       appliedFilters.push({
         id: "os",
         definition: {
@@ -254,10 +263,10 @@ export class CohortDataService {
           label: "OS",
           type: "multiselect",
         },
-        value: filters.os,
-        displayText: filters.os.join(", "),
+        value: osArray,
+        displayText: osArray.join(", "),
         label: "OS",
-        displayValue: filters.os.join(", "),
+        displayValue: osArray.join(", "),
       });
     }
 

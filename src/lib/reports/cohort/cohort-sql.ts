@@ -265,3 +265,84 @@ export function estimateQueryComplexity(
     return { complexity: "high", estimatedTime: 8000 };
   }
 }
+
+// =============================================================================
+// ATTRIBUTION SQL LOGIC
+// =============================================================================
+
+/**
+ * Get the correct date field for attribution mode
+ */
+export function getAttributionDateField(attribution: "ftd" | "registration"): string {
+  switch (attribution) {
+    case "ftd": {
+      return "firstDepositDate";
+    }
+    case "registration": {
+      return "signUpDate";
+    }
+    default: {
+      const _exhaustive: never = attribution;
+      throw new Error(`Invalid attribution type: ${_exhaustive}`);
+    }
+  }
+}
+
+/**
+ * Build attribution-aware WHERE clause for Prisma queries
+ *
+ * Business Rules:
+ * - Registration Attribution: Include ALL players grouped by signUpDate
+ * - FTD Attribution: Include only players with FTD grouped by firstDepositDate
+ */
+export function getAttributionWhereClause(
+  attribution: "ftd" | "registration",
+  additionalConditions: Record<string, unknown> = {},
+): Record<string, unknown> {
+  const dateField = getAttributionDateField(attribution);
+
+  return {
+    [dateField]: { not: null }, // Ensure the attribution date field exists
+    ...additionalConditions,
+  };
+}
+
+/**
+ * Build GROUP BY fields with attribution support
+ */
+export function buildAttributionGroupBy(
+  attribution: "ftd" | "registration",
+  additionalFields: string[] = [],
+): string[] {
+  const dateField = getAttributionDateField(attribution);
+  return [dateField, ...additionalFields];
+}
+
+/**
+ * Safe attribution query execution with error handling
+ */
+export async function safeAttributionQuery<T>(
+  attribution: "ftd" | "registration",
+  queryFn: (dateField: string) => Promise<T[]>,
+  fallbackFn?: () => Promise<T[]>,
+): Promise<T[]> {
+  try {
+    const dateField = getAttributionDateField(attribution);
+    const results = await queryFn(dateField);
+
+    // If no results and fallback is available, try alternative attribution
+    if (results.length === 0 && fallbackFn) {
+      return await fallbackFn();
+    }
+
+    return results;
+  } catch (error) {
+    console.error(`Attribution query failed for ${attribution}:`, error);
+
+    if (fallbackFn) {
+      return await fallbackFn();
+    }
+
+    throw error;
+  }
+}

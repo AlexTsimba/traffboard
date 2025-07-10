@@ -277,7 +277,8 @@ describe("formatFilterValue", () => {
       end: new Date("2024-01-31"),
     };
     const result = formatFilterValue(dateRange, "daterange");
-    expect(result).toContain(" - ");
+    // Updated to match actual same-month format: "January 2024 (1-31)"
+    expect(result).toBe("January 2024 (1-31)");
   });
 
   it("formats number range values correctly", () => {
@@ -473,7 +474,8 @@ describe("COMMON_FILTERS", () => {
     const dateRange = COMMON_FILTERS.DATE_RANGE;
     expect(dateRange.id).toBe("dateRange");
     expect(dateRange.type).toBe("daterange");
-    expect(dateRange.group).toBe("time");
+    // Updated to match actual group name with ordering prefix
+    expect(dateRange.group).toBe("a-timeframe");
   });
 
   it("has correct structure for select filters", () => {

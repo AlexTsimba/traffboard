@@ -97,7 +97,14 @@ function CohortMetricSection({
 
     const result = cohortService.getCohortData({
       metric,
-      filters,
+      filters: {
+        dateStart: filters.dateStart as string,
+        dateEnd: filters.dateEnd as string,
+        partners: Array.isArray(filters.partners) ? (filters.partners as string[]) : undefined,
+        campaigns: Array.isArray(filters.campaigns) ? (filters.campaigns as string[]) : undefined,
+        countries: Array.isArray(filters.countries) ? (filters.countries as string[]) : undefined,
+        os: Array.isArray(filters.os) ? (filters.os as string[]) : undefined,
+      },
       mode,
       breakpoints,
     });

@@ -24,8 +24,11 @@ taskmaster-ai:next_task --projectRoot /Users/simba/Documents/Projects/TraffBoard
 memory:search_nodes "TraffBoard patterns"
 memory:search_nodes "TraffBoard-ESLint-Standards" 
 memory:search_nodes "TraffBoard-Architecture-Patterns"
+memory:search_nodes "TraffBoard-Business-Logic"
+memory:search_nodes "Attribution Logic"
 desktop-commander:read_file /Users/simba/Documents/Projects/TraffBoard_old/docs/memory-system/linting-patterns.md
 desktop-commander:read_file /Users/simba/Documents/Projects/TraffBoard_old/docs/cohort-dep2cost-implementation.md
+desktop-commander:read_file /Users/simba/Documents/Projects/TraffBoard_old/docs/business-logic-nuances.md
 ```
 
 ### **Step 2: Critical Analysis Questions (exactly 5 questions, 2 minutes)**
@@ -59,6 +62,21 @@ Create `/docs/tasks/[task-id]-execution-plan.md` with:
 **Current Focus**: Universal Filter System with Attribution support
 **Active Plan**: Follow /docs/cohort-dep2cost-implementation.md
 
+## Critical Business Logic (MANDATORY)
+[Copy relevant sections from /docs/business-logic-nuances.md]
+
+### Attribution Rules
+- **Registration Attribution**: [specific rule from business-logic-nuances.md]
+- **FTD Attribution**: [specific rule from business-logic-nuances.md]
+
+### Performance Requirements
+- **Database Queries**: [specific performance rules]
+- **UI Response Times**: [specific timing requirements]
+
+### Filter System Logic
+- **Breakpoints**: [specific breakpoint rules]
+- **Cohort Modes**: [specific mode switching rules]
+
 ## Developer Instructions (from CLAUDE.md)
 
 ### SESSION INITIALIZATION PROTOCOL
@@ -68,7 +86,9 @@ memory:read_graph
 taskmaster-ai:get_task [task-id] --projectRoot /Users/simba/Documents/Projects/TraffBoard_old
 memory:search_nodes "TraffBoard-ESLint-Standards"
 memory:search_nodes "TraffBoard-Architecture-Patterns"
+memory:search_nodes "TraffBoard-Business-Logic"
 desktop-commander:read_file /Users/simba/Documents/Projects/TraffBoard_old/docs/memory-system/linting-patterns.md
+desktop-commander:read_file /Users/simba/Documents/Projects/TraffBoard_old/docs/business-logic-nuances.md
 ```
 
 ### CRITICAL BEHAVIORAL RULES
@@ -86,7 +106,7 @@ desktop-commander:read_file /Users/simba/Documents/Projects/TraffBoard_old/docs/
 - **Quality**: ESLint + Prettier + Memory-driven standards
 
 ## Scope Limits
-- **Files to modify**: [max 3 files listed]
+- **Files to modify**: [max 4 files listed]
 - **Lines of code**: [max 150 total]
 - **Time estimate**: [max 2 hours]
 - **Single feature**: [one functionality only]
@@ -132,6 +152,12 @@ memory:add_observations [{
   contents: ["Working pattern: [specific implementation details]"]
 }]
 
+# Update business logic memory
+memory:add_observations [{
+  entityName: "TraffBoard-Business-Logic-Applied",
+  contents: ["Task [task-id]: Applied [specific business rule] - [implementation details]"]
+}]
+
 # Update task status
 taskmaster-ai:update_task [task-id] "Progress: [detailed status with evidence]"
 ```
@@ -150,6 +176,7 @@ desktop-commander:execute_command "npm run test"
 - [ ] Zero TypeScript compilation errors
 - [ ] All ESLint rules pass
 - [ ] Tests pass and cover new functionality
+- [ ] Business logic rules followed correctly
 
 ## UI Requirements (if applicable)
 - [ ] Loading states implemented (skeleton loaders, spinners)
@@ -184,7 +211,9 @@ memory:add_observations [{
 taskmaster-ai:get_task [task-id] --projectRoot /Users/simba/Documents/Projects/TraffBoard_old
 desktop-commander:read_file /docs/tasks/[task-id]-execution-plan.md
 memory:search_nodes "TraffBoard-ESLint-Standards"
+memory:search_nodes "TraffBoard-Business-Logic"
 desktop-commander:read_file /Users/simba/Documents/Projects/TraffBoard_old/docs/memory-system/linting-patterns.md
+desktop-commander:read_file /Users/simba/Documents/Projects/TraffBoard_old/docs/business-logic-nuances.md
 ```
 
 ### **Step 2: Implementation Review (1 minute)**
@@ -223,6 +252,13 @@ Verify against specific standards:
 - [ ] Empty states with clear messaging implemented
 - [ ] Responsive design tested on mobile and desktop
 
+**Business Logic Compliance**:
+- [ ] Attribution logic implemented correctly
+- [ ] Filter system follows established patterns
+- [ ] Performance requirements met
+- [ ] Cohort breakpoints handled properly
+- [ ] Edge cases covered according to business rules
+
 **Code Quality**:
 - [ ] TypeScript types properly defined
 - [ ] No explicit 'any' types used
@@ -238,6 +274,10 @@ memory:add_observations [{
   entityName: "TraffBoard-Successful-Patterns",
   contents: ["Task [task-id] completed successfully: [key implementation details]"]
 }]
+memory:add_observations [{
+  entityName: "TraffBoard-Business-Logic-Applied",
+  contents: ["Task [task-id] verified: [business rules applied correctly]"]
+}]
 # Output: APPROVED - Ready for commit/push
 ```
 
@@ -249,6 +289,7 @@ memory:add_observations [{
 - [ ] [Specific linting issue with file:line]
 - [ ] [TypeScript error with file:line]  
 - [ ] [Architecture violation with details]
+- [ ] [Business logic violation with details]
 - [ ] [Test failure with specifics]
 
 **Required Fixes**:
@@ -272,6 +313,7 @@ desktop-commander:execute_command "npm run test"
 
 ### **For Planning Mode**:
 - ✅ Context loaded in under 30 seconds
+- ✅ Business logic nuances included in execution plan
 - ✅ Max 2 critical questions asked
 - ✅ Complete execution document created with embedded CLAUDE.md instructions
 - ✅ Task fits in single Claude session (150 lines, 2 hours)
@@ -280,6 +322,7 @@ desktop-commander:execute_command "npm run test"
 ### **For Verification Mode**:
 - ✅ All quality checks pass (lint, typecheck, tests)
 - ✅ TraffBoard patterns followed correctly
+- ✅ Business logic rules verified
 - ✅ Implementation matches execution plan exactly
 - ✅ Binary decision with specific actionable feedback
 - ✅ TaskMaster status updated appropriately
@@ -300,7 +343,7 @@ desktop-commander:execute_command "npm run test"
 
 ---
 
-**🚨 CRITICAL SUCCESS FACTOR**: Developer Claude must receive complete, self-contained instructions that eliminate all exploration and uncertainty. Every execution document must be immediately actionable.
+**🚨 CRITICAL SUCCESS FACTOR**: Developer Claude must receive complete, self-contained instructions that eliminate all exploration and uncertainty. Every execution document must be immediately actionable and include all relevant business logic nuances.
 
 ## Usage
 Specify which mode: 

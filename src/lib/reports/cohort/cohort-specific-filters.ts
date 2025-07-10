@@ -112,7 +112,7 @@ export function validateCohortSpecificFilters(values: Record<string, unknown>): 
     errors.push("Primary metric is required");
   }
 
-  if (values.breakpoints && values.breakpoints.length === 0) {
+  if (Array.isArray(values.breakpoints) && values.breakpoints.length === 0) {
     errors.push("At least one breakpoint must be selected");
   }
 
