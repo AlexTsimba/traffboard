@@ -1,47 +1,73 @@
-import "~/styles/globals.css";
-import "./theme.css";
+import '~/styles/globals.css';
+import './theme.css';
 
-import { type Metadata } from "next";
-import { Geist } from "next/font/google";
-import { cookies } from "next/headers";
-import { cn } from "~/lib/utils";
-import ThemeProvider from "~/components/layout/ThemeToggle/theme-provider";
-import { ActiveThemeProvider } from "~/components/active-theme";
+import { type Metadata } from 'next';
+import { Geist } from 'next/font/google';
+import { cn } from '~/lib/utils';
+import { ThemeProvider } from 'next-themes';
+import { AuthProvider } from '~/components/auth-provider';
 
 export const metadata: Metadata = {
-  title: "Traffboard Analytics",
-  description: "Analytics dashboard for traffic analysis",
-  icons: [{ rel: "icon", url: "/favicon.ico" }],
+  title: 'Traffboard Analytics',
+  description: 'Analytics dashboard for traffic analysis',
+  icons: [{ rel: 'icon', url: '/favicon.ico' }],
 };
 
 const geist = Geist({
-  subsets: ["latin"],
-  variable: "--font-geist-sans",
+  subsets: ['latin'],
+  variable: '--font-geist-sans',
 });
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const cookieStore = await cookies();
-  const activeThemeValue = cookieStore.get('active_theme')?.value;
-  const isScaled = activeThemeValue?.endsWith('-scaled');
-
   return (
-    <html lang="en" className={`${geist.variable}`} suppressHydrationWarning>
-      <body className={cn(
-        'bg-background overflow-hidden overscroll-none font-sans antialiased',
-        activeThemeValue ? `theme-${activeThemeValue}` : '',
-        isScaled ? 'theme-scaled' : ''
-      )}>
+    <html
+      lang="en"
+      className={cn(geist.variable)}
+      suppressHydrationWarning
+    >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  // Apply color theme immediately
+                  const colorTheme = localStorage.getItem('color-theme') || 'tangerine';
+                  if (['tangerine', 'vercel', 'claude'].includes(colorTheme)) {
+                    document.documentElement.classList.remove('tangerine', 'vercel', 'claude');
+                    document.documentElement.classList.add(colorTheme);
+                  }
+                  
+                  // Apply scaling immediately
+                  const isScaled = localStorage.getItem('theme-scaled') === 'true';
+                  document.documentElement.classList.toggle('theme-scaled', isScaled);
+                  
+                  // Apply content centering immediately
+                  const isContentCentered = localStorage.getItem('content-layout-centered');
+                  const validIsContentCentered = isContentCentered !== null 
+                    ? isContentCentered === 'true' 
+                    : true; // Default to centered
+                  document.documentElement.classList.toggle('content-centered', validIsContentCentered);
+                } catch (e) {}
+              })()
+            `,
+          }}
+        />
+      </head>
+      <body>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
+          enableSystem={true}
+          themes={['light', 'dark', 'system']}
+          disableTransitionOnChange={false}
+          storageKey="theme"
         >
-          <ActiveThemeProvider initialTheme={activeThemeValue as string}>
+          <AuthProvider>
             {children}
-          </ActiveThemeProvider>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

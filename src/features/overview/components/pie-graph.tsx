@@ -134,7 +134,7 @@ export function PieGraph() {
                         </tspan>
                         <tspan
                           x={viewBox.cx}
-                          y={(viewBox.cy || 0) + 24}
+                          y={(viewBox.cy ?? 0) + 24}
                           className='fill-muted-foreground text-sm'
                         >
                           Total Visitors
@@ -151,7 +151,7 @@ export function PieGraph() {
       <CardFooter className='flex-col gap-2 text-sm'>
         <div className='flex items-center gap-2 leading-none font-medium'>
           Chrome leads with{' '}
-          {((chartData[0]?.visitors || 0) / totalVisitors * 100).toFixed(1)}%{' '}
+          {((chartData[0]?.visitors ?? 0) / totalVisitors * 100).toFixed(1)}%{' '}
           <IconTrendingUp className='h-4 w-4' />
         </div>
         <div className='text-muted-foreground leading-none'>

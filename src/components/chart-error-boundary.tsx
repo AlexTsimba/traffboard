@@ -79,7 +79,7 @@ class ChartErrorBoundary extends React.Component<
 
   render() {
     if (this.state.hasError && this.state.error) {
-      const ErrorComponent = this.props.fallback || DefaultErrorFallback;
+      const ErrorComponent = this.props.fallback ?? DefaultErrorFallback;
       return (
         <ErrorComponent
           error={this.state.error}

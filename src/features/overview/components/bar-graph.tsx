@@ -227,7 +227,7 @@ export function BarGraph() {
               tickMargin={8}
               minTickGap={32}
               tickFormatter={(value) => {
-                const date = new Date(value);
+                const date = new Date(value as string | number | Date);
                 return date.toLocaleDateString('en-US', {
                   month: 'short',
                   day: 'numeric'
@@ -241,7 +241,7 @@ export function BarGraph() {
                   className='w-[150px]'
                   nameKey='views'
                   labelFormatter={(value) => {
-                    return new Date(value).toLocaleDateString('en-US', {
+                    return new Date(value as string | number | Date).toLocaleDateString('en-US', {
                       month: 'short',
                       day: 'numeric',
                       year: 'numeric'

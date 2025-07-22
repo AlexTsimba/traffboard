@@ -11,8 +11,9 @@ export async function GET() {
       },
     });
     return NextResponse.json({ message: "Database connection successful! New post created:", post: newPost });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Database connection error:", error);
-    return NextResponse.json({ message: "Database connection failed!", error: error.message }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    return NextResponse.json({ message: "Database connection failed!", error: errorMessage }, { status: 500 });
   }
 }

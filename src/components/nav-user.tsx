@@ -100,6 +100,12 @@ export function NavUser({
                 <Bell />
                 Notifications
               </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <a href="/preferences">
+                  <Sparkles />
+                  Preferences
+                </a>
+              </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem>

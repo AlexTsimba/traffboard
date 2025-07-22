@@ -2,16 +2,12 @@
 
 import * as React from "react"
 import {
-  Bot,
-  Frame,
-  Map,
   PieChart,
-  Settings2,
   SquareTerminal,
 } from "lucide-react"
 
 import { NavMain } from "~/components/nav-main"
-import { NavUser } from "~/components/nav-user"
+import { AuthNavUser } from "~/components/auth-nav-user"
 import { TeamSwitcher } from "~/components/team-switcher"
 import {
   Sidebar,
@@ -78,7 +74,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <AuthNavUser />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

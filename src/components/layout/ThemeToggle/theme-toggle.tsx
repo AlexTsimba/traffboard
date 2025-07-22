@@ -1,47 +1,56 @@
 'use client';
 
-import { Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
-import * as React from 'react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
+import { useEffect, useState, useCallback } from 'react';
 
-import { Button } from '~/components/ui/button';
+const MODE_OPTIONS = [
+  { value: 'light', label: 'Light' },
+  { value: 'dark', label: 'Dark' },
+  { value: 'system', label: 'System' },
+];
 
 export function ModeToggle() {
-  const { setTheme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  const { setTheme, theme } = useTheme();
 
-  const handleThemeToggle = React.useCallback(
-    (e?: React.MouseEvent) => {
-      const newMode = resolvedTheme === 'dark' ? 'light' : 'dark';
-      const root = document.documentElement;
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
+  const handleThemeToggle = useCallback(
+    (newTheme: string) => {
       if (!document.startViewTransition) {
-        setTheme(newMode);
+        setTheme(newTheme);
         return;
       }
 
-      // Set coordinates from the click event
-      if (e) {
-        root.style.setProperty('--x', `${e.clientX}px`);
-        root.style.setProperty('--y', `${e.clientY}px`);
-      }
-
       document.startViewTransition(() => {
-        setTheme(newMode);
+        setTheme(newTheme);
       });
     },
-    [resolvedTheme, setTheme]
+    [setTheme]
   );
 
+  // Get current mode (filter out color themes)
+  const currentMode = MODE_OPTIONS.find(mode => mode.value === theme)?.value ?? 'system';
+
+  if (!mounted) {
+    return null;
+  }
+
   return (
-    <Button
-      variant='ghost'
-      size='icon'
-      className='h-8 w-8'
-      onClick={handleThemeToggle}
-    >
-      <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-      <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-      <span className='sr-only'>Toggle theme</span>
-    </Button>
+    <Select value={currentMode} onValueChange={handleThemeToggle}>
+      <SelectTrigger className="w-32">
+        <SelectValue placeholder="Select mode" />
+      </SelectTrigger>
+      <SelectContent>
+        {MODE_OPTIONS.map((mode) => (
+          <SelectItem key={mode.value} value={mode.value}>
+            {mode.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 }

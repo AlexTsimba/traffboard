@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { Card, CardDescription, CardHeader, CardTitle } from "~/components/ui/card"
+import { ProtectedLayout } from "~/components/protected-layout"
 
 const reports = [
   {
@@ -26,20 +27,22 @@ const reports = [
 
 export default function ReportsPage() {
   return (
-    <div className="flex flex-1 flex-col gap-4">
-      <h1 className="text-2xl font-bold">Reports</h1>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {reports.map((report) => (
-          <Link key={report.title} href={report.url}>
-            <Card className="hover:bg-muted/50 transition-colors cursor-pointer">
-              <CardHeader>
-                <CardTitle>{report.title}</CardTitle>
-                <CardDescription>{report.description}</CardDescription>
-              </CardHeader>
-            </Card>
-          </Link>
-        ))}
+    <ProtectedLayout>
+      <div className="flex flex-1 flex-col gap-4">
+        <h1 className="text-2xl font-bold">Reports</h1>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {reports.map((report) => (
+            <Link key={report.title} href={report.url}>
+              <Card className="hover:bg-muted/50 transition-colors cursor-pointer">
+                <CardHeader>
+                  <CardTitle>{report.title}</CardTitle>
+                  <CardDescription>{report.description}</CardDescription>
+                </CardHeader>
+              </Card>
+            </Link>
+          ))}
+        </div>
       </div>
-    </div>
+    </ProtectedLayout>
   )
 }

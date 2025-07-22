@@ -18,11 +18,10 @@ import {
   CardAction,
   CardFooter
 } from '~/components/ui/card';
-import { ScrollArea } from '~/components/ui/scroll-area';
 import { ChartErrorBoundary } from '~/components/chart-error-boundary';
-import { IconTrendingDown, IconTrendingUp } from '@tabler/icons-react';
+import { IconTrendingUp } from '@tabler/icons-react';
 
-export default function DashboardPage() {
+export function DashboardClient() {
   const [mounted, setMounted] = React.useState(false);
   const [chartsLoaded, setChartsLoaded] = React.useState(0);
 
@@ -45,8 +44,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <ScrollArea className="h-[calc(100dvh-52px)]">
-      <div className="flex flex-1 flex-col gap-4 p-4 md:px-6">
+    <div className="flex flex-1 flex-col gap-4 p-4 md:px-6 min-h-[calc(100dvh-52px)]">
       {/* Welcome Header */}
       <div className="flex items-center justify-between space-y-2">
         <h2 className="text-2xl font-bold tracking-tight">
@@ -55,7 +53,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Statistics Cards */}
-      <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs md:grid-cols-2 lg:grid-cols-4">
+      <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid gap-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs grid-cols-1 sm:grid-cols-2 xl:grid-cols-4">
         <Card className="@container/card">
           <CardHeader>
             <CardDescription>Total Revenue</CardDescription>
@@ -170,6 +168,5 @@ export default function DashboardPage() {
         </div>
       </div>
       </div>
-    </ScrollArea>
   )
 }

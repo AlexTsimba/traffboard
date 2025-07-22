@@ -1,20 +1,96 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "postgresql"
-    url      = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    @@index([name])
+  @@index([name])
+}
+
+model User {
+  id               String     @id @default(cuid())
+  name             String
+  email            String     @unique
+  emailVerified    Boolean    @default(false)
+  image            String?
+  password         String?
+  twoFactorEnabled Boolean    @default(false)
+  role             String     @default("user")
+  banned           Boolean    @default(false)
+  banExpiresAt     DateTime?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  banReason        String?
+  banExpires       DateTime?
+  accounts         Account[]
+  sessions         Session[]
+  twoFactor        TwoFactor?
+
+  @@map("user")
+}
+
+model Session {
+  id             String   @id @default(cuid())
+  userId         String
+  token          String   @unique
+  expiresAt      DateTime
+  ipAddress      String?
+  userAgent      String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  impersonatedBy String?
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  userId                String
+  accountId             String
+  providerId            String
+  accessToken           String?
+  refreshToken          String?
+  accessTokenExpiresAt  DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  idToken               String?
+  refreshTokenExpiresAt DateTime?
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, accountId])
+  @@map("account")
+}
+
+model TwoFactor {
+  id          String  @id @default(cuid())
+  userId      String  @unique
+  secret      String?
+  backupCodes String?
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("twoFactor")
+}
+
+model Verification {
+  id         String    @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime?
+
+  @@unique([identifier, value])
+  @@map("verification")
 }

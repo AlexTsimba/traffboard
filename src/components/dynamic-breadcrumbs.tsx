@@ -30,10 +30,10 @@ export function DynamicBreadcrumbs() {
           <div key={segment} className="contents">
             <BreadcrumbItem>
               {index === segments.length - 1 ? (
-                <BreadcrumbPage>{routeLabels[segment] || segment}</BreadcrumbPage>
+                <BreadcrumbPage>{routeLabels[segment] ?? segment}</BreadcrumbPage>
               ) : (
                 <BreadcrumbLink href={`/${segments.slice(0, index + 1).join('/')}`}>
-                  {routeLabels[segment] || segment}
+                  {routeLabels[segment] ?? segment}
                 </BreadcrumbLink>
               )}
             </BreadcrumbItem>
