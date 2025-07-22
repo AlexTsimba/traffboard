@@ -87,13 +87,18 @@ export function TwoFactorManager() {
         return;
       }
       
-      const enableData = await enableResult.json();
+      const enableData = await enableResult.json() as {
+        totpURI?: string;
+        totp_uri?: string;
+        totpUri?: string;
+        uri?: string;
+      };
       console.log('Enable API response data:', enableData);
       
       // Check if TOTP URI is already in the enable response
-      let totpURI = null;
-      if (enableData.totpURI || enableData.totp_uri || enableData.totpUri || enableData.uri) {
-        totpURI = enableData.totpURI || enableData.totp_uri || enableData.totpUri || enableData.uri;
+      let totpURI: string | null = null;
+      if (enableData.totpURI ?? enableData.totp_uri ?? enableData.totpUri ?? enableData.uri) {
+        totpURI = enableData.totpURI ?? enableData.totp_uri ?? enableData.totpUri ?? enableData.uri ?? null;
         console.log('Found TOTP URI in enable response:', totpURI);
       } else {
         // If not in enable response, try to get it separately
@@ -108,9 +113,14 @@ export function TwoFactorManager() {
         });
         
         if (uriResult.ok) {
-          const uriData = await uriResult.json();
+          const uriData = await uriResult.json() as {
+            totpURI?: string;
+            totp_uri?: string;
+            totpUri?: string;
+            uri?: string;
+          };
           console.log('URI API response data:', uriData);
-          totpURI = uriData.totpURI || uriData.totp_uri || uriData.totpUri || uriData.uri;
+          totpURI = uriData.totpURI ?? uriData.totp_uri ?? uriData.totpUri ?? uriData.uri ?? null;
         }
       }
 
@@ -123,9 +133,9 @@ export function TwoFactorManager() {
         console.error('No totpURI found after enable/get attempts');
         setError('Failed to get TOTP URI. Check server configuration.');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('2FA enable error:', err);
-      setError(err.message || 'Failed to enable 2FA');
+      setError(err instanceof Error ? err.message : 'Failed to enable 2FA');
     } finally {
       setLoading(false);
     }
@@ -161,7 +171,7 @@ export function TwoFactorManager() {
         return;
       }
 
-      const verifyResult = await response.json();
+      const verifyResult = await response.json() as Record<string, unknown>;
       console.log('verifyTotp result:', verifyResult);
 
       // 2FA is now enabled, show success and finish
@@ -170,9 +180,9 @@ export function TwoFactorManager() {
       
       // Note: Backup codes are typically generated during the initial setup
       // If needed, user can generate them separately from profile settings
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('2FA verify error:', err);
-      setError(err.message || 'Failed to verify code');
+      setError(err instanceof Error ? err.message : 'Failed to verify code');
     } finally {
       setLoading(false);
     }
@@ -206,16 +216,16 @@ export function TwoFactorManager() {
         return;
       }
 
-      const result = await response.json();
+      const result = await response.json() as Record<string, unknown>;
       console.log('Disable result:', result);
 
       setState('disabled');
       clearPassword();
       setBackupCodes([]);
       setTotpUri('');
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('2FA disable error:', err);
-      setError(err.message || 'Failed to disable 2FA');
+      setError(err instanceof Error ? err.message : 'Failed to disable 2FA');
     } finally {
       setLoading(false);
     }
@@ -249,7 +259,7 @@ export function TwoFactorManager() {
       const result = await authClient.twoFactor.generateBackupCodes({ password });
 
       if (result.error) {
-        setError(result.error.message || 'Failed to generate backup codes');
+        setError(result.error.message ?? 'Failed to generate backup codes');
         return;
       }
 
@@ -258,9 +268,9 @@ export function TwoFactorManager() {
         setState('show_backup');
         clearPassword();
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Backup codes generation error:', err);
-      setError(err.message || 'Failed to generate backup codes');
+      setError(err instanceof Error ? err.message : 'Failed to generate backup codes');
     } finally {
       setLoading(false);
     }
@@ -491,7 +501,7 @@ export function TwoFactorManager() {
 
         <div className="pt-2">
           <Button onClick={finishSetup} className="w-full">
-            I've Saved My Backup Codes
+            I&apos;ve Saved My Backup Codes
           </Button>
         </div>
       </div>
@@ -509,7 +519,7 @@ export function TwoFactorManager() {
 
         <Alert variant="destructive">
           <AlertDescription>
-            This will remove the extra security layer from your account. You'll only need your password to sign in.
+            This will remove the extra security layer from your account. You&apos;ll only need your password to sign in.
           </AlertDescription>
         </Alert>
 

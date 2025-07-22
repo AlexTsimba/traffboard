@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { authClient } from '~/lib/auth-client';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
@@ -9,11 +9,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import { Separator } from '~/components/ui/separator';
 import { Alert, AlertDescription } from '~/components/ui/alert';
 import { Badge } from '~/components/ui/badge';
-import { Shield, ShieldCheck } from 'lucide-react';
+import { Shield, ShieldCheck, Key, Eye, EyeOff, Monitor, Smartphone, Tablet, Globe, Trash2 } from 'lucide-react';
 import QRCode from 'react-qr-code';
 
 export function SecurityClient() {
   const { data: session, isPending } = authClient.useSession();
+  
+  // 2FA state
   const [password, setPassword] = useState('');
   const [totpCode, setTotpCode] = useState('');
   const [totpUri, setTotpUri] = useState('');
@@ -21,12 +23,146 @@ export function SecurityClient() {
   const [loading, setLoading] = useState(false);
   const [showEnableForm, setShowEnableForm] = useState(false);
   const [showQR, setShowQR] = useState(false);
+  
+  // Change password state
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showChangePasswordForm, setShowChangePasswordForm] = useState(false);
+  const [passwordSuccess, setPasswordSuccess] = useState(false);
+
+  // Session management state
+  const [sessions, setSessions] = useState<Array<{
+    id: string;
+    userAgent?: string | null;
+    ipAddress?: string | null;
+    updatedAt: Date;
+    userId: string;
+    expiresAt: Date;
+    createdAt: Date;
+    token: string;
+  }>>([]);
+  const [sessionsLoading, setSessionsLoading] = useState(false);
+  const [sessionError, setSessionError] = useState('');
+  const [revokeLoading, setRevokeLoading] = useState('');
+
+  const loadSessions = async () => {
+    setSessionsLoading(true);
+    setSessionError('');
+    
+    try {
+      const response = await authClient.listSessions();
+      
+      // Better Auth returns {data: Array, error: null} format
+      if (response?.data && Array.isArray(response.data)) {
+        setSessions(response.data);
+      } else if (response?.error) {
+        setSessionError(response.error.message ?? 'Failed to load sessions');
+      } else {
+        setSessions([]);
+      }
+    } catch (err: unknown) {
+      setSessionError(err instanceof Error ? err.message : 'Failed to load sessions');
+    } finally {
+      setSessionsLoading(false);
+    }
+  };
+
+  const revokeSession = async (sessionToken: string) => {
+    setRevokeLoading(sessionToken);
+    
+    try {
+      await authClient.revokeSession({ token: sessionToken });
+      // Reload sessions after successful revocation
+      await loadSessions();
+    } catch (err: unknown) {
+      setSessionError(err instanceof Error ? err.message : 'Failed to revoke session');
+    } finally {
+      setRevokeLoading('');
+    }
+  };
+
+  const revokeAllOtherSessions = async () => {
+    setSessionsLoading(true);
+    setSessionError('');
+    
+    try {
+      await authClient.revokeOtherSessions();
+      // Reload sessions after successful revocation
+      await loadSessions();
+    } catch (err: unknown) {
+      setSessionError(err instanceof Error ? err.message : 'Failed to revoke other sessions');
+    } finally {
+      setSessionsLoading(false);
+    }
+  };
+
+  const getDeviceIcon = (userAgent?: string) => {
+    if (!userAgent) return <Monitor className="h-4 w-4" />;
+    
+    const ua = userAgent.toLowerCase();
+    if (ua.includes('mobile') || ua.includes('android') || ua.includes('iphone')) {
+      return <Smartphone className="h-4 w-4" />;
+    }
+    if (ua.includes('tablet') || ua.includes('ipad')) {
+      return <Tablet className="h-4 w-4" />;
+    }
+    return <Monitor className="h-4 w-4" />;
+  };
+
+  const getBrowserName = (userAgent?: string | null): string => {
+    if (!userAgent) return 'Unknown Browser';
+    
+    const ua = userAgent.toLowerCase();
+    
+    // Check for specific browsers in order of specificity
+    if (ua.includes('edg/')) return 'Edge';
+    if (ua.includes('chrome/') && ua.includes('safari/')) return 'Chrome';
+    if (ua.includes('firefox/')) return 'Firefox';
+    if (ua.includes('safari/') && !ua.includes('chrome/')) return 'Safari';
+    if (ua.includes('opera/') || ua.includes('opr/')) return 'Opera';
+    if (ua.includes('brave/')) return 'Brave';
+    
+    // Fallback to parsing the first meaningful part
+    const parts = userAgent.split(' ');
+    for (const part of parts) {
+      if (part.includes('/') && !part.startsWith('Mozilla/')) {
+        return part.split('/')[0];
+      }
+    }
+    
+    return 'Unknown Browser';
+  };
+
+  const formatLastActive = (date: Date | string) => {
+    const now = new Date();
+    const sessionDate = typeof date === 'string' ? new Date(date) : date;
+    const diffMs = now.getTime() - sessionDate.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffMinutes = Math.floor(diffMs / (1000 * 60));
+    
+    if (diffDays > 0) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+    if (diffHours > 0) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+    if (diffMinutes > 0) return `${diffMinutes} minute${diffMinutes > 1 ? 's' : ''} ago`;
+    return 'Just now';
+  };
+
+  // Load sessions on component mount
+  useEffect(() => {
+    void loadSessions();
+  }, []);
 
   if (isPending) {
     return <div>Loading...</div>;
   }
 
-  const is2FAEnabled = session?.user?.twoFactorEnabled || false;
+  const is2FAEnabled = session?.user?.twoFactorEnabled ?? false;
 
   const handleEnable2FA = async () => {
     if (!password.trim()) {
@@ -38,23 +174,18 @@ export function SecurityClient() {
     setError('');
 
     try {
-      const { data, error } = await authClient.twoFactor.enable({
+      const result = await authClient.twoFactor.enable({
         password,
         issuer: "Traffboard Analytics"
       });
 
-      if (error) {
-        setError(error.message || 'Failed to enable 2FA');
-        return;
-      }
-
-      if (data?.totpURI) {
-        setTotpUri(data.totpURI);
+      if (result?.data?.totpURI) {
+        setTotpUri(result.data.totpURI);
         setShowQR(true);
         setPassword('');
       }
-    } catch (err: any) {
-      setError(err.message || 'Failed to enable 2FA');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to enable 2FA');
     } finally {
       setLoading(false);
     }
@@ -70,15 +201,10 @@ export function SecurityClient() {
     setError('');
 
     try {
-      const { data, error } = await authClient.twoFactor.verifyTotp({
+      await authClient.twoFactor.verifyTotp({
         code: totpCode,
         trustDevice: true
       });
-
-      if (error) {
-        setError(error.message || 'Invalid code');
-        return;
-      }
 
       // Success - reset form
       setTotpCode('');
@@ -86,8 +212,8 @@ export function SecurityClient() {
       setShowQR(false);
       setShowEnableForm(false);
       // Session will update automatically
-    } catch (err: any) {
-      setError(err.message || 'Failed to verify code');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to verify code');
     } finally {
       setLoading(false);
     }
@@ -103,21 +229,64 @@ export function SecurityClient() {
     setError('');
 
     try {
-      const { data, error } = await authClient.twoFactor.disable({
+      await authClient.twoFactor.disable({
         password
       });
 
-      if (error) {
-        setError(error.message || 'Failed to disable 2FA');
-        return;
-      }
-
       setPassword('');
       setShowEnableForm(false);
-    } catch (err: any) {
-      setError(err.message || 'Failed to disable 2FA');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to disable 2FA');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleChangePassword = async () => {
+    if (!currentPassword.trim()) {
+      setPasswordError('Current password is required');
+      return;
+    }
+
+    if (!newPassword.trim()) {
+      setPasswordError('New password is required');
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      setPasswordError('New password must be at least 6 characters');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setPasswordError('New passwords do not match');
+      return;
+    }
+
+    setPasswordLoading(true);
+    setPasswordError('');
+
+    try {
+      await authClient.changePassword({
+        currentPassword,
+        newPassword,
+        revokeOtherSessions: true // Automatically revoke other sessions for security
+      });
+
+      // Success
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      setShowChangePasswordForm(false);
+      setPasswordSuccess(true);
+      setTimeout(() => setPasswordSuccess(false), 3000);
+      
+      // Reload sessions since other sessions were revoked
+      await loadSessions();
+    } catch (err: unknown) {
+      setPasswordError(err instanceof Error ? err.message : 'Failed to change password');
+    } finally {
+      setPasswordLoading(false);
     }
   };
 
@@ -132,7 +301,7 @@ export function SecurityClient() {
 
       <Separator />
 
-      <div className="grid gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card>
           <CardHeader>
             <CardTitle className="text-xl">Two-Factor Authentication</CardTitle>
@@ -276,33 +445,231 @@ export function SecurityClient() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-xl">Account Security</CardTitle>
+            <CardTitle className="text-xl">Change Password</CardTitle>
             <p className="text-sm text-muted-foreground">
-              Additional security settings for your account.
+              Update your account password for better security.
             </p>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-medium">Password</h3>
-                <p className="text-sm text-muted-foreground">
-                  Last changed: Never
-                </p>
+              <div className="flex items-center gap-3">
+                <Key className="h-5 w-5 text-muted-foreground" />
+                <div>
+                  <div className="font-medium">Password</div>
+                  <div className="text-sm text-muted-foreground">
+                    Keep your password secure and up to date
+                  </div>
+                </div>
               </div>
-              {/* Change password functionality can be added later */}
             </div>
-            
-            <Separator />
-            
+
+            {passwordSuccess && (
+              <Alert>
+                <AlertDescription>Password changed successfully!</AlertDescription>
+              </Alert>
+            )}
+
+            {passwordError && (
+              <Alert variant="destructive">
+                <AlertDescription>{passwordError}</AlertDescription>
+              </Alert>
+            )}
+
+            {!showChangePasswordForm && (
+              <Button onClick={() => setShowChangePasswordForm(true)}>
+                Change Password
+              </Button>
+            )}
+
+            {showChangePasswordForm && (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="currentPassword">Current Password</Label>
+                  <div className="relative">
+                    <Input
+                      id="currentPassword"
+                      type={showCurrentPassword ? 'text' : 'password'}
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      placeholder="Enter current password"
+                      disabled={passwordLoading}
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                      onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                      disabled={passwordLoading}
+                    >
+                      {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="newPassword">New Password</Label>
+                  <div className="relative">
+                    <Input
+                      id="newPassword"
+                      type={showNewPassword ? 'text' : 'password'}
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder="Enter new password (min 6 characters)"
+                      disabled={passwordLoading}
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      disabled={passwordLoading}
+                    >
+                      {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                  <div className="relative">
+                    <Input
+                      id="confirmPassword"
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="Confirm new password"
+                      disabled={passwordLoading}
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      disabled={passwordLoading}
+                    >
+                      {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="flex gap-2">
+                  <Button 
+                    onClick={handleChangePassword} 
+                    disabled={passwordLoading || !currentPassword.trim() || !newPassword.trim() || !confirmPassword.trim()}
+                  >
+                    {passwordLoading ? 'Changing...' : 'Change Password'}
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      setShowChangePasswordForm(false);
+                      setCurrentPassword('');
+                      setNewPassword('');
+                      setConfirmPassword('');
+                      setPasswordError('');
+                    }}
+                    disabled={passwordLoading}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-xl">Active Sessions</CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Manage your active sessions and sign out from other devices.
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {sessionError && (
+              <Alert variant="destructive">
+                <AlertDescription>{sessionError}</AlertDescription>
+              </Alert>
+            )}
+
             <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-medium">Active Sessions</h3>
-                <p className="text-sm text-muted-foreground">
-                  Manage your active login sessions
-                </p>
+              <div className="flex items-center gap-3">
+                <Globe className="h-5 w-5 text-muted-foreground" />
+                <div>
+                  <div className="font-medium">Sessions</div>
+                  <div className="text-sm text-muted-foreground">
+                    {sessions.length} active session{sessions.length !== 1 ? 's' : ''}
+                  </div>
+                </div>
               </div>
-              {/* Session management can be added later */}
+              <Button 
+                variant="outline" 
+                onClick={revokeAllOtherSessions}
+                disabled={sessionsLoading || sessions.length <= 1}
+                size="sm"
+              >
+                {sessionsLoading ? 'Revoking...' : 'Sign Out Others'}
+              </Button>
             </div>
+
+            <Separator />
+
+            {sessionsLoading ? (
+              <div className="text-center py-4">
+                <div className="text-sm text-muted-foreground">Loading sessions...</div>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {sessions.map((sessionItem) => (
+                  <div key={sessionItem.id} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div className="flex items-center gap-3">
+                      {getDeviceIcon(sessionItem.userAgent)}
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-sm">
+                            {getBrowserName(sessionItem.userAgent)}
+                          </span>
+                          {sessionItem.id === (session?.session as { id: string } | undefined)?.id && (
+                            <Badge variant="secondary" className="text-xs">Current</Badge>
+                          )}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {sessionItem.ipAddress && (
+                            <span>{sessionItem.ipAddress} • </span>
+                          )}
+                          Last active {formatLastActive(sessionItem.updatedAt)}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {sessionItem.id !== (session?.session as { id: string } | undefined)?.id && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => revokeSession(sessionItem.id)}
+                        disabled={revokeLoading === sessionItem.id}
+                        className="text-destructive hover:text-destructive"
+                      >
+                        {revokeLoading === sessionItem.id ? (
+                          'Revoking...'
+                        ) : (
+                          <Trash2 className="h-4 w-4" />
+                        )}
+                      </Button>
+                    )}
+                  </div>
+                ))}
+                
+                {sessions.length === 0 && (
+                  <div className="text-center py-4">
+                    <div className="text-sm text-muted-foreground">No active sessions found</div>
+                  </div>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
