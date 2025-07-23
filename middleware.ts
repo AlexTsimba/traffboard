@@ -14,7 +14,7 @@ export async function middleware(request: NextRequest) {
     }
 
     // User has 2FA enabled but hasn't completed verification - redirect to 2FA
-    if (session.user.twoFactorEnabled && !session.twoFactorVerified) {
+    if (session.user.twoFactorEnabled && !(session as any).twoFactorVerified) {
         return NextResponse.redirect(new URL("/auth/two-factor", request.url));
     }
 
@@ -23,5 +23,5 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   runtime: "nodejs",
-  matcher: ["/dashboard", "/reports/conversions", "/reports/cohort", "/reports/quality", "/reports/landings", "/admin", "/preferences"]
+  matcher: ["/dashboard", "/reports/conversions", "/reports/cohort", "/reports/quality", "/reports/landings", "/admin", "/settings"]
 };

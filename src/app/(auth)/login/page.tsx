@@ -8,6 +8,7 @@ import { Label } from '~/components/ui/label';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff } from 'lucide-react';
+import Link from 'next/link';
 // Google icon as SVG component
 const GoogleIcon = () => (
   <svg className="w-4 h-4" viewBox="0 0 24 24">
@@ -66,7 +67,7 @@ export default function LoginPage() {
       });
 
       if (result.error) {
-        setError(result.error.message);
+        setError(result.error.message ?? 'Sign in failed');
       } else {
         router.push('/dashboard');
       }
@@ -109,9 +110,9 @@ export default function LoginPage() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password">Password</Label>
-                  <a href="/auth/forgot-password" className="text-sm text-primary hover:underline">
+                  <Link href="/auth/forgot-password" className="text-sm text-primary hover:underline">
                     Forgot your password?
-                  </a>
+                  </Link>
                 </div>
                 <div className="relative">
                   <Input

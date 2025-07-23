@@ -11,6 +11,7 @@
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
     "dev": "lsof -ti:3000 | xargs kill -9 2>/dev/null || true && next dev --turbo -p 3000",
+    "dev:shared": "lsof -ti:3000 | xargs kill -9 2>/dev/null || true && next dev --turbo -p 3000 -H 0.0.0.0",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,mdx}\" --cache",
     "format:write": "prettier --write \"**/*.{ts,tsx,js,jsx,mdx}\" --cache",
     "postinstall": "prisma generate",

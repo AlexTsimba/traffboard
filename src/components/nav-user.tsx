@@ -101,9 +101,9 @@ export function NavUser({
                 Notifications
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <a href="/preferences">
+                <a href="/settings">
                   <Sparkles />
-                  Preferences
+                  Settings
                 </a>
               </DropdownMenuItem>
             </DropdownMenuGroup>

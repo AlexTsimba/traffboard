@@ -90,8 +90,8 @@ export function SecurityClient() {
           // Better Auth account linking doesn't store OAuth profile data
           // For linked accounts, we should show that it's connected but we can't get the Google email
           // The email shown should be the current user's email who linked the account
-          let userEmail = session?.user?.email;
-          let userName = session?.user?.name;
+          const userEmail = session?.user?.email;
+          const userName = session?.user?.name;
           
           console.log('Using session email for linked account:', { userEmail, userName });
           
@@ -215,7 +215,7 @@ export function SecurityClient() {
     try {
       await authClient.linkSocial({
         provider: 'google',
-        callbackURL: `${window.location.origin}/preferences/security`
+        callbackURL: `${window.location.origin}/settings/security`
       });
       // Note: This will redirect to Google OAuth, so loading state won't reset here
     } catch (err: unknown) {
@@ -317,14 +317,22 @@ export function SecurityClient() {
 
     try {
       const result = await authClient.twoFactor.enable({
-        password,
-        issuer: "Traffboard Analytics"
+        password
       });
+
+      console.log('2FA enable result:', result);
 
       if (result?.data?.totpURI) {
         setTotpUri(result.data.totpURI);
         setShowQR(true);
         setPassword('');
+      } else if (result?.totpURI) {
+        // Handle different response structure
+        setTotpUri(result.totpURI);
+        setShowQR(true);
+        setPassword('');
+      } else {
+        setError('Failed to generate 2FA setup - no TOTP URI received');
       }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to enable 2FA');
@@ -409,11 +417,14 @@ export function SecurityClient() {
     setPasswordError('');
 
     try {
-      await authClient.changePassword({
+      console.log('Attempting password change...');
+      const result = await authClient.changePassword({
         currentPassword,
         newPassword,
         revokeOtherSessions: true // Automatically revoke other sessions for security
       });
+
+      console.log('Password change result:', result);
 
       // Success
       setCurrentPassword('');
@@ -426,6 +437,7 @@ export function SecurityClient() {
       // Reload sessions since other sessions were revoked
       await loadSessions();
     } catch (err: unknown) {
+      console.error('Password change error:', err);
       setPasswordError(err instanceof Error ? err.message : 'Failed to change password');
     } finally {
       setPasswordLoading(false);

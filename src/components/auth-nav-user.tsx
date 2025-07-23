@@ -78,9 +78,9 @@ export function AuthNavUser() {
               sideOffset={4}
             >
               <DropdownMenuItem asChild>
-                <Link href="/preferences">
+                <Link href="/settings">
                   <Settings className="h-4 w-4" />
-                  Preferences
+                  Settings
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
