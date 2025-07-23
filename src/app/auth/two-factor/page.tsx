@@ -7,11 +7,11 @@ import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
 import { useRouter } from 'next/navigation';
+import { authNotifications } from '~/lib/toast-utils';
 
 export default function TwoFactorPage() {
   const [code, setCode] = useState('');
   const [useBackupCode, setUseBackupCode] = useState(false);
-  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
@@ -30,44 +30,28 @@ export default function TwoFactorPage() {
   };
 
   const handleVerify = async () => {
-    if (!code) {
-      setError('Please enter the verification code');
+    if (!code.trim()) {
+      authNotifications.twoFactor.error('Please enter the verification code');
       return;
     }
 
     setIsLoading(true);
-    setError('');
 
     try {
-      if (useBackupCode) {
-        // Verify backup code
-        const result = await authClient.twoFactor.verifyBackupCode({
-          code
-        });
-        
-        if (result.error) {
-          setError(result.error.message ?? 'Invalid backup code');
-          setCode('');
-        } else {
-          router.push('/dashboard');
-        }
+      const result = useBackupCode 
+        ? await authClient.twoFactor.verifyBackupCode({ code })
+        : await authClient.twoFactor.verifyTotp({ code, trustDevice: true });
+      
+      if (result.error) {
+        const errorMessage = result.error.message ?? (useBackupCode ? 'Invalid backup code' : 'Invalid verification code');
+        authNotifications.twoFactor.error(errorMessage);
+        setCode(''); // Clear the code for retry
       } else {
-        // Verify TOTP code
-        const result = await authClient.twoFactor.verifyTotp({
-          code,
-          trustDevice: true // Mark device as trusted for 60 days
-        });
-        
-        if (result.error) {
-          setError(result.error.message ?? 'Invalid verification code');
-          setCode(''); // Clear the code for retry
-        } else {
-          // Success - redirect to dashboard
-          router.push('/dashboard');
-        }
+        router.push('/dashboard?login=success');
       }
     } catch (err: unknown) {
-      setError((err as Error).message ?? (useBackupCode ? 'Invalid backup code' : 'Invalid verification code'));
+      const errorMessage = (err as Error).message ?? (useBackupCode ? 'Invalid backup code' : 'Invalid verification code');
+      authNotifications.twoFactor.error(errorMessage);
       setCode(''); // Clear the code for retry
     } finally {
       setIsLoading(false);
@@ -86,11 +70,7 @@ export default function TwoFactorPage() {
             }
           </p>
         </CardHeader>
-        <CardContent className="space-y-4">
-          {error && (
-            <div className="text-sm text-destructive">{error}</div>
-          )}
-          
+        <CardContent className="space-y-4">          
           <div className="space-y-2">
             <Label htmlFor="code">
               {useBackupCode ? 'Backup Code' : 'Verification Code'}
@@ -121,7 +101,6 @@ export default function TwoFactorPage() {
               onClick={() => {
                 setUseBackupCode(!useBackupCode);
                 setCode('');
-                setError('');
               }}
               className="text-sm text-muted-foreground hover:text-foreground underline"
             >

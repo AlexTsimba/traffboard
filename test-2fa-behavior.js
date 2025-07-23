@@ -43,7 +43,7 @@ async function test1_checkDatabaseState() {
     return isConfiguredCorrectly;
     
   } catch (error) {
-    console.error('❌ Database test failed:', error.message);
+    console.error('❌ Database test failed:', error instanceof Error ? error.message : 'Unknown error');
     return false;
   } finally {
     await prisma.$disconnect();
@@ -87,7 +87,7 @@ async function test2_checkSessionData() {
     };
     
   } catch (error) {
-    console.error('❌ Session test failed:', error.message);
+    console.error('❌ Session test failed:', error instanceof Error ? error.message : 'Unknown error');
     return false;
   }
 }
@@ -127,7 +127,7 @@ async function test3_testMiddlewareBehavior() {
     }
     
   } catch (error) {
-    console.error('❌ Middleware test failed:', error.message);
+    console.error('❌ Middleware test failed:', error instanceof Error ? error.message : 'Unknown error');
     return false;
   }
 }

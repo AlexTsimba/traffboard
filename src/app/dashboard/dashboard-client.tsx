@@ -1,6 +1,8 @@
 'use client';
 
 import * as React from 'react';
+import { useSearchParams } from 'next/navigation';
+import { authNotifications } from '~/lib/toast-utils';
 import { AreaGraph } from '~/features/overview/components/area-graph';
 import { AreaGraphSkeleton } from '~/features/overview/components/area-graph-skeleton';
 import { BarGraph } from '~/features/overview/components/bar-graph';
@@ -24,6 +26,20 @@ import { IconTrendingUp } from '@tabler/icons-react';
 export function DashboardClient() {
   const [mounted, setMounted] = React.useState(false);
   const [chartsLoaded, setChartsLoaded] = React.useState(0);
+  const searchParams = useSearchParams();
+  const toastShown = React.useRef(false);
+
+  // Show welcome toast for successful logins
+  React.useEffect(() => {
+    const loginSuccess = searchParams.get('login');
+    if (loginSuccess === 'success' && !toastShown.current) {
+      toastShown.current = true;
+      // Small delay to ensure Toaster is ready
+      setTimeout(() => {
+        authNotifications.login.success();
+      }, 100);
+    }
+  }, [searchParams]);
 
   React.useEffect(() => {
     setMounted(true);

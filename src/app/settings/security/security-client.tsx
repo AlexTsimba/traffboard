@@ -7,9 +7,9 @@ import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import { Separator } from '~/components/ui/separator';
-import { Alert, AlertDescription } from '~/components/ui/alert';
+import { securityNotifications } from '~/lib/toast-utils';
 import { Badge } from '~/components/ui/badge';
-import { Shield, ShieldCheck, Key, Eye, EyeOff, Monitor, Smartphone, Tablet, Globe, Trash2, Link, Unlink } from 'lucide-react';
+import { Shield, ShieldCheck, Key, Eye, EyeOff, Monitor, Smartphone, Tablet, Globe, Trash2, Link } from 'lucide-react';
 import QRCode from 'react-qr-code';
 
 export function SecurityClient() {
@@ -19,7 +19,6 @@ export function SecurityClient() {
   const [password, setPassword] = useState('');
   const [totpCode, setTotpCode] = useState('');
   const [totpUri, setTotpUri] = useState('');
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showEnableForm, setShowEnableForm] = useState(false);
   const [showQR, setShowQR] = useState(false);
@@ -28,13 +27,10 @@ export function SecurityClient() {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [passwordError, setPasswordError] = useState('');
-  const [passwordLoading, setPasswordLoading] = useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showChangePasswordForm, setShowChangePasswordForm] = useState(false);
-  const [passwordSuccess, setPasswordSuccess] = useState(false);
 
   // Session management state
   const [sessions, setSessions] = useState<Array<{
@@ -48,13 +44,8 @@ export function SecurityClient() {
     token: string;
   }>>([]);
   const [sessionsLoading, setSessionsLoading] = useState(false);
-  const [sessionError, setSessionError] = useState('');
   const [revokeLoading, setRevokeLoading] = useState('');
 
-  // Google account linking state
-  const [googleLinkLoading, setGoogleLinkLoading] = useState(false);
-  const [googleError, setGoogleError] = useState('');
-  const [googleSuccess, setGoogleSuccess] = useState(false);
 
   // Check if Google account is linked and get account details
   const [isGoogleLinked, setIsGoogleLinked] = useState(false);
@@ -71,8 +62,6 @@ export function SecurityClient() {
   const checkGoogleAccount = async () => {
     try {
       const result = await authClient.listAccounts();
-      console.log('listAccounts result:', result);
-      console.log('current session:', session);
       
       if (result.data && Array.isArray(result.data)) {
         const googleAccount = result.data.find((account: { 
@@ -85,15 +74,11 @@ export function SecurityClient() {
         if (googleAccount) {
           setIsGoogleLinked(true);
           
-          console.log('Google account object:', googleAccount);
-          
           // Better Auth account linking doesn't store OAuth profile data
           // For linked accounts, we should show that it's connected but we can't get the Google email
           // The email shown should be the current user's email who linked the account
           const userEmail = session?.user?.email;
           const userName = session?.user?.name;
-          
-          console.log('Using session email for linked account:', { userEmail, userName });
           
           setGoogleAccountInfo({
             accountId: googleAccount.accountId,
@@ -112,54 +97,19 @@ export function SecurityClient() {
         setGoogleAccountInfo(null);
       }
     } catch (err) {
-      // Silently fail - account check is not critical
-      console.log('Could not check linked accounts:', err);
+      // Account check failed - reset to safe state
       setIsGoogleLinked(false);
       setGoogleAccountInfo(null);
     }
   };
 
   useEffect(() => {
-    void checkGoogleAccount();
+    checkGoogleAccount();
   }, [session]); // Re-run when session changes
 
-  // Handle OAuth callback validation and errors
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const error = urlParams.get('error');
-    const success = urlParams.get('linked');
-    const errorDescription = urlParams.get('error_description');
-    
-    if (error) {
-      let errorMessage = decodeURIComponent(error);
-      
-      // Handle specific Better Auth linking errors
-      if (error === 'linking_failed') {
-        errorMessage = 'Account linking failed. Please ensure you use the same email address for OAuth authentication.';
-      } else if (error === 'email_mismatch') {
-        errorMessage = 'Email mismatch: The Google account email does not match your current account email. Please use the same email address.';
-      } else if (errorDescription) {
-        errorMessage = decodeURIComponent(errorDescription);
-      }
-      
-      setGoogleError(errorMessage);
-      setGoogleLinkLoading(false);
-      // Clean up URL parameters
-      window.history.replaceState({}, document.title, window.location.pathname);
-    } else if (success === 'google') {
-      setGoogleSuccess(true);
-      setTimeout(() => setGoogleSuccess(false), 3000);
-      setGoogleLinkLoading(false);
-      // Refresh account info
-      void checkGoogleAccount();
-      // Clean up URL parameters
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
-  }, []); // Empty dependency array - runs only on mount
 
   const loadSessions = async () => {
     setSessionsLoading(true);
-    setSessionError('');
     
     try {
       const response = await authClient.listSessions();
@@ -168,12 +118,12 @@ export function SecurityClient() {
       if (response?.data && Array.isArray(response.data)) {
         setSessions(response.data);
       } else if (response?.error) {
-        setSessionError(response.error.message ?? 'Failed to load sessions');
+        securityNotifications.sessions.error(response.error.message ?? 'Failed to load sessions');
       } else {
         setSessions([]);
       }
     } catch (err: unknown) {
-      setSessionError(err instanceof Error ? err.message : 'Failed to load sessions');
+      securityNotifications.sessions.error(err instanceof Error ? err.message : 'Failed to load sessions');
     } finally {
       setSessionsLoading(false);
     }
@@ -186,8 +136,9 @@ export function SecurityClient() {
       await authClient.revokeSession({ token: sessionToken });
       // Reload sessions after successful revocation
       await loadSessions();
+      securityNotifications.sessions.revoked(1);
     } catch (err: unknown) {
-      setSessionError(err instanceof Error ? err.message : 'Failed to revoke session');
+      securityNotifications.sessions.error(err instanceof Error ? err.message : 'Failed to revoke session');
     } finally {
       setRevokeLoading('');
     }
@@ -195,54 +146,19 @@ export function SecurityClient() {
 
   const revokeAllOtherSessions = async () => {
     setSessionsLoading(true);
-    setSessionError('');
     
     try {
       await authClient.revokeOtherSessions();
       // Reload sessions after successful revocation
       await loadSessions();
+      securityNotifications.sessions.revoked(sessions.length - 1);
     } catch (err: unknown) {
-      setSessionError(err instanceof Error ? err.message : 'Failed to revoke other sessions');
+      securityNotifications.sessions.error(err instanceof Error ? err.message : 'Failed to revoke other sessions');
     } finally {
       setSessionsLoading(false);
     }
   };
 
-  const handleLinkGoogle = async () => {
-    setGoogleLinkLoading(true);
-    setGoogleError('');
-    
-    try {
-      await authClient.linkSocial({
-        provider: 'google',
-        callbackURL: `${window.location.origin}/settings/security`
-      });
-      // Note: This will redirect to Google OAuth, so loading state won't reset here
-    } catch (err: unknown) {
-      setGoogleError(err instanceof Error ? err.message : 'Failed to link Google account');
-      setGoogleLinkLoading(false);
-    }
-  };
-
-  const handleUnlinkGoogle = async () => {
-    setGoogleLinkLoading(true);
-    setGoogleError('');
-    
-    try {
-      await authClient.unlinkAccount({
-        providerId: 'google'
-      });
-      
-      setIsGoogleLinked(false);
-      setGoogleAccountInfo(null);
-      setGoogleSuccess(true);
-      setTimeout(() => setGoogleSuccess(false), 3000);
-    } catch (err: unknown) {
-      setGoogleError(err instanceof Error ? err.message : 'Failed to unlink Google account');
-    } finally {
-      setGoogleLinkLoading(false);
-    }
-  };
 
   const getDeviceIcon = (userAgent?: string) => {
     if (!userAgent) return <Monitor className="h-4 w-4" />;
@@ -308,34 +224,28 @@ export function SecurityClient() {
 
   const handleEnable2FA = async () => {
     if (!password.trim()) {
-      setError('Password is required');
+      securityNotifications.twoFactor.error('Password is required');
       return;
     }
 
     setLoading(true);
-    setError('');
 
     try {
       const result = await authClient.twoFactor.enable({
         password
       });
 
-      console.log('2FA enable result:', result);
+      // 2FA enable result handled via result.data.totpURI
 
       if (result?.data?.totpURI) {
         setTotpUri(result.data.totpURI);
         setShowQR(true);
         setPassword('');
-      } else if (result?.totpURI) {
-        // Handle different response structure
-        setTotpUri(result.totpURI);
-        setShowQR(true);
-        setPassword('');
       } else {
-        setError('Failed to generate 2FA setup - no TOTP URI received');
+        securityNotifications.twoFactor.error('Failed to generate 2FA setup - no TOTP URI received');
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to enable 2FA');
+      securityNotifications.twoFactor.error(err instanceof Error ? err.message : 'Failed to enable 2FA');
     } finally {
       setLoading(false);
     }
@@ -343,12 +253,11 @@ export function SecurityClient() {
 
   const handleVerifyTOTP = async () => {
     if (!totpCode.trim() || totpCode.length !== 6) {
-      setError('Please enter a valid 6-digit code');
+      securityNotifications.twoFactor.error('Please enter a valid 6-digit code');
       return;
     }
 
     setLoading(true);
-    setError('');
 
     try {
       await authClient.twoFactor.verifyTotp({
@@ -356,14 +265,15 @@ export function SecurityClient() {
         trustDevice: true
       });
 
-      // Success - reset form
+      // Success - reset form and show notification
       setTotpCode('');
       setTotpUri('');
       setShowQR(false);
       setShowEnableForm(false);
+      securityNotifications.twoFactor.verified();
       // Session will update automatically
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to verify code');
+      securityNotifications.twoFactor.error(err instanceof Error ? err.message : 'Failed to verify code');
     } finally {
       setLoading(false);
     }
@@ -371,12 +281,11 @@ export function SecurityClient() {
 
   const handleDisable2FA = async () => {
     if (!password.trim()) {
-      setError('Password is required');
+      securityNotifications.twoFactor.error('Password is required');
       return;
     }
 
     setLoading(true);
-    setError('');
 
     try {
       await authClient.twoFactor.disable({
@@ -385,8 +294,9 @@ export function SecurityClient() {
 
       setPassword('');
       setShowEnableForm(false);
+      securityNotifications.twoFactor.disabled();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to disable 2FA');
+      securityNotifications.twoFactor.error(err instanceof Error ? err.message : 'Failed to disable 2FA');
     } finally {
       setLoading(false);
     }
@@ -394,53 +304,46 @@ export function SecurityClient() {
 
   const handleChangePassword = async () => {
     if (!currentPassword.trim()) {
-      setPasswordError('Current password is required');
+      securityNotifications.password.error('Current password is required');
       return;
     }
 
     if (!newPassword.trim()) {
-      setPasswordError('New password is required');
+      securityNotifications.password.error('New password is required');
       return;
     }
 
     if (newPassword.length < 6) {
-      setPasswordError('New password must be at least 6 characters');
+      securityNotifications.password.error('New password must be at least 6 characters');
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      setPasswordError('New passwords do not match');
+      securityNotifications.password.error('New passwords do not match');
       return;
     }
 
-    setPasswordLoading(true);
-    setPasswordError('');
+    const changePasswordPromise = authClient.changePassword({
+      currentPassword,
+      newPassword,
+      revokeOtherSessions: true // Automatically revoke other sessions for security
+    });
+
+    securityNotifications.password.loading(changePasswordPromise);
 
     try {
-      console.log('Attempting password change...');
-      const result = await authClient.changePassword({
-        currentPassword,
-        newPassword,
-        revokeOtherSessions: true // Automatically revoke other sessions for security
-      });
-
-      console.log('Password change result:', result);
-
-      // Success
+      await changePasswordPromise;
+      
+      // Success - reset form
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
       setShowChangePasswordForm(false);
-      setPasswordSuccess(true);
-      setTimeout(() => setPasswordSuccess(false), 3000);
       
       // Reload sessions since other sessions were revoked
       await loadSessions();
     } catch (err: unknown) {
-      console.error('Password change error:', err);
-      setPasswordError(err instanceof Error ? err.message : 'Failed to change password');
-    } finally {
-      setPasswordLoading(false);
+      // Error toast is already shown by the promise handler
     }
   };
 
@@ -474,17 +377,6 @@ export function SecurityClient() {
               </div>
             </div>
 
-            {passwordSuccess && (
-              <Alert>
-                <AlertDescription>Password changed successfully!</AlertDescription>
-              </Alert>
-            )}
-
-            {passwordError && (
-              <Alert variant="destructive">
-                <AlertDescription>{passwordError}</AlertDescription>
-              </Alert>
-            )}
 
             {!showChangePasswordForm && (
               <Button onClick={() => setShowChangePasswordForm(true)}>
@@ -503,7 +395,7 @@ export function SecurityClient() {
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
                       placeholder="Enter current password"
-                      disabled={passwordLoading}
+                      disabled={false}
                     />
                     <Button
                       type="button"
@@ -511,7 +403,7 @@ export function SecurityClient() {
                       size="sm"
                       className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                       onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                      disabled={passwordLoading}
+                      disabled={false}
                     >
                       {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </Button>
@@ -527,7 +419,7 @@ export function SecurityClient() {
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
                       placeholder="Enter new password (min 6 characters)"
-                      disabled={passwordLoading}
+                      disabled={false}
                     />
                     <Button
                       type="button"
@@ -535,7 +427,7 @@ export function SecurityClient() {
                       size="sm"
                       className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                       onClick={() => setShowNewPassword(!showNewPassword)}
-                      disabled={passwordLoading}
+                      disabled={false}
                     >
                       {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </Button>
@@ -551,7 +443,7 @@ export function SecurityClient() {
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       placeholder="Confirm new password"
-                      disabled={passwordLoading}
+                      disabled={false}
                     />
                     <Button
                       type="button"
@@ -559,7 +451,7 @@ export function SecurityClient() {
                       size="sm"
                       className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      disabled={passwordLoading}
+                      disabled={false}
                     >
                       {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </Button>
@@ -569,9 +461,9 @@ export function SecurityClient() {
                 <div className="flex gap-2">
                   <Button 
                     onClick={handleChangePassword} 
-                    disabled={passwordLoading || !currentPassword.trim() || !newPassword.trim() || !confirmPassword.trim()}
+                    disabled={!currentPassword.trim() || !newPassword.trim() || !confirmPassword.trim()}
                   >
-                    {passwordLoading ? 'Changing...' : 'Change Password'}
+                    Change Password
                   </Button>
                   <Button 
                     variant="outline" 
@@ -580,9 +472,7 @@ export function SecurityClient() {
                       setCurrentPassword('');
                       setNewPassword('');
                       setConfirmPassword('');
-                      setPasswordError('');
                     }}
-                    disabled={passwordLoading}
                   >
                     Cancel
                   </Button>
@@ -622,11 +512,6 @@ export function SecurityClient() {
               </Badge>
             </div>
 
-            {error && (
-              <Alert variant="destructive">
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
 
             {!is2FAEnabled && !showEnableForm && !showQR && (
               <Button onClick={() => setShowEnableForm(true)}>
@@ -656,7 +541,6 @@ export function SecurityClient() {
                     onClick={() => {
                       setShowEnableForm(false);
                       setPassword('');
-                      setError('');
                     }}
                   >
                     Cancel
@@ -699,7 +583,6 @@ export function SecurityClient() {
                       setShowEnableForm(false);
                       setTotpCode('');
                       setTotpUri('');
-                      setError('');
                     }}
                   >
                     Cancel
@@ -733,74 +616,52 @@ export function SecurityClient() {
           </CardContent>
         </Card>
 
-        {/* Connected Accounts (Google) - Bottom Left */}
+        {/* Available Login Methods - Bottom Left */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-xl">Connected Accounts</CardTitle>
+            <CardTitle className="text-xl">Available Login Methods</CardTitle>
             <p className="text-sm text-muted-foreground">
-              Link your Google account for OAuth sign-in. Must use the same email as your current account ({session?.user?.email}).
+              Your account supports these authentication methods. Google OAuth is automatically linked when you sign in with matching email.
             </p>
           </CardHeader>
           <CardContent className="space-y-4">
+            {/* Email/Password Login */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Key className="h-5 w-5 text-green-500" />
+                <div>
+                  <div className="font-medium">Email & Password</div>
+                  <div className="text-sm text-muted-foreground">
+                    {session?.user?.email} • Always available
+                  </div>
+                </div>
+              </div>
+              <Badge variant="default">Available</Badge>
+            </div>
+
+            {/* Google OAuth */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 {isGoogleLinked ? (
                   <Link className="h-5 w-5 text-green-500" />
                 ) : (
-                  <Unlink className="h-5 w-5 text-muted-foreground" />
+                  <Globe className="h-5 w-5 text-muted-foreground" />
                 )}
                 <div>
-                  <div className="font-medium">Google Account</div>
+                  <div className="font-medium">Google OAuth</div>
                   <div className="text-sm text-muted-foreground">
                     {isGoogleLinked && googleAccountInfo?.userEmail
-                      ? `${googleAccountInfo.userEmail} • Connected ${new Date(googleAccountInfo.createdAt).toLocaleDateString()}`
-                      : isGoogleLinked
-                      ? `Connected ${googleAccountInfo ? new Date(googleAccountInfo.createdAt).toLocaleDateString() : ''}`
-                      : 'Connect your Google account for OAuth sign-in'
+                      ? `${googleAccountInfo.userEmail} • Linked ${new Date(googleAccountInfo.createdAt).toLocaleDateString()}`
+                      : 'Sign in with Google using matching email to auto-link'
                     }
                   </div>
                 </div>
               </div>
               <Badge variant={isGoogleLinked ? 'default' : 'outline'}>
-                {isGoogleLinked ? 'Connected' : 'Not Connected'}
+                {isGoogleLinked ? 'Linked' : 'Auto-Link Available'}
               </Badge>
             </div>
 
-
-            {googleSuccess && (
-              <Alert>
-                <AlertDescription>Google account successfully updated!</AlertDescription>
-              </Alert>
-            )}
-
-            {googleError && (
-              <Alert variant="destructive">
-                <AlertDescription>{googleError}</AlertDescription>
-              </Alert>
-            )}
-
-            <div className="flex gap-2 pt-2">
-              {isGoogleLinked ? (
-                <Button
-                  variant="outline"
-                  onClick={handleUnlinkGoogle}
-                  disabled={googleLinkLoading}
-                  className="flex items-center gap-2"
-                >
-                  <Unlink className="h-4 w-4" />
-                  {googleLinkLoading ? 'Unlinking...' : 'Unlink Google'}
-                </Button>
-              ) : (
-                <Button
-                  onClick={handleLinkGoogle}
-                  disabled={googleLinkLoading}
-                  className="flex items-center gap-2"
-                >
-                  <Link className="h-4 w-4" />
-                  {googleLinkLoading ? 'Linking...' : 'Link Google Account'}
-                </Button>
-              )}
-            </div>
           </CardContent>
         </Card>
 
@@ -813,11 +674,6 @@ export function SecurityClient() {
             </p>
           </CardHeader>
           <CardContent className="space-y-4">
-            {sessionError && (
-              <Alert variant="destructive">
-                <AlertDescription>{sessionError}</AlertDescription>
-              </Alert>
-            )}
 
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">

@@ -5,10 +5,11 @@ import { Card, CardHeader, CardTitle, CardContent } from '~/components/ui/card';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
+import { authNotifications } from '~/lib/toast-utils';
 // Google icon as SVG component
 const GoogleIcon = () => (
   <svg className="w-4 h-4" viewBox="0 0 24 24">
@@ -36,19 +37,40 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Handle error query parameters and show appropriate toast
+  useEffect(() => {
+    const error = searchParams.get('error');
+    if (error === 'signup_disabled') {
+      // Small delay to ensure Toaster is ready
+      setTimeout(() => {
+        authNotifications.oauth.noAccount();
+      }, 100);
+    }
+  }, [searchParams]);
 
   const handleGoogleSignIn = async () => {
     try {
       setIsSubmitting(true);
-      setError('');
+      authNotifications.oauth.redirecting('Google');
       await authClient.signIn.social({
         provider: 'google',
-        callbackURL: '/dashboard'
+        callbackURL: '/dashboard?login=success',
+        errorCallbackURL: '/login?error=signup_disabled'
       });
+      // Note: User will be redirected, so success will be handled on redirect callback
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to sign in with Google');
+      if (err instanceof Error) {
+        if (err.message.includes('No account found') || err.message.includes('Contact your administrator')) {
+          authNotifications.oauth.noAccount();
+        } else {
+          authNotifications.oauth.error(err.message);
+        }
+      } else {
+        authNotifications.oauth.error('Failed to sign in with Google');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -56,10 +78,15 @@ export default function LoginPage() {
 
   const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!email.trim() || !password.trim()) {
+      authNotifications.login.error('Please enter both email and password');
+      return;
+    }
+
+    setIsSubmitting(true);
+
     try {
-      setIsSubmitting(true);
-      setError('');
-      
       const result = await authClient.signIn.email({
         email,
         password,
@@ -67,12 +94,13 @@ export default function LoginPage() {
       });
 
       if (result.error) {
-        setError(result.error.message ?? 'Sign in failed');
+        authNotifications.login.error(result.error.message ?? 'Sign in failed');
       } else {
-        router.push('/dashboard');
+        router.push('/dashboard?login=success');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to sign in');
+      authNotifications.login.error(err instanceof Error ? err.message : 'Sign in failed');
+      // Error already logged via authNotifications
     } finally {
       setIsSubmitting(false);
     }
@@ -88,11 +116,6 @@ export default function LoginPage() {
           <div className="space-y-4">
             {/* Email/Password Form */}
             <form onSubmit={handleEmailSignIn} className="space-y-4">
-              {error && (
-                <div className="text-sm text-destructive text-center">
-                  {error}
-                </div>
-              )}
               
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>

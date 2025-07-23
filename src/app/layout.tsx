@@ -6,6 +6,7 @@ import { Geist } from 'next/font/google';
 import { cn } from '~/lib/utils';
 import { ThemeProvider } from 'next-themes';
 import { AuthProvider } from '~/components/auth-provider';
+import { Toaster } from 'sonner';
 
 export const metadata: Metadata = {
   title: 'Traffboard Analytics',
@@ -68,6 +69,20 @@ export default function RootLayout({
           <AuthProvider>
             {children}
           </AuthProvider>
+          <Toaster 
+            position="top-right"
+            richColors 
+            closeButton
+            expand={true}
+            visibleToasts={5}
+            toastOptions={{
+              duration: 4000,
+              style: {
+                fontSize: '14px',
+              },
+            }}
+            theme="system"
+          />
         </ThemeProvider>
       </body>
     </html>

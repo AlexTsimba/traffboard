@@ -4,8 +4,19 @@ import { admin, twoFactor } from "better-auth/plugins";
 import { nextCookies } from "better-auth/next-js";
 import { PrismaClient } from "@prisma/client";
 
-// Using same instantiation pattern as existing test-db route  
-const prisma = new PrismaClient();
+// Validate required environment variables
+if (!process.env.BETTER_AUTH_SECRET) {
+  throw new Error('BETTER_AUTH_SECRET environment variable is required');
+}
+
+// Singleton pattern for PrismaClient to prevent multiple instances
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient | undefined;
+};
+
+const prisma = globalForPrisma.prisma ?? new PrismaClient();
+
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 
 export const auth = betterAuth({
   secret: process.env.BETTER_AUTH_SECRET!,
@@ -22,6 +33,7 @@ export const auth = betterAuth({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       prompt: "select_account",
+      disableSignUp: true, // Prevent new user creation via OAuth
     },
   } : {},
   session: {
@@ -33,7 +45,7 @@ export const auth = betterAuth({
     accountLinking: {
       enabled: true,
       trustedProviders: ["google"],
-      allowDifferentEmails: false // This is the correct way to prevent different emails
+      allowDifferentEmails: false
     }
   },
   plugins: [
