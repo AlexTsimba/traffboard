@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import { Separator } from '~/components/ui/separator';
 import { Alert, AlertDescription } from '~/components/ui/alert';
 import { Badge } from '~/components/ui/badge';
-import { Shield, ShieldCheck, Key, Eye, EyeOff, Monitor, Smartphone, Tablet, Globe, Trash2 } from 'lucide-react';
+import { Shield, ShieldCheck, Key, Eye, EyeOff, Monitor, Smartphone, Tablet, Globe, Trash2, Link, Unlink } from 'lucide-react';
 import QRCode from 'react-qr-code';
 
 export function SecurityClient() {
@@ -50,6 +50,112 @@ export function SecurityClient() {
   const [sessionsLoading, setSessionsLoading] = useState(false);
   const [sessionError, setSessionError] = useState('');
   const [revokeLoading, setRevokeLoading] = useState('');
+
+  // Google account linking state
+  const [googleLinkLoading, setGoogleLinkLoading] = useState(false);
+  const [googleError, setGoogleError] = useState('');
+  const [googleSuccess, setGoogleSuccess] = useState(false);
+
+  // Check if Google account is linked and get account details
+  const [isGoogleLinked, setIsGoogleLinked] = useState(false);
+  const [googleAccountInfo, setGoogleAccountInfo] = useState<{
+    accountId: string;
+    provider: string;
+    createdAt: Date;
+    scopes: string[];
+    userEmail?: string;
+    userName?: string;
+  } | null>(null);
+
+  // Load linked accounts on component mount
+  const checkGoogleAccount = async () => {
+    try {
+      const result = await authClient.listAccounts();
+      console.log('listAccounts result:', result);
+      console.log('current session:', session);
+      
+      if (result.data && Array.isArray(result.data)) {
+        const googleAccount = result.data.find((account: { 
+          provider: string; 
+          accountId: string;
+          createdAt: Date;
+          scopes: string[];
+        }) => account.provider === 'google');
+        
+        if (googleAccount) {
+          setIsGoogleLinked(true);
+          
+          console.log('Google account object:', googleAccount);
+          
+          // Better Auth account linking doesn't store OAuth profile data
+          // For linked accounts, we should show that it's connected but we can't get the Google email
+          // The email shown should be the current user's email who linked the account
+          let userEmail = session?.user?.email;
+          let userName = session?.user?.name;
+          
+          console.log('Using session email for linked account:', { userEmail, userName });
+          
+          setGoogleAccountInfo({
+            accountId: googleAccount.accountId,
+            provider: googleAccount.provider,
+            createdAt: googleAccount.createdAt,
+            scopes: googleAccount.scopes || [],
+            userEmail,
+            userName
+          });
+        } else {
+          setIsGoogleLinked(false);
+          setGoogleAccountInfo(null);
+        }
+      } else {
+        setIsGoogleLinked(false);
+        setGoogleAccountInfo(null);
+      }
+    } catch (err) {
+      // Silently fail - account check is not critical
+      console.log('Could not check linked accounts:', err);
+      setIsGoogleLinked(false);
+      setGoogleAccountInfo(null);
+    }
+  };
+
+  useEffect(() => {
+    void checkGoogleAccount();
+  }, [session]); // Re-run when session changes
+
+  // Handle OAuth callback validation and errors
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const error = urlParams.get('error');
+    const success = urlParams.get('linked');
+    const errorDescription = urlParams.get('error_description');
+    
+    if (error) {
+      let errorMessage = decodeURIComponent(error);
+      
+      // Handle specific Better Auth linking errors
+      if (error === 'linking_failed') {
+        errorMessage = 'Account linking failed. Please ensure you use the same email address for OAuth authentication.';
+      } else if (error === 'email_mismatch') {
+        errorMessage = 'Email mismatch: The Google account email does not match your current account email. Please use the same email address.';
+      } else if (errorDescription) {
+        errorMessage = decodeURIComponent(errorDescription);
+      }
+      
+      setGoogleError(errorMessage);
+      setGoogleLinkLoading(false);
+      // Clean up URL parameters
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } else if (success === 'google') {
+      setGoogleSuccess(true);
+      setTimeout(() => setGoogleSuccess(false), 3000);
+      setGoogleLinkLoading(false);
+      // Refresh account info
+      void checkGoogleAccount();
+      // Clean up URL parameters
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []); // Empty dependency array - runs only on mount
 
   const loadSessions = async () => {
     setSessionsLoading(true);
@@ -102,6 +208,42 @@ export function SecurityClient() {
     }
   };
 
+  const handleLinkGoogle = async () => {
+    setGoogleLinkLoading(true);
+    setGoogleError('');
+    
+    try {
+      await authClient.linkSocial({
+        provider: 'google',
+        callbackURL: `${window.location.origin}/preferences/security`
+      });
+      // Note: This will redirect to Google OAuth, so loading state won't reset here
+    } catch (err: unknown) {
+      setGoogleError(err instanceof Error ? err.message : 'Failed to link Google account');
+      setGoogleLinkLoading(false);
+    }
+  };
+
+  const handleUnlinkGoogle = async () => {
+    setGoogleLinkLoading(true);
+    setGoogleError('');
+    
+    try {
+      await authClient.unlinkAccount({
+        providerId: 'google'
+      });
+      
+      setIsGoogleLinked(false);
+      setGoogleAccountInfo(null);
+      setGoogleSuccess(true);
+      setTimeout(() => setGoogleSuccess(false), 3000);
+    } catch (err: unknown) {
+      setGoogleError(err instanceof Error ? err.message : 'Failed to unlink Google account');
+    } finally {
+      setGoogleLinkLoading(false);
+    }
+  };
+
   const getDeviceIcon = (userAgent?: string) => {
     if (!userAgent) return <Monitor className="h-4 w-4" />;
     
@@ -132,7 +274,7 @@ export function SecurityClient() {
     const parts = userAgent.split(' ');
     for (const part of parts) {
       if (part.includes('/') && !part.startsWith('Mozilla/')) {
-        return part.split('/')[0];
+        return part.split('/')[0] ?? 'Unknown Browser';
       }
     }
     
@@ -293,156 +435,13 @@ export function SecurityClient() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Security Settings</h1>
-        <p className="text-muted-foreground">
-          Manage your account security and two-factor authentication
-        </p>
+        <h1 className="text-xl font-bold">Security Settings</h1>
       </div>
 
       <Separator />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-xl">Two-Factor Authentication</CardTitle>
-            <p className="text-sm text-muted-foreground">
-              Add an extra layer of security to your account by requiring a code from your authenticator app.
-            </p>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                {is2FAEnabled ? (
-                  <ShieldCheck className="h-5 w-5 text-green-500" />
-                ) : (
-                  <Shield className="h-5 w-5 text-muted-foreground" />
-                )}
-                <div>
-                  <div className="font-medium">Two-Factor Authentication</div>
-                  <div className="text-sm text-muted-foreground">
-                    {is2FAEnabled 
-                      ? 'Your account is protected with 2FA' 
-                      : 'Add extra security to your account'
-                    }
-                  </div>
-                </div>
-              </div>
-              <Badge variant={is2FAEnabled ? 'default' : 'outline'}>
-                {is2FAEnabled ? 'Enabled' : 'Disabled'}
-              </Badge>
-            </div>
-
-            {error && (
-              <Alert variant="destructive">
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-
-            {!is2FAEnabled && !showEnableForm && !showQR && (
-              <Button onClick={() => setShowEnableForm(true)}>
-                Enable Two-Factor Authentication
-              </Button>
-            )}
-
-            {!is2FAEnabled && showEnableForm && !showQR && (
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="password">Current Password</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter your password"
-                    disabled={loading}
-                  />
-                </div>
-                <div className="flex gap-2">
-                  <Button onClick={handleEnable2FA} disabled={loading || !password.trim()}>
-                    {loading ? 'Generating...' : 'Continue'}
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    onClick={() => {
-                      setShowEnableForm(false);
-                      setPassword('');
-                      setError('');
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </div>
-            )}
-
-            {showQR && (
-              <div className="space-y-4">
-                <div className="text-sm text-muted-foreground">
-                  Scan this QR code with your authenticator app, then enter the 6-digit code below.
-                </div>
-                
-                <div className="flex justify-center p-6 bg-white rounded-lg border">
-                  <QRCode value={totpUri} size={200} />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="totpCode">Verification Code</Label>
-                  <Input
-                    id="totpCode"
-                    type="text"
-                    value={totpCode}
-                    onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                    placeholder="Enter 6-digit code"
-                    maxLength={6}
-                    disabled={loading}
-                  />
-                </div>
-
-                <div className="flex gap-2">
-                  <Button onClick={handleVerifyTOTP} disabled={loading || totpCode.length !== 6}>
-                    {loading ? 'Verifying...' : 'Verify & Enable'}
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    onClick={() => {
-                      setShowQR(false);
-                      setShowEnableForm(false);
-                      setTotpCode('');
-                      setTotpUri('');
-                      setError('');
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </div>
-            )}
-
-            {is2FAEnabled && (
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="disablePassword">Current Password</Label>
-                  <Input
-                    id="disablePassword"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter your password to disable 2FA"
-                    disabled={loading}
-                  />
-                </div>
-                <Button 
-                  variant="destructive" 
-                  onClick={handleDisable2FA} 
-                  disabled={loading || !password.trim()}
-                >
-                  {loading ? 'Disabling...' : 'Disable 2FA'}
-                </Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Change Password - Top Left */}
         <Card>
           <CardHeader>
             <CardTitle className="text-xl">Change Password</CardTitle>
@@ -581,6 +580,219 @@ export function SecurityClient() {
           </CardContent>
         </Card>
 
+        {/* Two-Factor Authentication - Top Right */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-xl">Two-Factor Authentication</CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Add an extra layer of security to your account by requiring a code from your authenticator app.
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                {is2FAEnabled ? (
+                  <ShieldCheck className="h-5 w-5 text-green-500" />
+                ) : (
+                  <Shield className="h-5 w-5 text-muted-foreground" />
+                )}
+                <div>
+                  <div className="text-sm text-muted-foreground">
+                    {is2FAEnabled 
+                      ? 'Your account is protected with 2FA' 
+                      : 'Add extra security to your account'
+                    }
+                  </div>
+                </div>
+              </div>
+              <Badge variant={is2FAEnabled ? 'default' : 'outline'}>
+                {is2FAEnabled ? 'Enabled' : 'Disabled'}
+              </Badge>
+            </div>
+
+            {error && (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
+            {!is2FAEnabled && !showEnableForm && !showQR && (
+              <Button onClick={() => setShowEnableForm(true)}>
+                Enable Two-Factor Authentication
+              </Button>
+            )}
+
+            {!is2FAEnabled && showEnableForm && !showQR && (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="password">Current Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter your password"
+                    disabled={loading}
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button onClick={handleEnable2FA} disabled={loading || !password.trim()}>
+                    {loading ? 'Generating...' : 'Continue'}
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      setShowEnableForm(false);
+                      setPassword('');
+                      setError('');
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {showQR && (
+              <div className="space-y-4">
+                <div className="text-sm text-muted-foreground">
+                  Scan this QR code with your authenticator app, then enter the 6-digit code below.
+                </div>
+                
+                <div className="flex justify-center p-6 bg-white rounded-lg border">
+                  <QRCode value={totpUri} size={200} />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="totpCode">Verification Code</Label>
+                  <Input
+                    id="totpCode"
+                    type="text"
+                    value={totpCode}
+                    onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    placeholder="Enter 6-digit code"
+                    maxLength={6}
+                    disabled={loading}
+                  />
+                </div>
+
+                <div className="flex gap-2">
+                  <Button onClick={handleVerifyTOTP} disabled={loading || totpCode.length !== 6}>
+                    {loading ? 'Verifying...' : 'Verify & Enable'}
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      setShowQR(false);
+                      setShowEnableForm(false);
+                      setTotpCode('');
+                      setTotpUri('');
+                      setError('');
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {is2FAEnabled && (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="disablePassword">Current Password</Label>
+                  <Input
+                    id="disablePassword"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter your password to disable 2FA"
+                    disabled={loading}
+                  />
+                </div>
+                <Button 
+                  variant="destructive" 
+                  onClick={handleDisable2FA} 
+                  disabled={loading || !password.trim()}
+                >
+                  {loading ? 'Disabling...' : 'Disable 2FA'}
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Connected Accounts (Google) - Bottom Left */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-xl">Connected Accounts</CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Link your Google account for OAuth sign-in. Must use the same email as your current account ({session?.user?.email}).
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                {isGoogleLinked ? (
+                  <Link className="h-5 w-5 text-green-500" />
+                ) : (
+                  <Unlink className="h-5 w-5 text-muted-foreground" />
+                )}
+                <div>
+                  <div className="font-medium">Google Account</div>
+                  <div className="text-sm text-muted-foreground">
+                    {isGoogleLinked && googleAccountInfo?.userEmail
+                      ? `${googleAccountInfo.userEmail} • Connected ${new Date(googleAccountInfo.createdAt).toLocaleDateString()}`
+                      : isGoogleLinked
+                      ? `Connected ${googleAccountInfo ? new Date(googleAccountInfo.createdAt).toLocaleDateString() : ''}`
+                      : 'Connect your Google account for OAuth sign-in'
+                    }
+                  </div>
+                </div>
+              </div>
+              <Badge variant={isGoogleLinked ? 'default' : 'outline'}>
+                {isGoogleLinked ? 'Connected' : 'Not Connected'}
+              </Badge>
+            </div>
+
+
+            {googleSuccess && (
+              <Alert>
+                <AlertDescription>Google account successfully updated!</AlertDescription>
+              </Alert>
+            )}
+
+            {googleError && (
+              <Alert variant="destructive">
+                <AlertDescription>{googleError}</AlertDescription>
+              </Alert>
+            )}
+
+            <div className="flex gap-2 pt-2">
+              {isGoogleLinked ? (
+                <Button
+                  variant="outline"
+                  onClick={handleUnlinkGoogle}
+                  disabled={googleLinkLoading}
+                  className="flex items-center gap-2"
+                >
+                  <Unlink className="h-4 w-4" />
+                  {googleLinkLoading ? 'Unlinking...' : 'Unlink Google'}
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleLinkGoogle}
+                  disabled={googleLinkLoading}
+                  className="flex items-center gap-2"
+                >
+                  <Link className="h-4 w-4" />
+                  {googleLinkLoading ? 'Linking...' : 'Link Google Account'}
+                </Button>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Active Sessions - Bottom Right */}
         <Card>
           <CardHeader>
             <CardTitle className="text-xl">Active Sessions</CardTitle>
@@ -626,11 +838,11 @@ export function SecurityClient() {
                 {sessions.map((sessionItem) => (
                   <div key={sessionItem.id} className="flex items-center justify-between p-3 border rounded-lg">
                     <div className="flex items-center gap-3">
-                      {getDeviceIcon(sessionItem.userAgent)}
+                      {getDeviceIcon(sessionItem.userAgent ?? undefined)}
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
                           <span className="font-medium text-sm">
-                            {getBrowserName(sessionItem.userAgent)}
+                            {getBrowserName(sessionItem.userAgent ?? undefined)}
                           </span>
                           {sessionItem.id === (session?.session as { id: string } | undefined)?.id && (
                             <Badge variant="secondary" className="text-xs">Current</Badge>

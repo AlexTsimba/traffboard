@@ -21,6 +21,7 @@ export const auth = betterAuth({
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      prompt: "select_account",
     },
   } : {},
   session: {
@@ -28,6 +29,13 @@ export const auth = betterAuth({
     updateAge: 60 * 60 * 24      // 24 hours  
   },
   appName: "Traffboard Analytics", // Required for 2FA issuer
+  account: {
+    accountLinking: {
+      enabled: true,
+      trustedProviders: ["google"],
+      allowDifferentEmails: false // This is the correct way to prevent different emails
+    }
+  },
   plugins: [
     admin({
       defaultRole: "user",

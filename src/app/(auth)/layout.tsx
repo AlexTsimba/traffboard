@@ -1,16 +1,27 @@
+import { PieChart } from 'lucide-react';
+
 export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="w-full max-w-md space-y-6">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold">Traffboard</h1>
-          <p className="text-muted-foreground">Analytics Platform</p>
+    <div className="h-screen flex flex-col bg-background">
+      {/* Logo at top-left */}
+      <div className="p-6">
+        <div className="flex items-center gap-2">
+          <div className="bg-primary text-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+            <PieChart className="size-4" />
+          </div>
+          <span className="text-xl font-semibold">Traffboard</span>
         </div>
-        {children}
+      </div>
+      
+      {/* Content centered */}
+      <div className="flex-1 flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          {children}
+        </div>
       </div>
     </div>
   );
