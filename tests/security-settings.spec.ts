@@ -173,6 +173,136 @@ test.describe('Change Password Functionality', () => {
       await expect(changePasswordButton).toBeVisible();
     }
   });
+
+  test('should show error toast with specific message for wrong current password', async ({ page }) => {
+    await page.goto('/settings/security');
+    await page.waitForLoadState('networkidle');
+    
+    // Skip if redirected to login
+    if (page.url().includes('/login')) {
+      return;
+    }
+    
+    const changePasswordButton = page.locator('button', { hasText: 'Change Password' });
+    const isVisible = await changePasswordButton.isVisible().catch(() => false);
+    
+    if (isVisible) {
+      await changePasswordButton.click();
+      
+      // Fill form with wrong current password
+      await page.fill('input[id="currentPassword"]', 'wrong-password-123');
+      await page.fill('input[id="newPassword"]', 'new123456');
+      await page.fill('input[id="confirmPassword"]', 'new123456');
+      
+      // Submit the form
+      const submitButton = page.locator('button:has-text("Change Password")').nth(1);
+      await submitButton.click();
+      
+      // Wait for toast notification
+      await page.waitForTimeout(2000);
+      
+      // Should show error toast with specific message (not success)
+      const errorToast = page.locator('[data-sonner-toast]').filter({ hasText: 'Failed to change password' });
+      const successToast = page.locator('[data-sonner-toast]').filter({ hasText: 'Password changed successfully' });
+      
+      // Verify error toast appears and success toast does NOT appear
+      const hasErrorToast = await errorToast.isVisible().catch(() => false);
+      const hasSuccessToast = await successToast.isVisible().catch(() => false);
+      
+      expect(hasErrorToast).toBe(true);
+      expect(hasSuccessToast).toBe(false);
+      
+      // Form should remain open since password change failed
+      await expect(page.locator('input[id="currentPassword"]')).toBeVisible();
+    }
+  });
+
+  test('should show loading toast during password change operation', async ({ page }) => {
+    await page.goto('/settings/security');
+    await page.waitForLoadState('networkidle');
+    
+    // Skip if redirected to login
+    if (page.url().includes('/login')) {
+      return;
+    }
+    
+    const changePasswordButton = page.locator('button', { hasText: 'Change Password' });
+    const isVisible = await changePasswordButton.isVisible().catch(() => false);
+    
+    if (isVisible) {
+      await changePasswordButton.click();
+      
+      // Fill form with any password (will likely fail but that's fine for loading test)
+      await page.fill('input[id="currentPassword"]', 'test-password');
+      await page.fill('input[id="newPassword"]', 'new123456');
+      await page.fill('input[id="confirmPassword"]', 'new123456');
+      
+      // Submit the form
+      const submitButton = page.locator('button:has-text("Change Password")').nth(1);
+      await submitButton.click();
+      
+      // Check for loading toast (should appear quickly)
+      const loadingToast = page.locator('[data-sonner-toast]').filter({ hasText: 'Changing password' });
+      const hasLoadingToast = await loadingToast.isVisible().catch(() => false);
+      
+      // Should show loading state
+      expect(hasLoadingToast).toBe(true);
+    }
+  });
+
+  test('should validate that success toast only appears on actual success', async ({ page }) => {
+    await page.goto('/settings/security');
+    await page.waitForLoadState('networkidle');
+    
+    // Skip if redirected to login
+    if (page.url().includes('/login')) {
+      return;
+    }
+    
+    const changePasswordButton = page.locator('button', { hasText: 'Change Password' });
+    const isVisible = await changePasswordButton.isVisible().catch(() => false);
+    
+    if (isVisible) {
+      await changePasswordButton.click();
+      
+      // Try multiple invalid scenarios
+      const invalidScenarios = [
+        { current: '', new: 'new123456', confirm: 'new123456', description: 'empty current password' },
+        { current: 'wrong123', new: 'new', confirm: 'new', description: 'too short new password' },
+        { current: 'wrong123', new: 'new123456', confirm: 'different123', description: 'mismatched passwords' },
+        { current: 'definitely-wrong-password', new: 'new123456', confirm: 'new123456', description: 'invalid current password' }
+      ];
+      
+      for (const scenario of invalidScenarios) {
+        // Clear and fill form
+        await page.fill('input[id="currentPassword"]', '');
+        await page.fill('input[id="newPassword"]', '');
+        await page.fill('input[id="confirmPassword"]', '');
+        
+        await page.fill('input[id="currentPassword"]', scenario.current);
+        await page.fill('input[id="newPassword"]', scenario.new);
+        await page.fill('input[id="confirmPassword"]', scenario.confirm);
+        
+        // Submit if button is enabled
+        const submitButton = page.locator('button:has-text("Change Password")').nth(1);
+        const isEnabled = await submitButton.isEnabled().catch(() => false);
+        
+        if (isEnabled) {
+          await submitButton.click();
+          await page.waitForTimeout(2000);
+          
+          // Check that no success toast appears
+          const successToast = page.locator('[data-sonner-toast]').filter({ hasText: 'Password changed successfully' });
+          const hasSuccessToast = await successToast.isVisible().catch(() => false);
+          
+          expect(hasSuccessToast).toBe(false);
+        }
+        
+        // Wait a bit between scenarios
+        await page.waitForTimeout(500);
+      }
+    }
+  });
 });
 
 test.describe('Two-Factor Authentication', () => {

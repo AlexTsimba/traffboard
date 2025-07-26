@@ -64,14 +64,19 @@ const data = {
   ],
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+type AppSidebarProps = React.ComponentProps<typeof Sidebar>
+
+export function AppSidebar({ ...props }: AppSidebarProps) {
+  // Settings and administration moved to AuthNavUser component
+  const fullNavItems = data.navMain
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={fullNavItems} />
       </SidebarContent>
       <SidebarFooter>
         <AuthNavUser />

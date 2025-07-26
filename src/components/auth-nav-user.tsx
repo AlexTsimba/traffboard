@@ -1,7 +1,7 @@
 'use client';
 
 import { SignedIn, SignedOut } from '@daveyplate/better-auth-ui';
-import { User, LogOut, Settings } from 'lucide-react';
+import { User, LogOut, Settings, Shield, Palette, Users, Database } from 'lucide-react';
 import Link from 'next/link';
 import { authClient } from '~/lib/auth-client';
 import {
@@ -16,6 +16,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
 } from '~/components/ui/dropdown-menu';
 import {
   Avatar,
@@ -77,12 +80,56 @@ export function AuthNavUser() {
               align="end"
               sideOffset={4}
             >
-              <DropdownMenuItem asChild>
-                <Link href="/settings">
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger className="flex items-center gap-2">
                   <Settings className="h-4 w-4" />
                   Settings
-                </Link>
-              </DropdownMenuItem>
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  <DropdownMenuItem asChild>
+                    <Link href="/settings/user/account" className="flex items-center gap-2">
+                      <User className="h-4 w-4" />
+                      Account
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/settings/user/security" className="flex items-center gap-2">
+                      <Shield className="h-4 w-4" />
+                      Security
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/settings/user/preferences" className="flex items-center gap-2">
+                      <Palette className="h-4 w-4" />
+                      Preferences
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+              
+              {session?.user?.role === 'admin' && (
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger className="flex items-center gap-2">
+                    <Users className="h-4 w-4" />
+                    Administration
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent>
+                    <DropdownMenuItem asChild>
+                      <Link href="/settings/admin/users" className="flex items-center gap-2">
+                        <Users className="h-4 w-4" />
+                        User Management
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/settings/admin/data" className="flex items-center gap-2">
+                        <Database className="h-4 w-4" />
+                        Data Management
+                      </Link>
+                    </DropdownMenuItem>
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+              )}
+              
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleSignOut}>
                 <LogOut className="h-4 w-4" />

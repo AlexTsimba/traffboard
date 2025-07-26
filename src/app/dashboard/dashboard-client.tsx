@@ -22,6 +22,7 @@ import {
 } from '~/components/ui/card';
 import { ChartErrorBoundary } from '~/components/chart-error-boundary';
 import { IconTrendingUp } from '@tabler/icons-react';
+import { PageContainer } from '~/components/page-container';
 
 export function DashboardClient() {
   const [mounted, setMounted] = React.useState(false);
@@ -60,7 +61,7 @@ export function DashboardClient() {
   }
 
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4 md:px-6 min-h-[calc(100dvh-52px)]">
+    <PageContainer variant="dashboard">
       {/* Welcome Header */}
       <div className="flex items-center justify-between space-y-2">
         <h2 className="text-2xl font-bold tracking-tight">
@@ -183,6 +184,6 @@ export function DashboardClient() {
           </ChartErrorBoundary>
         </div>
       </div>
-      </div>
+    </PageContainer>
   )
 }

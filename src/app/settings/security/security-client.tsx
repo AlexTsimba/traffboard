@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { authClient } from '~/lib/auth-client';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
@@ -19,7 +19,6 @@ export function SecurityClient() {
   const [password, setPassword] = useState('');
   const [totpCode, setTotpCode] = useState('');
   const [totpUri, setTotpUri] = useState('');
-  const [loading, setLoading] = useState(false);
   const [showEnableForm, setShowEnableForm] = useState(false);
   const [showQR, setShowQR] = useState(false);
   
@@ -59,7 +58,7 @@ export function SecurityClient() {
   } | null>(null);
 
   // Load linked accounts on component mount
-  const checkGoogleAccount = async () => {
+  const checkGoogleAccount = useCallback(async () => {
     try {
       const result = await authClient.listAccounts();
       
@@ -96,16 +95,16 @@ export function SecurityClient() {
         setIsGoogleLinked(false);
         setGoogleAccountInfo(null);
       }
-    } catch (err) {
+    } catch {
       // Account check failed - reset to safe state
       setIsGoogleLinked(false);
       setGoogleAccountInfo(null);
     }
-  };
+  }, [session]);
 
   useEffect(() => {
-    checkGoogleAccount();
-  }, [session]); // Re-run when session changes
+    void checkGoogleAccount();
+  }, [session, checkGoogleAccount]); // Re-run when session changes
 
 
   const loadSessions = async () => {
@@ -228,14 +227,16 @@ export function SecurityClient() {
       return;
     }
 
-    setLoading(true);
-
     try {
       const result = await authClient.twoFactor.enable({
         password
       });
 
-      // 2FA enable result handled via result.data.totpURI
+      // Check for errors first before looking for TOTP URI
+      if (result?.error) {
+        securityNotifications.twoFactor.error(result.error.message ?? 'Failed to enable 2FA');
+        return;
+      }
 
       if (result?.data?.totpURI) {
         setTotpUri(result.data.totpURI);
@@ -246,8 +247,6 @@ export function SecurityClient() {
       }
     } catch (err: unknown) {
       securityNotifications.twoFactor.error(err instanceof Error ? err.message : 'Failed to enable 2FA');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -257,25 +256,27 @@ export function SecurityClient() {
       return;
     }
 
-    setLoading(true);
-
     try {
-      await authClient.twoFactor.verifyTotp({
+      const result = await authClient.twoFactor.verifyTotp({
         code: totpCode,
         trustDevice: true
       });
 
-      // Success - reset form and show notification
+      // Check if verification actually succeeded
+      if (result?.error) {
+        securityNotifications.twoFactor.error(result.error.message ?? 'Failed to verify code');
+        return; // Don't reset form on error
+      }
+
+      // Success - reset form
+      securityNotifications.twoFactor.verified();
       setTotpCode('');
       setTotpUri('');
       setShowQR(false);
       setShowEnableForm(false);
-      securityNotifications.twoFactor.verified();
-      // Session will update automatically
     } catch (err: unknown) {
       securityNotifications.twoFactor.error(err instanceof Error ? err.message : 'Failed to verify code');
-    } finally {
-      setLoading(false);
+      // Don't reset form on error
     }
   };
 
@@ -285,20 +286,23 @@ export function SecurityClient() {
       return;
     }
 
-    setLoading(true);
-
     try {
-      await authClient.twoFactor.disable({
+      const result = await authClient.twoFactor.disable({
         password
       });
 
+      // Check if disable actually succeeded before showing success
+      if (result?.error) {
+        securityNotifications.twoFactor.error(result.error.message ?? 'Failed to disable 2FA');
+        return; // Don't reset form on error
+      }
+
+      securityNotifications.twoFactor.disabled();
       setPassword('');
       setShowEnableForm(false);
-      securityNotifications.twoFactor.disabled();
     } catch (err: unknown) {
       securityNotifications.twoFactor.error(err instanceof Error ? err.message : 'Failed to disable 2FA');
-    } finally {
-      setLoading(false);
+      // Don't reset form on error
     }
   };
 
@@ -326,25 +330,25 @@ export function SecurityClient() {
     const changePasswordPromise = authClient.changePassword({
       currentPassword,
       newPassword,
-      revokeOtherSessions: true // Automatically revoke other sessions for security
-    });
-
-    securityNotifications.password.loading(changePasswordPromise);
-
-    try {
-      await changePasswordPromise;
+      revokeOtherSessions: true
+    }).then(async (result) => {
+      // Check for errors in the response
+      if (result?.error) {
+        throw new Error(result.error.message ?? 'Password change failed');
+      }
       
-      // Success - reset form
+      // Success - reset form and reload sessions
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
       setShowChangePasswordForm(false);
-      
-      // Reload sessions since other sessions were revoked
       await loadSessions();
-    } catch (err: unknown) {
-      // Error toast is already shown by the promise handler
-    }
+      
+      return result;
+    });
+
+    // Use centralized promise-based notification
+    securityNotifications.password.loading(changePasswordPromise);
   };
 
   return (
@@ -529,12 +533,11 @@ export function SecurityClient() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter your password"
-                    disabled={loading}
                   />
                 </div>
                 <div className="flex gap-2">
-                  <Button onClick={handleEnable2FA} disabled={loading || !password.trim()}>
-                    {loading ? 'Generating...' : 'Continue'}
+                  <Button onClick={handleEnable2FA} disabled={!password.trim()}>
+                    Continue
                   </Button>
                   <Button 
                     variant="outline" 
@@ -568,13 +571,12 @@ export function SecurityClient() {
                     onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                     placeholder="Enter 6-digit code"
                     maxLength={6}
-                    disabled={loading}
                   />
                 </div>
 
                 <div className="flex gap-2">
-                  <Button onClick={handleVerifyTOTP} disabled={loading || totpCode.length !== 6}>
-                    {loading ? 'Verifying...' : 'Verify & Enable'}
+                  <Button onClick={handleVerifyTOTP} disabled={totpCode.length !== 6}>
+                    Verify & Enable
                   </Button>
                   <Button 
                     variant="outline" 
@@ -601,15 +603,14 @@ export function SecurityClient() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter your password to disable 2FA"
-                    disabled={loading}
                   />
                 </div>
                 <Button 
                   variant="destructive" 
                   onClick={handleDisable2FA} 
-                  disabled={loading || !password.trim()}
+                  disabled={!password.trim()}
                 >
-                  {loading ? 'Disabling...' : 'Disable 2FA'}
+                  Disable 2FA
                 </Button>
               </div>
             )}

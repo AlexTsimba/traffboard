@@ -13,7 +13,7 @@ export const notifications = {
       loading: (promise: Promise<unknown>) => toast.promise(promise, {
         loading: 'Changing password...',
         success: 'Password changed successfully',
-        error: 'Failed to change password'
+        error: (error: Error) => error.message || 'Failed to change password'
       })
     },
     
@@ -33,7 +33,24 @@ export const notifications = {
       }),
       error: (message: string) => toast.error("2FA operation failed", {
         description: message
-      })
+      }),
+      loading: {
+        enable: (promise: Promise<unknown>) => toast.promise(promise, {
+          loading: 'Enabling 2FA...',
+          success: 'Ready to scan QR code',
+          error: (error: Error) => error.message || 'Failed to enable 2FA'
+        }),
+        verify: (promise: Promise<unknown>) => toast.promise(promise, {
+          loading: 'Verifying code...',
+          success: '2FA enabled successfully',
+          error: (error: Error) => error.message || 'Failed to verify code'
+        }),
+        disable: (promise: Promise<unknown>) => toast.promise(promise, {
+          loading: 'Disabling 2FA...',
+          success: '2FA disabled successfully',
+          error: (error: Error) => error.message || 'Failed to disable 2FA'
+        })
+      }
     },
     
     oauth: {
@@ -114,6 +131,73 @@ export const notifications = {
     error: (message: string) => toast.error("Report generation failed", {
       description: message
     })
+  },
+
+  // Admin notifications
+  admin: {
+    users: {
+      created: (email: string) => toast.success("User created successfully", {
+        description: `New user account created for ${email}`,
+        action: {
+          label: 'Copy Credentials',
+          onClick: () => { /* Will be provided by component */ }
+        }
+      }),
+      roleChanged: (email: string, newRole: string) => toast.success("User role updated", {
+        description: `${email} is now ${newRole === 'admin' ? 'an admin' : 'a user'}`
+      }),
+      banned: (email: string) => toast.success("User banned", {
+        description: `${email} has been banned from the system`
+      }),
+      unbanned: (email: string) => toast.success("User unbanned", {
+        description: `${email} can now access the system again`
+      }),
+      deleted: (email: string) => toast.success("User deleted", {
+        description: `${email} has been permanently removed`
+      }),
+      error: (message: string) => toast.error("User management failed", {
+        description: message
+      }),
+      loading: {
+        create: (promise: Promise<unknown>) => toast.promise(promise, {
+          loading: 'Creating user account...',
+          success: 'User created successfully',
+          error: (error: Error) => error.message || 'Failed to create user'
+        }),
+        roleChange: (promise: Promise<unknown>) => toast.promise(promise, {
+          loading: 'Updating user role...',
+          success: 'Role updated successfully',
+          error: (error: Error) => error.message || 'Failed to update role'
+        }),
+        ban: (promise: Promise<unknown>) => toast.promise(promise, {
+          loading: 'Updating ban status...',
+          success: 'Ban status updated',
+          error: (error: Error) => error.message || 'Failed to update ban status'
+        }),
+        delete: (promise: Promise<unknown>) => toast.promise(promise, {
+          loading: 'Deleting user...',
+          success: 'User deleted successfully',
+          error: (error: Error) => error.message || 'Failed to delete user'
+        })
+      }
+    },
+    
+    data: {
+      exported: (type: string) => toast.success("Data exported", {
+        description: `${type} data has been exported successfully`
+      }),
+      imported: (type: string, count: number) => toast.success("Data imported", {
+        description: `Successfully imported ${count} ${type} records`
+      }),
+      error: (message: string) => toast.error("Data operation failed", {
+        description: message
+      }),
+      loading: (promise: Promise<unknown>, operation: string) => toast.promise(promise, {
+        loading: `${operation} data...`,
+        success: `${operation} completed successfully`,
+        error: (error: Error) => error.message || `${operation} failed`
+      })
+    }
   },
 
   // System notifications
@@ -216,4 +300,5 @@ export const authNotifications = {
 export const securityNotifications = notifications.security
 export const analyticsNotifications = notifications.analytics  
 export const reportsNotifications = notifications.reports
+export const adminNotifications = notifications.admin
 export const systemNotifications = notifications.system

@@ -10,10 +10,23 @@ import {
 
 interface ProtectedLayoutProps {
   children: React.ReactNode;
+  sessionProp?: {
+    user: {
+      id: string;
+      name: string;
+      email: string;
+      role?: string;
+    };
+    session: {
+      id: string;
+      expiresAt: Date;
+    };
+  }; // Allow external session to be passed in
 }
 
-export async function ProtectedLayout({ children }: ProtectedLayoutProps) {
-  const session = await auth.api.getSession({
+export async function ProtectedLayout({ children, sessionProp }: ProtectedLayoutProps) {
+  // Use provided session or fetch new one
+  const session = sessionProp ?? await auth.api.getSession({
     headers: await headers()
   });
 

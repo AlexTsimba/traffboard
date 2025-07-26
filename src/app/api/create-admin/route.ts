@@ -1,5 +1,5 @@
-import { auth } from "~/lib/auth";
 import { type NextRequest, NextResponse } from "next/server";
+import { auth } from "~/lib/auth";
 
 interface CreateAdminRequest {
   email: string;
@@ -18,41 +18,53 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create admin user using Better Auth
-    const result = await auth.api.signUpEmail({
+    console.log("Creating admin user with Better Auth server-side API...");
+    
+    // Use Better Auth server-side API directly
+    const userResult = await auth.api.createUser({
       body: {
         email,
         password,
         name,
-        // Set as admin user
-        callbackURL: "/dashboard"
+        role: "admin"
       }
     });
 
-    if (!result.user) {
+    console.log("User creation result:", userResult);
+
+    if (!userResult?.user) {
       return NextResponse.json(
         { error: "Failed to create user" },
         { status: 400 }
       );
     }
 
-    // TODO: Set admin role - updateUser API signature needs investigation
-    // await auth.api.updateUser({ ... });
-
     return NextResponse.json({
       message: "Admin user created successfully",
       user: {
-        id: result.user.id,
-        email: result.user.email,
-        name: result.user.name,
-        role: "admin"
+        id: userResult.user.id,
+        email: userResult.user.email,
+        name: userResult.user.name,
+        role: userResult.user.role
       }
     });
 
   } catch (error) {
     console.error("Admin creation error:", error);
+    
+    // Handle specific Better Auth errors
+    if (error instanceof Error) {
+      if (error.message.includes("already exists") || error.message.includes("duplicate")) {
+        return NextResponse.json(
+          { error: "User with this email already exists" },
+          { status: 409 }
+        );
+      }
+    }
+    
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
-      { error: "Failed to create admin user" },
+      { error: "Failed to create admin user", details: errorMessage },
       { status: 500 }
     );
   }

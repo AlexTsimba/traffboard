@@ -1,10 +1,6 @@
-import { SecurityClient } from './security-client';
-import { ProtectedLayout } from '~/components/protected-layout';
+import { redirect } from 'next/navigation';
 
-export default function SecurityPage() {
-  return (
-    <ProtectedLayout>
-      <SecurityClient />
-    </ProtectedLayout>
-  );
+export default function SecuritySettingsPage() {
+  // Redirect to new user settings security
+  redirect('/settings/user/security');
 }
