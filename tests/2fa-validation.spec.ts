@@ -209,7 +209,7 @@ test.describe('2FA Validation E2E Tests', () => {
       
       // Clear and fill form
       await page.fill('input[id="password"]', '');
-      await page.fill('input[id="password"]', password);
+      await page.fill('input[id="password"]', password ?? '');
       
       // Submit
       const continueButton = page.locator('button:has-text("Continue")');

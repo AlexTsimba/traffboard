@@ -15,7 +15,7 @@ interface ProtectedLayoutProps {
       id: string;
       name: string;
       email: string;
-      role?: string;
+      role?: string | null;
     };
     session: {
       id: string;

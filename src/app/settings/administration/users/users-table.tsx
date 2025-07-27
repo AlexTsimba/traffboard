@@ -75,6 +75,7 @@ import {
 
 import { authClient } from '~/lib/auth-client';
 import { adminNotifications } from '~/lib/toast-utils';
+import { UsersTableSkeleton } from './users-table-skeleton';
 
 interface User {
   id: string;
@@ -135,7 +136,7 @@ const columns: ColumnDef<User>[] = [
       const role = row.getValue('role');
       return (
         <Badge variant={role === 'admin' ? 'default' : 'secondary'}>
-          {role}
+          {String(role)}
         </Badge>
       );
     },
@@ -179,7 +180,7 @@ const columns: ColumnDef<User>[] = [
       );
     },
     cell: ({ row }) => {
-      const date = new Date(row.getValue('createdAt'));
+      const date = new Date(String(row.getValue('createdAt')));
       return date.toLocaleDateString();
     },
   },
@@ -199,7 +200,7 @@ const columns: ColumnDef<User>[] = [
     },
     cell: ({ row }) => {
       const lastSeen = row.getValue('lastSeen');
-      if (!lastSeen) return <span className="text-muted-foreground">Never</span>;
+      if (!lastSeen || typeof lastSeen !== 'string') return <span className="text-muted-foreground">Never</span>;
       
       const date = new Date(lastSeen);
       const now = new Date();
@@ -556,14 +557,7 @@ export function UsersTable() {
   };
 
   if (loading) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-xl font-bold">User Management</h1>
-          <p className="text-muted-foreground">Loading users...</p>
-        </div>
-      </div>
-    );
+    return <UsersTableSkeleton />;
   }
 
   return (

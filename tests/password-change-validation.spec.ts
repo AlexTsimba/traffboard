@@ -187,9 +187,9 @@ test.describe('Password Change Validation E2E Tests', () => {
       await page.fill('input[id="newPassword"]', '');
       await page.fill('input[id="confirmPassword"]', '');
       
-      await page.fill('input[id="currentPassword"]', attempt.current);
-      await page.fill('input[id="newPassword"]', attempt.new);
-      await page.fill('input[id="confirmPassword"]', attempt.confirm);
+      await page.fill('input[id="currentPassword"]', attempt?.current ?? '');
+      await page.fill('input[id="newPassword"]', attempt?.new ?? '');
+      await page.fill('input[id="confirmPassword"]', attempt?.confirm ?? '');
       
       // Submit
       const submitButton = page.locator('button:has-text("Change Password")').nth(1);

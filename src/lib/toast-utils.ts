@@ -186,15 +186,27 @@ export const notifications = {
       exported: (type: string) => toast.success("Data exported", {
         description: `${type} data has been exported successfully`
       }),
-      imported: (type: string, count: number) => toast.success("Data imported", {
-        description: `Successfully imported ${count} ${type} records`
-      }),
+      imported: (type: string, count: number) => {
+        if (count === 0) {
+          return toast.info("No new data imported", {
+            description: `All ${type} records already exist in the database`
+          });
+        }
+        return toast.success("Data imported", {
+          description: `Successfully imported ${count} ${type} records`
+        });
+      },
       error: (message: string) => toast.error("Data operation failed", {
         description: message
       }),
-      loading: (promise: Promise<unknown>, operation: string) => toast.promise(promise, {
-        loading: `${operation} data...`,
-        success: `${operation} completed successfully`,
+      loading: (promise: Promise<{type: string, count: number}>, operation: string) => toast.promise(promise, {
+        loading: `${operation}...`,
+        success: (data: {type: string, count: number}) => {
+          if (data.count === 0) {
+            return `No new ${data.type} records imported - all data already exists`;
+          }
+          return `Successfully imported ${data.count} ${data.type} records`;
+        },
         error: (error: Error) => error.message || `${operation} failed`
       })
     }

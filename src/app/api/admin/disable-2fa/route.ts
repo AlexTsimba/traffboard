@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { userId } = await request.json();
+    const { userId } = await request.json() as { userId: string };
 
     if (!userId) {
       return NextResponse.json(
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     const targetUser = await prisma.user.findUnique({
       where: { id: userId },
       include: { twoFactor: true }
-    });
+    }) as { id: string; email: string; twoFactorEnabled: boolean; twoFactor?: { userId: string } } | null;
 
     if (!targetUser) {
       return NextResponse.json(
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     // Remove 2FA secrets and backup codes
     if (targetUser.twoFactor) {
       await prisma.twoFactor.delete({
-        where: { userId: userId }
+        where: { userId }
       });
     }
 

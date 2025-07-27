@@ -13,7 +13,7 @@ export default async function SettingsLayout({
   });
 
   return (
-    <ProtectedLayout sessionProp={session}>
+    <ProtectedLayout sessionProp={session ?? undefined}>
       {children}
     </ProtectedLayout>
   );
