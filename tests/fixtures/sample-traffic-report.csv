@@ -1,0 +1,5 @@
+date,foreign_brand_id,foreign_partner_id,foreign_campaign_id,foreign_landing_id,traffic_source,device_type,user_agent_family,os_family,country,all_clicks,unique_clicks,registrations_count,ftd_count,deposits_count,cr,cftd,cd,rftd
+2023-01-01,1,123,456,789,google,desktop,Chrome,Windows,US,100,80,10,5,15,0,0,0,0
+2023-01-01,1,123,456,789,facebook,mobile,Safari,iOS,CA,120,90,12,6,18,0,0,0,0
+2023-01-02,1,123,456,789,,desktop,Firefox,Linux,UK,150,110,15,8,20,0,0,0,0
+2023-01-03,1,123,456,789,twitter,tablet,Chrome,Android,AU,200,160,20,10,25,0,0,0,0

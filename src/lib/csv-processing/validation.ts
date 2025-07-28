@@ -13,6 +13,20 @@ export interface ValidationError {
 
 type ValidationRule = (value: string) => boolean;
 
+// Define which fields are nullable (allow empty values)
+const NULLABLE_FIELDS: Record<DataType, string[]> = {
+  traffic_report: ['trafficSource'], // Traffic source can be empty
+  players_data: [
+    'playerId', 'originalPlayerId', 'partnerId', 'campaignId', 'promoId',
+    'prequalified', 'duplicate', 'selfExcluded', 'disabled',
+    'ftdCount', 'depositsCount', 'cashoutsCount', 'casinoBetsCount',
+    'signUpDate', 'firstDepositDate', 'date',
+    'ftdSum', 'depositsSum', 'cashoutsSum', 'casinoRealNgr', 'fixedPerPlayer',
+    'casinoBetsSum', 'casinoWinsSum',
+    'tagClickid', 'tagOs', 'tagSource', 'tagSub2', 'tagWebId'
+  ]
+};
+
 // Validation rules for each field type
 const VALIDATION_RULES: Record<DataType, Record<string, ValidationRule>> = {
   traffic_report: {
@@ -74,13 +88,30 @@ export function validateRecord(
     const value = record[index] ?? '';
     const dbField = getMappedField(header, dataType);
     const validator = rules[dbField];
+    const isNullable = NULLABLE_FIELDS[dataType].includes(dbField);
+    
+    // Skip validation for nullable fields when they are empty
+    if (isNullable && (value === '' || value === null || value === undefined)) {
+      return;
+    }
     
     if (validator && !validator(value)) {
+      let errorMessage = `Invalid value for ${header}`;
+      
+      // Provide specific error messages for common cases
+      if (value === '' || value === null || value === undefined) {
+        errorMessage = `${header} is required`;
+      } else if (dbField === 'date' || header.toLowerCase().includes('date')) {
+        errorMessage = `Invalid date format for ${header}`;
+      } else if (dbField.includes('Count') || dbField.includes('Clicks') || dbField.includes('Id')) {
+        errorMessage = `Invalid numeric value for ${header}`;
+      }
+      
       errors.push({
         row: rowNumber,
         column: header,
         value: value,
-        error: `Invalid value for ${header}`,
+        error: errorMessage,
         severity: 'error'
       });
     }

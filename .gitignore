@@ -44,3 +44,13 @@ yarn-error.log*
 
 # idea files
 .idea
+
+# temp directories
+temp/
+/temp
+tmp/
+/tmp
+
+# test artifacts
+test-results/
+playwright-report/

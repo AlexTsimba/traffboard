@@ -63,6 +63,7 @@ export const FIELD_MAPPINGS = {
     'Partner ID': 'partnerId',
     'partner_id': 'partnerId',
     'partnerId': 'partnerId',
+    'Company Name': 'companyName',
     'Company name': 'companyName',
     'company_name': 'companyName',
     'companyName': 'companyName',
@@ -153,7 +154,29 @@ export type DataType = keyof typeof FIELD_MAPPINGS;
 // Get the mapped field name for a given CSV header
 export function getMappedField(csvHeader: string, dataType: DataType): string {
   const mappings = FIELD_MAPPINGS[dataType] as Record<string, string>;
-  return mappings[csvHeader] ?? csvHeader;
+  
+  // Try exact match first
+  if (mappings[csvHeader]) {
+    return mappings[csvHeader];
+  }
+  
+  // Try case-insensitive match
+  const lowerHeader = csvHeader.toLowerCase();
+  for (const [key, value] of Object.entries(mappings)) {
+    if (key.toLowerCase() === lowerHeader) {
+      return value;
+    }
+  }
+  
+  // If no mapping found, convert to camelCase
+  return csvHeader
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, ' ')
+    .trim()
+    .replace(/\s+/g, ' ')
+    .split(' ')
+    .map((word, index) => index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1))
+    .join('');
 }
 
 // Get all known database fields for a data type

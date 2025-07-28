@@ -16,15 +16,15 @@ interface FieldTransformer {
 const FIELD_TRANSFORMERS: Record<DataType, Record<string, FieldTransformer>> = {
   traffic_report: {
     date: { transform: (val: string) => new Date(val) },
-    foreignBrandId: { transform: (val: string) => parseInt(val) },
-    foreignPartnerId: { transform: (val: string) => parseInt(val) },
-    foreignCampaignId: { transform: (val: string) => parseInt(val) },
-    foreignLandingId: { transform: (val: string) => parseInt(val) },
-    allClicks: { transform: (val: string) => parseInt(val) },
-    uniqueClicks: { transform: (val: string) => parseInt(val) },
-    registrationsCount: { transform: (val: string) => parseInt(val) },
-    ftdCount: { transform: (val: string) => parseInt(val) },
-    depositsCount: { transform: (val: string) => parseInt(val) },
+    foreignBrandId: { transform: (val: string) => Math.floor(Number(val)) },
+    foreignPartnerId: { transform: (val: string) => Math.floor(Number(val)) },
+    foreignCampaignId: { transform: (val: string) => Math.floor(Number(val)) },
+    foreignLandingId: { transform: (val: string) => Math.floor(Number(val)) },
+    allClicks: { transform: (val: string) => Math.floor(Number(val)) },
+    uniqueClicks: { transform: (val: string) => Math.floor(Number(val)) },
+    registrationsCount: { transform: (val: string) => Math.floor(Number(val)) },
+    ftdCount: { transform: (val: string) => Math.floor(Number(val)) },
+    depositsCount: { transform: (val: string) => Math.floor(Number(val)) },
     trafficSource: { transform: (val: string) => val || '', allowNull: false },
     deviceType: { transform: (val: string) => val || '' },
     userAgentFamily: { transform: (val: string) => val || '' },
@@ -33,19 +33,19 @@ const FIELD_TRANSFORMERS: Record<DataType, Record<string, FieldTransformer>> = {
   },
 
   players_data: {
-    playerId: { transform: (val: string) => val ? parseInt(val) : null, allowNull: true },
-    originalPlayerId: { transform: (val: string) => val ? parseInt(val) : null, allowNull: true },
-    partnerId: { transform: (val: string) => val ? parseInt(val) : null, allowNull: true },
-    campaignId: { transform: (val: string) => val ? parseInt(val) : null, allowNull: true },
-    promoId: { transform: (val: string) => val ? parseInt(val) : null, allowNull: true },
-    prequalified: { transform: (val: string) => val ? parseInt(val) : null, allowNull: true },
-    duplicate: { transform: (val: string) => val ? parseInt(val) : null, allowNull: true },
-    selfExcluded: { transform: (val: string) => val ? parseInt(val) : null, allowNull: true },
-    disabled: { transform: (val: string) => val ? parseInt(val) : null, allowNull: true },
-    ftdCount: { transform: (val: string) => val ? parseInt(val) : null, allowNull: true },
-    depositsCount: { transform: (val: string) => val ? parseInt(val) : null, allowNull: true },
-    cashoutsCount: { transform: (val: string) => val ? parseInt(val) : null, allowNull: true },
-    casinoBetsCount: { transform: (val: string) => val ? parseInt(val) : null, allowNull: true },
+    playerId: { transform: (val: string) => val ? Math.floor(Number(val)) : null, allowNull: true },
+    originalPlayerId: { transform: (val: string) => val ? Math.floor(Number(val)) : null, allowNull: true },
+    partnerId: { transform: (val: string) => val ? Math.floor(Number(val)) : null, allowNull: true },
+    campaignId: { transform: (val: string) => val ? Math.floor(Number(val)) : null, allowNull: true },
+    promoId: { transform: (val: string) => val ? Math.floor(Number(val)) : null, allowNull: true },
+    prequalified: { transform: (val: string) => val ? Math.floor(Number(val)) : null, allowNull: true },
+    duplicate: { transform: (val: string) => val ? Math.floor(Number(val)) : null, allowNull: true },
+    selfExcluded: { transform: (val: string) => val ? Math.floor(Number(val)) : null, allowNull: true },
+    disabled: { transform: (val: string) => val ? Math.floor(Number(val)) : null, allowNull: true },
+    ftdCount: { transform: (val: string) => val ? Math.floor(Number(val)) : null, allowNull: true },
+    depositsCount: { transform: (val: string) => val ? Math.floor(Number(val)) : null, allowNull: true },
+    cashoutsCount: { transform: (val: string) => val ? Math.floor(Number(val)) : null, allowNull: true },
+    casinoBetsCount: { transform: (val: string) => val ? Math.floor(Number(val)) : null, allowNull: true },
     signUpDate: { transform: (val: string) => val ? new Date(val) : null, allowNull: true },
     firstDepositDate: { transform: (val: string) => val ? new Date(val) : null, allowNull: true },
     date: { transform: (val: string) => val ? new Date(val) : null, allowNull: true },
@@ -70,6 +70,12 @@ const FIELD_TRANSFORMERS: Record<DataType, Record<string, FieldTransformer>> = {
   }
 };
 
+// Columns to filter out during processing (user requirement)
+const FILTERED_COLUMNS: Record<DataType, string[]> = {
+  traffic_report: ['cr', 'cftd', 'cd', 'rftd'],
+  players_data: []
+};
+
 function transformRecord(
   record: string[], 
   headers: string[], 
@@ -78,6 +84,7 @@ function transformRecord(
   const data: Record<string, unknown> = {};
   const transformers = FIELD_TRANSFORMERS[dataType];
   const knownFields = getKnownFields(dataType);
+  const filteredColumns = FILTERED_COLUMNS[dataType];
   
   // Debug logging for first few transformations
   const isDebugRow = Math.random() < 0.01; // Log ~1% of records for debugging
@@ -90,6 +97,14 @@ function transformRecord(
   headers.forEach((header, index) => {
     const value = record[index] ?? '';
     const dbField = getMappedField(header, dataType);
+    
+    // Filter out unwanted columns
+    if (filteredColumns.includes(header.toLowerCase())) {
+      if (isDebugRow) {
+        console.log(`🚫 Filtered column "${header}" skipped`);
+      }
+      return;
+    }
     
     if (isDebugRow) {
       console.log(`🔄 Header "${header}" -> DB field "${dbField}" -> Value: "${value}"`);

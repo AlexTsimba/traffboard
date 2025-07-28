@@ -1,0 +1,7 @@
+Date,Foreign Brand ID,Foreign Partner ID,Foreign Campaign ID,Foreign Landing ID,All Clicks,Unique Clicks,Registrations Count,FTD Count,Deposits Count,Traffic Source,Device Type,User Agent Family,OS Family,Country
+2023-01-01,1,123,456,789,100,80,10,5,15,google,desktop,Chrome,Windows,US
+2023-01-01,1,123,456,789,120,90,12,6,18,facebook,mobile,Safari,iOS,CA
+2023-01-01,1,123,456,789,100,80,10,5,15,google,desktop,Chrome,Windows,US
+2023-01-02,1,123,456,789,150,110,15,8,20,,desktop,Firefox,Linux,UK
+2023-01-01,1,123,456,789,120,90,12,6,18,facebook,mobile,Safari,iOS,CA
+2023-01-04,1,123,456,789,250,200,25,12,30,instagram,mobile,Chrome,Android,DE
