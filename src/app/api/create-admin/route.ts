@@ -1,5 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { auth } from "~/lib/auth";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 interface CreateAdminRequest {
   email: string;
@@ -20,13 +23,12 @@ export async function POST(request: NextRequest) {
 
     console.log("Creating admin user with Better Auth server-side API...");
     
-    // Use Better Auth server-side API directly
-    const userResult = await auth.api.createUser({
+    // Use Better Auth server-side API directly (correct method)
+    const userResult = await auth.api.signUpEmail({
       body: {
         email,
         password,
-        name,
-        role: "admin"
+        name
       }
     });
 
@@ -39,13 +41,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Update user role to admin using Prisma (Better Auth pattern)
+    const adminUser = await prisma.user.update({
+      where: { id: userResult.user.id },
+      data: { 
+        role: 'admin',
+        emailVerified: true 
+      }
+    });
+
     return NextResponse.json({
       message: "Admin user created successfully",
       user: {
-        id: userResult.user.id,
-        email: userResult.user.email,
-        name: userResult.user.name,
-        role: userResult.user.role
+        id: adminUser.id,
+        email: adminUser.email,
+        name: adminUser.name,
+        role: adminUser.role
       }
     });
 
