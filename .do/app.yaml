@@ -1,0 +1,38 @@
+name: traffboard
+region: fra
+services:
+  - name: web-service
+    github:
+      repo: AlexTsimba/traffboard
+      branch: main
+      deploy_on_push: true
+    build_command: npm ci && npx prisma generate && npm run build && node scripts/production-admin.cjs
+    run_command: npm start
+    environment_slug: node-js
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    http_port: 3000
+    routes:
+      - path: /
+    envs:
+      - key: DATABASE_URL
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+      - key: BETTER_AUTH_SECRET
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+      - key: BETTER_AUTH_URL
+        value: https://traffboard-7gwxh.ondigitalocean.app
+        scope: RUN_AND_BUILD_TIME
+      - key: NEXT_PUBLIC_BETTER_AUTH_URL
+        value: https://traffboard-7gwxh.ondigitalocean.app
+        scope: RUN_AND_BUILD_TIME
+      - key: NODE_ENV
+        value: production
+        scope: RUN_AND_BUILD_TIME
+      - key: SKIP_ENV_VALIDATION
+        value: "true"
+        scope: RUN_AND_BUILD_TIME
+      - key: NPM_CONFIG_PRODUCTION
+        value: "false"
+        scope: BUILD_TIME
