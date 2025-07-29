@@ -7,7 +7,6 @@ import { Label } from '~/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card';
 import { Alert, AlertDescription } from '~/components/ui/alert';
 import { CheckCircle, AlertCircle, Loader2, Shield } from 'lucide-react';
-import { authClient } from '~/lib/auth-client';
 import { useRouter } from 'next/navigation';
 
 interface SetupStatus {
@@ -41,19 +40,18 @@ export default function SetupPage() {
   useEffect(() => {
     const checkAdminStatus = async () => {
       try {
-        // Try to list users - this will fail if no admin exists or user isn't authenticated
-        const response = await authClient.admin.listUsers({ query: {} });
+        // Check setup status using GET endpoint
+        const response = await fetch('/api/setup');
         
-        if (response.data?.users) {
-          // Check if any admin users exist
-          const adminUsers = response.data.users.filter(user => user.role === 'admin');
+        if (response.ok) {
+          const data = await response.json() as { hasAdminUsers: boolean };
           setSetupStatus({
-            hasAdminUsers: adminUsers.length > 0,
+            hasAdminUsers: data.hasAdminUsers,
             loading: false,
             error: null
           });
         } else {
-          // No admin users or can't access - setup needed
+          // If API fails, assume setup is needed
           setSetupStatus({
             hasAdminUsers: false,
             loading: false,
@@ -61,7 +59,7 @@ export default function SetupPage() {
           });
         }
       } catch {
-        // Error likely means no admin access - setup needed
+        // If fetch fails, assume setup is needed
         setSetupStatus({
           hasAdminUsers: false,
           loading: false,
@@ -102,26 +100,33 @@ export default function SetupPage() {
     setCreateStatus({ loading: true, success: false, error: null });
 
     try {
-      // Use the same method as your existing user management
-      const response = await authClient.admin.createUser({
-        name: formData.name,
-        email: formData.email,
-        password: formData.password,
-        role: 'admin'
+      // Use the setup API endpoint for initial admin creation
+      const response = await fetch('/api/setup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+        }),
       });
 
-      if (response.data) {
+      const data = await response.json() as { success?: boolean; error?: string };
+
+      if (response.ok && data.success) {
         setCreateStatus({ loading: false, success: true, error: null });
         
         // Redirect to login after 2 seconds
         setTimeout(() => {
           router.push('/login');
         }, 2000);
-      } else if (response.error) {
+      } else {
         setCreateStatus({ 
           loading: false, 
           success: false, 
-          error: response.error.message ?? 'Failed to create admin user' 
+          error: data.error ?? 'Failed to create admin user' 
         });
       }
     } catch (error) {
