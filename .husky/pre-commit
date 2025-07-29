@@ -1,2 +1,10 @@
 #!/bin/sh
+
+# Fix output display issues in Git 2.36.0+ (Context7 best practice)
+if sh -c ": >/dev/tty" >/dev/null 2>/dev/null; then exec >/dev/tty 2>&1; fi
+
+# Skip environment validation for linting (performance optimization)
+export SKIP_ENV_VALIDATION=true
+
+# Run lint-staged with optimized config
 npx lint-staged

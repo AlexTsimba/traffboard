@@ -1,0 +1,31 @@
+#!/bin/sh
+
+# Validate local setup matches CI/CD expectations
+# This ensures no surprises when code reaches production
+
+echo "🔍 Validating CI/CD alignment..."
+
+# Check TypeScript compilation (same as CI)
+echo "📝 TypeScript check..."
+if ! npx tsc --noEmit --pretty; then
+  echo "❌ TypeScript errors found - CI will fail"
+  exit 1
+fi
+
+# Check linting (same as CI)
+echo "🔧 ESLint check..."
+if ! npm run lint; then
+  echo "❌ Linting errors found - CI will fail"  
+  exit 1
+fi
+
+# Check if tests would pass (optional but recommended)
+if [ -f "playwright.config.ts" ]; then
+  echo "🧪 Quick test validation..."
+  # Don't run full tests, just validate they can start
+  if ! npx playwright install-deps --dry-run >/dev/null 2>&1; then
+    echo "⚠️  Test dependencies may be missing"
+  fi
+fi
+
+echo "✅ Local setup aligned with CI/CD requirements"

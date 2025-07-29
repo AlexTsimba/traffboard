@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# Auto-cleanup old lint-staged stashes (keep only latest 1)
+# This prevents stash accumulation while maintaining safety
+if [ "$(git stash list | grep 'lint-staged automatic backup' | wc -l)" -gt 1 ]; then
+  # Drop all but the most recent lint-staged backup
+  git stash list | grep -n 'lint-staged automatic backup' | tail -n +2 | cut -d: -f1 | while read line; do
+    git stash drop stash@{$((line-1))} 2>/dev/null || true
+  done
+fi
