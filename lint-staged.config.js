@@ -1,12 +1,17 @@
 /**
+ * @fileoverview Advanced lint-staged configuration optimized for TypeScript + Next.js
  * @type {import('lint-staged').Configuration}
- * Advanced lint-staged configuration optimized for TypeScript + Next.js
  */
 import path from 'path'
 
-const buildEslintCommand = (filenames) =>
-  `next lint --fix --file ${filenames
-    .map((f) => path.relative(process.cwd(), f))
+/**
+ * Build ESLint command with Next.js integration for staged files
+ * @param {string[]} stagedFileNames - Array of staged file paths
+ * @returns {string} ESLint command with file arguments
+ */
+const buildEslintCommand = (stagedFileNames) =>
+  `next lint --fix --file ${stagedFileNames
+    .map((/** @type {string} */ f) => path.relative(process.cwd(), f))
     .join(' --file ')}`
 
 export default {

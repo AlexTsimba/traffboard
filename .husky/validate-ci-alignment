@@ -1,31 +1,66 @@
 #!/bin/sh
 
-# Validate local setup matches CI/CD expectations
-# This ensures no surprises when code reaches production
+# CI/CD Alignment Validator - Research-backed implementation
+# Based on Husky best practices and 2024 CI/CD patterns
+# Sources: Context7 /typicode/husky docs + web research
 
 echo "🔍 Validating CI/CD alignment..."
 
-# Check TypeScript compilation (same as CI)
+# Performance optimization: Skip environment validation during alignment check
+export SKIP_ENV_VALIDATION=true
+
+# Build validation (matches CI exactly)
+echo "🏗️  Build check..."
+if ! npm run build >/dev/null 2>&1; then
+  echo "❌ Build errors found - CI will fail"
+  echo "💡 Run 'npm run build' to see detailed errors"
+  exit 1
+fi
+
+# TypeScript compilation (matches CI exactly)
 echo "📝 TypeScript check..."
 if ! npx tsc --noEmit --pretty; then
   echo "❌ TypeScript errors found - CI will fail"
   exit 1
 fi
 
-# Check linting (same as CI)
+# Linting (matches CI exactly)
 echo "🔧 ESLint check..."
 if ! npm run lint; then
   echo "❌ Linting errors found - CI will fail"  
   exit 1
 fi
 
-# Check if tests would pass (optional but recommended)
+# Format validation (matches CI expectations)
+echo "💅 Format check..."
+if ! npm run format:check >/dev/null 2>&1; then
+  echo "❌ Formatting issues found - run 'npm run format:write'"
+  exit 1
+fi
+
+# Test validation (if tests exist, validate they can run)
 if [ -f "playwright.config.ts" ]; then
-  echo "🧪 Quick test validation..."
-  # Don't run full tests, just validate they can start
-  if ! npx playwright install-deps --dry-run >/dev/null 2>&1; then
-    echo "⚠️  Test dependencies may be missing"
+  echo "🧪 Test environment validation..."
+  # Check if Playwright browsers are installed
+  if ! npx playwright install --dry-run >/dev/null 2>&1; then
+    echo "⚠️  Playwright browsers may need installation: npx playwright install"
+  fi
+  
+  # Validate test setup doesn't have critical errors
+  if ! npm run test:setup >/dev/null 2>&1; then
+    echo "⚠️  Test setup may have issues - check database configuration"
   fi
 fi
 
-echo "✅ Local setup aligned with CI/CD requirements"
+# Dependency validation (matches CI lockfile check)
+echo "📦 Dependency validation..."
+if [ -f "package-lock.json" ]; then
+  if ! npm ci --dry-run >/dev/null 2>&1; then
+    echo "❌ Package lock file issues - CI will fail"
+    echo "💡 Run 'npm install' to fix lockfile"
+    exit 1
+  fi
+fi
+
+echo "✅ Local setup fully aligned with CI/CD pipeline"
+echo "🚀 Ready for production deployment"

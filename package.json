@@ -90,6 +90,7 @@
     "@vitest/ui": "^2.1.8",
     "eslint": "^9.23.0",
     "eslint-config-next": "^15.2.3",
+    "lint-staged": "^16.1.2",
     "msw": "^2.6.8",
     "otpauth": "^9.4.0",
     "postcss": "^8.5.3",
