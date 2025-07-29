@@ -22,6 +22,7 @@ test('debug navigation elements', async ({ page }) => {
   
   for (let i = 0; i < buttons.length; i++) {
     const button = buttons[i];
+    if (!button) continue;
     const text = await button.textContent();
     const role = await button.getAttribute('role');
     const type = await button.getAttribute('type');

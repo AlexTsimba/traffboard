@@ -39,6 +39,7 @@ test('debug admin user role', async ({ page }) => {
   
   for (let i = 0; i < dropdownItems.length; i++) {
     const item = dropdownItems[i];
+    if (!item) continue;
     const text = await item.textContent();
     console.log(`Dropdown item ${i}: "${text}"`);
   }

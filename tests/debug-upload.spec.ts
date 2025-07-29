@@ -73,7 +73,7 @@ test('debug upload flow', async ({ page }) => {
   });
   
   // Check console for errors
-  const logs = [];
+  const logs: string[] = [];
   page.on('console', msg => logs.push(`${msg.type()}: ${msg.text()}`));
   
   if (logs.length > 0) {
