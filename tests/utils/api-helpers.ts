@@ -28,7 +28,7 @@ export async function testRequest(url: string, options: RequestInit = {}) {
       const { GET, POST } = await import('~/app/api/auth/[...all]/route')
       const handler = options.method === 'POST' ? POST : GET
       return handler(request)
-    } catch (error) {
+    } catch {
       // Return proper error response for Better Auth endpoints
       return new Response(JSON.stringify({ error: 'Auth handler not available' }), {
         status: 500,
@@ -37,10 +37,6 @@ export async function testRequest(url: string, options: RequestInit = {}) {
     }
   }
   
-  if (url.startsWith('/api/create-admin')) {
-    const { POST } = await import('~/app/api/create-admin/route')
-    return POST(request)
-  }
   
   if (url.startsWith('/api/test-db')) {
     const { GET } = await import('~/app/api/test-db/route')
@@ -66,7 +62,7 @@ export async function makeAuthenticatedRequest(
     ...options,
     headers: {
       ...createAuthHeaders(sessionToken),
-      ...(options.headers || {})
+      ...(options.headers ?? {})
     }
   })
 }
