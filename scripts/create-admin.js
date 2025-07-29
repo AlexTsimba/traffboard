@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 
-// Initialize Prisma with retry logic for build environments
+// Initialize Prisma with retry logic for build environments  
 let prisma: PrismaClient;
 try {
   prisma = new PrismaClient();
