@@ -113,12 +113,9 @@
   },
   "packageManager": "npm@10.8.2",
   "lint-staged": {
-    "*.{ts,tsx,js,jsx}": [
+    "**/*.{ts,tsx,js,jsx}": [
       "bash -c 'SKIP_ENV_VALIDATION=true next lint --fix'",
-      "npx tsc --noEmit"
-    ],
-    "tests/*.{ts,tsx}": [
-      "npx tsc --noEmit"
+      "() => 'npx tsc --noEmit'"
     ]
   }
 }
