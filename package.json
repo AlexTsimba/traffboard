@@ -115,7 +115,7 @@
   "lint-staged": {
     "**/*.{ts,tsx,js,jsx}": [
       "bash -c 'SKIP_ENV_VALIDATION=true next lint --fix'",
-      "() => 'npx tsc --noEmit'"
+      "npx tsc --noEmit --pretty"
     ]
   }
 }
