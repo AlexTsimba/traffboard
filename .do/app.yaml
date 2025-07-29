@@ -1,5 +1,6 @@
 name: traffboard
 region: fra
+# Force deployment update
 services:
   - name: web-service
     github:
