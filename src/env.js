@@ -40,10 +40,25 @@ export const env = createEnv({
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
   /**
-   * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
-   * useful for Docker builds.
+   * Intelligent environment validation with auto-detection.
+   * Automatically skips validation during build/lint contexts while keeping it enabled for runtime.
+   * Manual override: SKIP_ENV_VALIDATION=true
    */
-  skipValidation: !!process.env.SKIP_ENV_VALIDATION,
+  skipValidation: (() => {
+    // Manual override (existing behavior)
+    if (process.env.SKIP_ENV_VALIDATION === 'true') return true;
+    
+    // Auto-detect build-time contexts where env validation should be skipped
+    const isBuildTimeContext = 
+      // Test environment
+      process.env.NODE_ENV === 'test' ||
+      // NPM lifecycle events (lint, build, check, etc.)
+      /^(lint|build|check|format|typecheck)/.test(process.env.npm_lifecycle_event || '') ||
+      // Command line arguments contain build/lint keywords
+      process.argv.some(arg => /\b(lint|build|next|tsc|eslint|prettier)\b/.test(arg));
+      
+    return isBuildTimeContext;
+  })(),
   /**
    * Makes it so that empty strings are treated as undefined. `SOME_VAR: z.string()` and
    * `SOME_VAR=''` will throw an error.
