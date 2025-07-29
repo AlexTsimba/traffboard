@@ -4,8 +4,14 @@ import { admin, twoFactor } from "better-auth/plugins";
 import { nextCookies } from "better-auth/next-js";
 import { PrismaClient } from "@prisma/client";
 
-// Validate required environment variables
-if (!process.env.BETTER_AUTH_SECRET) {
+// Intelligent environment validation - skip during build/test contexts
+const isTestOrBuildContext = 
+  process.env.NODE_ENV === 'test' ||
+  process.env.SKIP_ENV_VALIDATION === 'true' ||
+  /^(lint|build|check|format|typecheck|test)/.test(process.env.npm_lifecycle_event ?? '') ||
+  process.argv.some(arg => /\b(lint|build|next|tsc|eslint|prettier|playwright|vitest)\b/.test(arg));
+
+if (!isTestOrBuildContext && !process.env.BETTER_AUTH_SECRET) {
   throw new Error('BETTER_AUTH_SECRET environment variable is required');
 }
 
