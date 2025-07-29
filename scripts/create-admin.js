@@ -1,11 +1,21 @@
 import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
+// Initialize Prisma with retry logic for build environments
+let prisma;
+try {
+  prisma = new PrismaClient();
+} catch (error) {
+  console.error('❌ Failed to initialize Prisma client:', error.message);
+  process.exit(1);
+}
 
 async function createAdminUser() {
   const email = process.env.ADMIN_EMAIL || 'test-admin@example.com';
   const password = process.env.ADMIN_PASSWORD || 'admin123!';
   const name = process.env.ADMIN_NAME || 'Admin User';
+
+  console.log('🔧 Starting admin user creation...');
+  console.log(`📧 Target email: ${email}`);
 
   try {
     // Check if user already exists
@@ -19,7 +29,9 @@ async function createAdminUser() {
     }
 
     // Use Better Auth server API to create user properly
+    console.log('🔐 Loading Better Auth...');
     const { auth } = await import('../src/lib/auth.ts');
+    console.log('✅ Better Auth loaded successfully');
     
     const result = await auth.api.signUpEmail({
       body: {
