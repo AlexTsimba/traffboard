@@ -43,6 +43,9 @@ jobs:
       env:
         DATABASE_URL: "postgresql://test:test@localhost:5432/test_db"
     
+    - name: Install Playwright browsers
+      run: npx playwright install --with-deps
+    
     - name: Run TypeScript check
       run: npx tsc --noEmit
     
