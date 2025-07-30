@@ -51,6 +51,10 @@ jobs:
     
     - name: Run linter
       run: npm run lint --if-present
+      env:
+        DATABASE_URL: "postgresql://test:test@localhost:5432/test_db"
+        BETTER_AUTH_SECRET: "test-secret-key-32-chars-long-abcd" 
+        BETTER_AUTH_URL: "http://localhost:3000"
     
     - name: Run tests
       run: npm test --if-present
