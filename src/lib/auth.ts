@@ -4,14 +4,8 @@ import { admin, twoFactor } from "better-auth/plugins";
 import { nextCookies } from "better-auth/next-js";
 import { PrismaClient } from "@prisma/client";
 
-// Intelligent environment validation - skip during build/test contexts
-const isTestOrBuildContext = 
-  process.env.NODE_ENV === 'test' ||
-  process.env.SKIP_ENV_VALIDATION === 'true' ||
-  /^(lint|build|check|format|typecheck|test)/.test(process.env.npm_lifecycle_event ?? '') ||
-  process.argv.some(arg => /\b(lint|build|next|tsc|eslint|prettier|playwright|vitest)\b/.test(arg));
-
-if (!isTestOrBuildContext && !process.env.BETTER_AUTH_SECRET) {
+// Validate required environment variables
+if (!process.env.BETTER_AUTH_SECRET) {
   throw new Error('BETTER_AUTH_SECRET environment variable is required');
 }
 
@@ -34,14 +28,30 @@ export const auth = betterAuth({
     enabled: true,
     requireEmailVerification: false // Internal tool - admin creates users
   },
-  socialProviders: process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET ? {
-    google: {
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      prompt: "select_account",
-      disableSignUp: true, // Prevent new user creation via OAuth
-    },
-  } : {},
+  socialProviders: {
+    ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && {
+      google: {
+        clientId: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        prompt: "select_account",
+        disableSignUp: true, // Prevent new user creation via OAuth
+      }
+    }),
+    ...(process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET && {
+      github: {
+        clientId: process.env.GITHUB_CLIENT_ID,
+        clientSecret: process.env.GITHUB_CLIENT_SECRET,
+        disableSignUp: true,
+      }
+    }),
+    ...(process.env.MICROSOFT_CLIENT_ID && process.env.MICROSOFT_CLIENT_SECRET && {
+      microsoft: {
+        clientId: process.env.MICROSOFT_CLIENT_ID,
+        clientSecret: process.env.MICROSOFT_CLIENT_SECRET,
+        disableSignUp: true,
+      }
+    })
+  },
   session: {
     expiresIn: 60 * 60 * 24 * 7, // 7 days
     updateAge: 60 * 60 * 24      // 24 hours  

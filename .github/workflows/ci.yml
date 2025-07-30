@@ -59,16 +59,17 @@ jobs:
         BETTER_AUTH_SECRET: "test-secret-key-32-chars-long-abcd" 
         BETTER_AUTH_URL: "http://localhost:3000"
   
-  deploy:
-    needs: build-and-test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Deploy to DigitalOcean
-      uses: digitalocean/app_action@v2
-      with:
-        token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+# Deployment is handled by DigitalOcean auto-deploy (deploy_on_push: true in .do/app.yaml)
+  # deploy:
+  #   needs: build-and-test
+  #   runs-on: ubuntu-latest
+  #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+  #   
+  #   steps:
+  #   - name: Checkout code
+  #     uses: actions/checkout@v4
+  #     
+  #   - name: Deploy to DigitalOcean
+  #     uses: digitalocean/app_action/deploy@v2
+  #     with:
+  #       token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
